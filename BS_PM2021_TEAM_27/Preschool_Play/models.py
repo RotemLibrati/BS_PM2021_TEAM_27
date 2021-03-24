@@ -13,3 +13,10 @@ class Message(models.Model):
 
     def __str__(self):
         return str(self.sender + ' to ' + self.receiver)
+
+
+class Child(models.Model):
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
+    score = models.IntegerField(default=0)
+    suspended = models.BooleanField(default=False)
