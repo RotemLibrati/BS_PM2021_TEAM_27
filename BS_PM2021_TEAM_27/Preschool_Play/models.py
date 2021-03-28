@@ -42,4 +42,10 @@ class Media(models.Model):
 
 class Child(models.Model):
     name = models.CharField(max_length=20)
-    parent = models.ForeignKey(User, related_name='son', on_delete=models.SET_NULL)
+    parent = models.ForeignKey(User, related_name='son', on_delete=models.SET_NULL, null=True)
+
+
+class Score(models.Model):
+    amount = models.IntegerField(default=0)
+    date = models.DateTimeField(auto_now_add=True, blank=True)
+    comment = models.CharField(max_length=250, blank=True, null=True)
