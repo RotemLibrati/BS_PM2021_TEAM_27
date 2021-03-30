@@ -46,3 +46,18 @@ def send_game_info(request):
     except (Child.DoesNotExist):
         pass
     return HttpResponse('Failed')
+
+
+@login_required
+def parent_page(request):
+    try:
+        user_profile = UserProfile.objects.get(user=request.user)
+        if user_profile.type == 'parent':
+            context = {}
+            context['user'] = request.user
+            context['profile'] = user_profile
+            context['children'] = list(Child.objects.filter(parent=request.user))
+            return render(request, 'Preschool_Play/parent-page.html', context)
+    except (UserProfile.DoesNotExist):
+        pass
+    return render(request, 'Preschool_Play/error.html', {'message': 'Unauthorized user'})
