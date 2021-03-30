@@ -47,5 +47,8 @@ class Child(models.Model):
 
 class Score(models.Model):
     amount = models.IntegerField(default=0)
-    date = models.DateTimeField(auto_now_add=True, blank=True)
     comment = models.CharField(max_length=250, blank=True, null=True)
+    date = models.DateTimeField(default=datetime.now, blank=True)
+
+    def __str__(self):
+        return f'Amount: {self.amount.__str__()}, Comment: {self.comment}, Date: {self.date.__str__()}'
