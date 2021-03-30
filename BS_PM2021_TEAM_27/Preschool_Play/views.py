@@ -1,9 +1,10 @@
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 from django.db.models.functions import ExtractDay, ExtractMonth, ExtractYear
+from django.http import HttpResponse
 from django.shortcuts import render
-
 from .models import *
+import json
 
 
 def index(request):
@@ -26,3 +27,22 @@ def admin_graphs(request):
             Sum('amount')))
         return render(request, 'Preschool_Play/admin-graphs.html', context)
     return render(request, 'Preschool_Play/error.html', {'message': 'Unauthorized user'})
+
+
+@login_required
+def send_game_info(request):
+    data = request.body.decode('utf-8')
+    received_json_data = json.loads(data)
+    child_name = received_json_data['child']
+    _amount = received_json_data['amount']
+    _comment = received_json_data['comment']
+    try:
+        connected_user = request.user
+        child = Child.objects.get(name=child_name)
+        if child.parent == connected_user:
+            sc = Score(child=child, amount=_amount, comment=_comment)
+            sc.save()
+            return HttpResponse("Score saved")
+    except (Child.DoesNotExist):
+        pass
+    return HttpResponse('Failed')
