@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Graphs</title>
+</head>
+<body>
+    <h1>Admin Graphs</h1>
+    <ul>
+        {% for date in scoreData %}
+            <li>
+                Date: {{date.d}}/{{date.m}}/{{date.y}} Score: {{date.amount__sum}}
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
