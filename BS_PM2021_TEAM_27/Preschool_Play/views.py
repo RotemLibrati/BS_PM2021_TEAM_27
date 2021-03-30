@@ -21,6 +21,7 @@ def admin_graphs(request):
     context['user'] = request.user
     if request.user.is_authenticated:
         context['profile'] = UserProfile.objects.get(user=request.user)
+    if context['profile'].is_admin:
         context['scoreData'] = list(Score.objects.values(d=ExtractDay('date'), m=ExtractMonth('date'), y=ExtractYear('date')).annotate(
             Sum('amount')))
         return render(request, 'Preschool_Play/admin-graphs.html', context)
