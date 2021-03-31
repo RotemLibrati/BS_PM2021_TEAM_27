@@ -35,7 +35,8 @@ class Message(models.Model):
 class Media(models.Model):
     TYPES = (('music', 'music'), ('picture', 'picture'))
     name = models.CharField(max_length=20)
-    path = models.CharField(max_length=100, choices=TYPES, default='picture')
+    path = models.CharField(max_length=200)
+    type = models.CharField(max_length=200, choices=TYPES, default='picture')
 
 
 class Child(models.Model):
