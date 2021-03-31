@@ -1,3 +1,4 @@
+from builtins import sorted
 from datetime import timezone
 from multiprocessing.dummy import list
 from django.utils import timezone
@@ -8,7 +9,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from .models import *
 import json
-from datetime import datetime, timedelta
+
 
 
 
@@ -64,3 +65,14 @@ def show_suspend_user(request):
             users.append(user)
     context = {'users': users, 'suspend_user': suspend_user}
     return render(request, 'Preschool_Play/show-suspend-user.html', context)
+
+
+def filter_suspension(request):
+    user_profile = UserProfile.objects.all()
+    suspend_user = [] # list of suspended users
+    for user in user_profile:
+        if user.suspension_time >= timezone.now():
+            suspend_user.append(user)
+    suspend_user.sort(key=lambda r: r.suspension_time) # filter by time left
+    context = {'suspend_user': suspend_user}
+    return render(request, 'Preschool_Play/filter-suspension.html', context)
