@@ -1,3 +1,6 @@
+from datetime import timezone
+from multiprocessing.dummy import list
+from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 from django.db.models.functions import ExtractDay, ExtractMonth, ExtractYear
@@ -5,6 +8,8 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from .models import *
 import json
+from datetime import datetime, timedelta
+
 
 
 def index(request):
@@ -46,3 +51,16 @@ def send_game_info(request):
     except (Child.DoesNotExist):
         pass
     return HttpResponse('Failed')
+
+
+def show_suspend_user(request):
+    user_profile = UserProfile.objects.all()
+    users = [] # List of unsuspended users
+    suspend_user = [] # lost of suspended users
+    for user in user_profile:
+        if user.suspension_time >= timezone.now():
+            suspend_user.append(user)
+        else:
+            users.append(user)
+    context = {'users': users, 'suspend_user': suspend_user}
+    return render(request, 'Preschool_Play/show-suspend-user.html', context)
