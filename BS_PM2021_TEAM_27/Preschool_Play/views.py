@@ -9,9 +9,11 @@ from django.db.models import Sum
 from django.db.models.functions import ExtractDay, ExtractMonth, ExtractYear
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
+from pip._vendor.requests.compat import str
+
 from .models import *
 import json
-from .forms import AddMediaForm
+from .forms import AddMediaForm, DeleteMediaForm
 
 
 
@@ -101,3 +103,14 @@ def add_media(request):
     return render(request, 'Preschool_Play/add-media.html', context)
 
 
+def delete_media(request):
+    if request.method == 'POST':
+        form = DeleteMediaForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data['name']
+            media_delete = Media.objects.filter(name=name).delete()
+            return HttpResponseRedirect(reverse('Preschool_Play:index'))
+    else:
+        form = DeleteMediaForm()
+    context = {'form': form}
+    return render(request, 'Preschool_Play/delete-media.html', context)
