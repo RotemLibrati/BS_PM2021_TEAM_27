@@ -1,4 +1,6 @@
+from builtins import sorted
 from datetime import timezone
+
 
 from django.urls import reverse
 from django.utils import timezone
@@ -7,6 +9,7 @@ from django.db.models import Sum
 from django.db.models.functions import ExtractDay, ExtractMonth, ExtractYear
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
+
 
 from .models import *
 import json
@@ -112,16 +115,23 @@ def delete_media(request):
     context = {'form': form}
     return render(request, 'Preschool_Play/delete-media.html', context)
 
-@login_required
-def parent_page(request):
-    try:
-        user_profile = UserProfile.objects.get(user=request.user)
-        if user_profile.type == 'parent':
-            context = {}
-            context['user'] = request.user
-            context['profile'] = user_profile
-            context['children'] = list(Child.objects.filter(parent=request.user))
-            return render(request, 'Preschool_Play/parent-page.html', context)
-    except (UserProfile.DoesNotExist):
-        pass
-    return render(request, 'Preschool_Play/error.html', {'message': 'Unauthorized user'})
+
+def show_users(request):
+    user_profile = UserProfile.objects.all()
+    context = {'up': user_profile}
+    return render(request, 'Preschool_Play/show-users.html', context)
+
+
+def search_user(request):
+    user_profile = UserProfile.objects.get(user=request.user)
+    if request.method == 'POST':
+        fname = request.POST['fname']
+        lname = request.POST['lname']
+    if user_profile.is_admin:
+        unconfirmed_users = list(UserProfile.objects.filter(auth=False))
+        context = {}
+        for x in unconfirmed_users:
+            if x.user.first_name == fname and x.user.last_name == lname:
+                context['profile'] = x
+        return render(request, 'Preschool_Play/search-user.html', context)
+    return render(request, 'Preschool_Play/error.html', {'message':'unauthorized'})

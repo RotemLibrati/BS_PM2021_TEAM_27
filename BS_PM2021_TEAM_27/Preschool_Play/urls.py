@@ -12,6 +12,6 @@ urlpatterns = [
     path('filter-suspension', views.filter_suspension, name='filter-suspension'),
     path('show-users', views.show_users, name='show-users'),
     path('search-user', views.search_user, name='search-user'),
-    # path('add-media', views.add_media, name='add-media'),
-    # path('delete-media', views.delete_media, name='delete-media'),
+    path('add-media', views.add_media, name='add-media'),
+    path('delete-media', views.delete_media, name='delete-media'),
 ]
