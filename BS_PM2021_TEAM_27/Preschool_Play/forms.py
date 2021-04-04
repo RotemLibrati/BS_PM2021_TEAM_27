@@ -6,6 +6,11 @@ from django.contrib.auth.models import User
 from .models import Media
 
 
+class LoginForm(forms.Form):
+    user_name = forms.CharField(initial='')
+    password = forms.CharField(widget=forms.PasswordInput(), initial='')
+
+
 class AddMediaForm(forms.Form):
     TYPE = (('picture', 'Picture'), ('music', 'Music'))
     name = forms.CharField(max_length=20)
