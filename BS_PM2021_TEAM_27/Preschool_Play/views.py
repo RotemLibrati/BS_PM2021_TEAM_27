@@ -114,3 +114,18 @@ def filter_suspension(request):
 #         form = DeleteMediaForm()
 #     context = {'form': form}
 #     return render(request, 'Preschool_Play/delete-media.html', context)
+
+
+@login_required
+def search_user(request, fname, lname):
+    user_profile = UserProfile.objects.get(user=request.user)
+    if user_profile.is_admin:
+        unconfirmed_users = list(UserProfile.objects.filter(auth=False))
+        context = {}
+        for x in unconfirmed_users:
+            if x.user.first_name == fname and x.user.last_name == lname:
+                context['profile'] = x
+        return render(request, 'Preschool_Play/search-user.html', context)
+    return render(request, 'Preschool_Play/error.html', {'message':'unauthorized'})
+
+
