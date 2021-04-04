@@ -116,8 +116,17 @@ def filter_suspension(request):
 #     return render(request, 'Preschool_Play/delete-media.html', context)
 
 
-@login_required
-def search_user(request, fname, lname):
+def show_users(request):
+    user_profile = UserProfile.objects.all()
+    context = {'up': user_profile}
+    return render(request, 'Preschool_Play/show-users.html', context)
+
+
+# @login_required
+def search_user(request):
+    if request.method == 'POST':
+        fname = request.POST['fname']
+        lname = request.POST['lname']
     user_profile = UserProfile.objects.get(user=request.user)
     if user_profile.is_admin:
         unconfirmed_users = list(UserProfile.objects.filter(auth=False))
