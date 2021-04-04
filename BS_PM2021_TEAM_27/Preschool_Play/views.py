@@ -1,6 +1,4 @@
-from builtins import sorted
 from datetime import timezone
-from multiprocessing.dummy import list
 
 from django.urls import reverse
 from django.utils import timezone
@@ -9,7 +7,6 @@ from django.db.models import Sum
 from django.db.models.functions import ExtractDay, ExtractMonth, ExtractYear
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
-from pip._vendor.requests.compat import str
 
 from .models import *
 import json
