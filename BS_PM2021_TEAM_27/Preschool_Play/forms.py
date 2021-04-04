@@ -6,7 +6,6 @@ from django.contrib.auth.models import User
 from .models import Media
 
 
-
 class AddMediaForm(forms.Form):
     TYPE = (('picture', 'Picture'), ('music', 'Music'))
     name = forms.CharField(max_length=20)
