@@ -78,7 +78,7 @@ def filter_suspension(request):
     for user in user_profile:
         if user.suspension_time >= timezone.now():
             suspend_user.append(user)
-    suspend_user.sort(key=lambda r: r.suspension_time) # filter by time left
+    suspend_user.sort(key=lambda r: r.suspension_time) # filter by time left and keeping track of the time user has been suspended.
     context = {'suspend_user': suspend_user}
     return render(request, 'Preschool_Play/filter-suspension.html', context)
 
