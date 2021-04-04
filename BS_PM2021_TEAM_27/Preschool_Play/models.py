@@ -6,7 +6,6 @@ from datetime import timedelta, datetime
 class UserProfile(models.Model):
     TYPES = (('parent', 'parent'), ('teacher', 'teacher'))
     user = models.OneToOneField(User, related_name='profile', on_delete=models.CASCADE, blank=True, null=True)
-    # son = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True, related_name='dad')
     address = models.CharField(max_length=100, default='')
     age = models.IntegerField(default=0)
     points = models.IntegerField(default=0)
@@ -36,7 +35,8 @@ class Message(models.Model):
 class Media(models.Model):
     TYPES = (('music', 'music'), ('picture', 'picture'))
     name = models.CharField(max_length=20)
-    path = models.CharField(max_length=100, choices=TYPES, default='picture')
+    path = models.CharField(max_length=200)
+    type = models.CharField(max_length=200, choices=TYPES, default='picture')
 
 
 class Child(models.Model):
