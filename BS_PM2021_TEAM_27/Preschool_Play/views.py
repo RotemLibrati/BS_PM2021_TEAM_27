@@ -1,6 +1,6 @@
 from builtins import sorted
 from datetime import timezone
-from multiprocessing.dummy import list
+# from multiprocessing.dummy import list
 
 from django.urls import reverse
 from django.utils import timezone
@@ -13,7 +13,7 @@ from pip._vendor.requests.compat import str
 
 from .models import *
 import json
-from .forms import AddMediaForm, DeleteMediaForm
+# from .forms import AddMediaForm, DeleteMediaForm
 
 
 
@@ -83,34 +83,34 @@ def filter_suspension(request):
     return render(request, 'Preschool_Play/filter-suspension.html', context)
 
 
-def add_media(request):
-    if request.method == 'POST':
-        form = AddMediaForm(request.POST)
-        if form.is_valid():
-            name = form.cleaned_data['name']
-            path = form.cleaned_data['path']
-            type = form.cleaned_data['type']
-            media = Media.objects.all()
-            for m in media:
-                if m.name == name:
-                    return HttpResponse("This name is already exist")
-            new = Media.objects.create(name=name, path=path, type=type)
-            new.save()
-            return HttpResponseRedirect(reverse('Preschool_Play:index'))
-    else:
-        form = AddMediaForm()
-        context = {'form': form}
-    return render(request, 'Preschool_Play/add-media.html', context)
+# def add_media(request):
+#     if request.method == 'POST':
+#         form = AddMediaForm(request.POST)
+#         if form.is_valid():
+#             name = form.cleaned_data['name']
+#             path = form.cleaned_data['path']
+#             type = form.cleaned_data['type']
+#             media = Media.objects.all()
+#             for m in media:
+#                 if m.name == name:
+#                     return HttpResponse("This name is already exist")
+#             new = Media.objects.create(name=name, path=path, type=type)
+#             new.save()
+#             return HttpResponseRedirect(reverse('Preschool_Play:index'))
+#     else:
+#         form = AddMediaForm()
+#         context = {'form': form}
+#     return render(request, 'Preschool_Play/add-media.html', context)
 
 
-def delete_media(request):
-    if request.method == 'POST':
-        form = DeleteMediaForm(request.POST)
-        if form.is_valid():
-            name = form.cleaned_data['name']
-            media_delete = Media.objects.filter(name=name).delete()
-            return HttpResponseRedirect(reverse('Preschool_Play:index'))
-    else:
-        form = DeleteMediaForm()
-    context = {'form': form}
-    return render(request, 'Preschool_Play/delete-media.html', context)
+# def delete_media(request):
+#     if request.method == 'POST':
+#         form = DeleteMediaForm(request.POST)
+#         if form.is_valid():
+#             name = form.cleaned_data['name']
+#             media_delete = Media.objects.filter(name=name).delete()
+#             return HttpResponseRedirect(reverse('Preschool_Play:index'))
+#     else:
+#         form = DeleteMediaForm()
+#     context = {'form': form}
+#     return render(request, 'Preschool_Play/delete-media.html', context)
