@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Suspend user</title>
+</head>
+<body>
+
+    <h1>Users</h1>
+    {% for u in users %}
+    <tr>
+        <td>{{ u.user }}</td>
+        <br>
+    </tr>
+    {% endfor %}
+    <h1>Suspend users</h1>
+    {% for u in suspend_user %}
+    <tr>
+        <td>{{ u.user }}</td>
+        <td>{{ u.suspension_time }}</td>
+        <br>
+    </tr>
+    {% endfor %}
+
+</body>
+</html>
