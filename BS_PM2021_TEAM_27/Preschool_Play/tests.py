@@ -30,6 +30,11 @@ class TestUserProfileModel(TestCase):
                            suspension_time=datetime.now())
         self.assertIs(user.was_born_recently_for_parent(), True)
 
+    def test_new_profile_is_not_authorized_by_default(self):
+        user = UserProfile(user=None, address='asd', age=25, points=0, type='parent', is_admin=False,
+                           suspension_time=datetime.now())
+        self.assertEquals(user.auth, False, 'new user should not be authenticated by default')
+
 
 class TestSuspensionView(TestCase):
     def setUp(self):
@@ -46,6 +51,35 @@ class TestSuspensionView(TestCase):
         self.assertContains(response, "Users")
         self.assertContains(response, "Suspend user")
         self.assertTemplateUsed(response, 'Preschool_Play/show-suspend-user.html')
+
+
+class TestSearchUserView(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='Qwerty246')
+        self.user.save()
+
+    def test_non_admin_access_denial(self):
+        self.profile = UserProfile(user=self.user, is_admin=False)
+        self.profile.save()
+        self.client = Client()
+        self.client.login(username='testuser', password='Qwerty246')
+        data = {'fname': 'fname', 'lname': 'lname'}
+        response = self.client.post(reverse('Preschool_Play:search-user'), data=data)
+        self.assertTemplateUsed(response, 'Preschool_Play/error.html')
+
+    def test_search_existing_user(self):
+        self.profile = UserProfile(user=self.user, is_admin=True)
+        self.profile.save()
+        self.client = Client()
+        self.client.login(username='testuser', password='Qwerty246')
+        user2 = User.objects.create_user(username='nuser', password='Qwerty246', first_name='nuser', last_name='luser')
+        user2.save()
+        profile2 = UserProfile(user=user2, is_admin=False)
+        profile2.save()
+        data = {'fname': 'nuser', 'lname': 'luser'}
+        response = self.client.post(reverse('Preschool_Play:search-user'), data=data)
+        self.assertTemplateUsed(response, 'Preschool_Play/search-user.html')
+        self.assertContains(response, 'nuser')
 
 
 class TestMediaView(TestCase):
