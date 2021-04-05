@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
 from django.urls import reverse, resolve
-from django.test import TestCase, Client
+from django.test import TestCase, Client, tag
 from .models import UserProfile, Media
 from datetime import datetime
 from . import views
@@ -9,6 +9,7 @@ from . import views
 # Create your tests here.
 
 
+@tag('unit-test')
 class TestUserProfileModel(TestCase):
     def test_was_born_recently_with_negative_age(self):
         past_user = UserProfile(user=None, address='asd', age=-5, points=0, type='parent', is_admin=False,
@@ -36,6 +37,7 @@ class TestUserProfileModel(TestCase):
         self.assertEquals(user.auth, False, 'new user should not be authenticated by default')
 
 
+@tag('unit-test')
 class TestSuspensionView(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username='testuser', password='Qwerty246')
@@ -53,6 +55,7 @@ class TestSuspensionView(TestCase):
         self.assertTemplateUsed(response, 'Preschool_Play/show-suspend-user.html')
 
 
+@tag('unit-test')
 class TestSearchUserView(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username='testuser', password='Qwerty246')
@@ -82,6 +85,7 @@ class TestSearchUserView(TestCase):
         self.assertContains(response, 'nuser')
 
 
+@tag('unit-test')
 class TestMediaView(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username='testuser', password='Qwerty246')
@@ -104,6 +108,7 @@ class TestMediaView(TestCase):
         self.assertContains(response, "Delete Media")
 
 
+@tag('unit-test')
 class TestUrl(TestCase):
     def setUp(self):
         self.client.force_login(User.objects.get_or_create(username='testuser')[0])
