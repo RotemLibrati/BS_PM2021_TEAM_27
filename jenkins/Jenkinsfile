@@ -26,10 +26,12 @@ pipeline {
                 steps {
             dir('./') {
               withEnv(["HOME=${env.WORKSPACE}"]) {
-              sh """ #!/bin/bash
+              sh """
+                set +e
+                #!/bin/bash
                 cd BS_PM2021_TEAM_27
                 ls
-                python -m coverage run manage.py jenkins
+                python -m coverage run manage.py test --tag=unit-test
                 """
               }
             }
