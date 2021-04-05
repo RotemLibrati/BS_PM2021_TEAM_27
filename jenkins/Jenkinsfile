@@ -22,7 +22,6 @@ pipeline {
           }
           }
         }
-
           stage('Run Unit Tests') {
                 steps {
             dir('./') {
@@ -30,11 +29,8 @@ pipeline {
               sh """ #!/bin/bash
                 cd BS_PM2021_TEAM_27
                 ls
-                python -m coverage run manage.py test --tag=unit-test
+                python -m coverage run manage.py jenkins
                 """
-
-
-
               }
             }
           }
