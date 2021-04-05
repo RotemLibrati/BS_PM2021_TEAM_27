@@ -27,7 +27,7 @@ pipeline {
                 steps {
             dir("./") {
               withEnv(["HOME=${env.WORKSPACE}"]) {
-                sh "python -m coverage run manage.py test --tag=unit-test"
+                sh "python -m coverage run manage.py tests --tag=unit-test"
 
               }
             }
