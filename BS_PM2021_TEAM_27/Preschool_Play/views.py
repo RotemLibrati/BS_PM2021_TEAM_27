@@ -136,7 +136,7 @@ def search_user(request):
     return render(request, 'Preschool_Play/error.html', {'message': 'unauthorized'})
 
 
-def login_view(request):
+def login_view(request):  # login view
     if request.method == "POST":
         form = LoginForm(request.POST)
         if form.is_valid():
@@ -158,7 +158,7 @@ def login_view(request):
     return render(request, 'Preschool_Play/login.html', context)
 
 @login_required
-def logout(request):
+def logout(request):  # logout view
     userprofile = UserProfile.objects.get(user=request.user)
     td = timezone.now() - userprofile.last_login
     userprofile.total_minutes += (td.total_seconds() / 60)
