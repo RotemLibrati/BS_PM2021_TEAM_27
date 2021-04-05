@@ -1,0 +1,37 @@
+{% block title %}
+<h2>Inbox</h2>
+{% endblock %}
+
+{% block data %}
+<h3>Messages received</h3>
+<ol>
+    {% if not messages_received %}
+    <p>No Messages.</p>
+    {% else %}
+    {% for message in messages_received %}
+    <li>
+        From: {{message.sender}}. Subject: {{message.subject}}. Sent at: {{message.sent_date}}.
+        <a href="{% url 'Preschool_Play:view-message' message.id %}"class="button alt small"> Open</a>
+        <a href="/sign-language-teacher/inbox/delete/{{ message.id }}"class="button alt small"> Delete</a>
+    </li>
+    {% endfor %}
+    {% endif %}
+</ol>
+<h3>Messages sent</h3>
+<ol>
+    {% if not messages_sent %}
+    <p>No Messages.</p>
+    {% else %}
+    {% for message in messages_sent %}
+    <li>
+        To: {{message.receiver}}. Subject: {{message.subject}}. Sent at: {{message.sent_date}}
+        <a href="/sign-language-teacher/inbox/{{ message.id }}"class="button alt small"> Open</a>
+        <a href="/sign-language-teacher/inbox/delete/{{ message.id }}"class="button alt small"> Delete</a>
+    </li>
+    {% endfor %}
+    {% endif %}
+</ol>
+<br>
+<a href="{% url 'Preschool_Play:new-message' %}"class="button alt">Send new message</a><br>
+<a href="{% url 'Preschool_Play:index' %}"class="button alt">Return to main menu</a><br>
+{% endblock %}
