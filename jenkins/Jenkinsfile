@@ -27,10 +27,11 @@ pipeline {
             dir('./') {
               withEnv(["HOME=${env.WORKSPACE}"]) {
               sh """
-                set +e
                 #!/bin/bash
                 cd BS_PM2021_TEAM_27
                 ls
+                python manage.py makemigrations
+                python manage.py migrate
                 python -m coverage run manage.py test --tag=unit-test
                 """
               }
