@@ -14,5 +14,8 @@
     {% endif %}
     <li><a href="{% url 'Preschool_Play:logout' %}">Logout</a><br>
     {% endif %}
+    {% if not user.is_authenticated %}
+        <li><a href="{% url 'Preschool_Play:login' %}">Login</a><br>
+    {% endif %}
 </body>
 </html>
