@@ -30,7 +30,11 @@ pipeline {
                     pip install -r backend/requirements.txt
                     python backend/test.py
                 '''
+                sh '''
+                    $CMD || echo "string doesn't exist."
+                  '''
             }
+
         }
     }
 }
