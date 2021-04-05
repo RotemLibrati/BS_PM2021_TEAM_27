@@ -12,9 +12,7 @@ from django.shortcuts import render
 
 from .models import *
 import json
-from .forms import AddMediaForm, DeleteMediaForm, LoginForm
-
-
+from .forms import AddMediaForm, DeleteMediaForm, LoginForm, MessageForm
 
 
 def index(request):
@@ -168,3 +166,5 @@ def logout(request):
     if hasattr(request, 'user'):
         request.user = AnonymousUser()
     return HttpResponseRedirect(reverse('Preschool_Play:index'))
+
+

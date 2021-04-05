@@ -1,0 +1,22 @@
+<form action="{% url 'Preschool_Play:new-message' %}" method="POST">
+    {% csrf_token %}
+    <h2>New message</h2>
+    <h3>Users:</h3><br>
+    {% if user_profile.type == 'teacher' %}
+    <h>Parent list:</h><br>
+    <ul>
+        {% for f in profiles %}
+
+        {% if f.type == 'teacher' %}
+        <li>
+            <h>{{f}}</h><br>
+        </li>
+        {% endif %}
+
+        {% endfor %}
+    </ul>
+    {% endif%}
+    {{form.as_p}}
+    <button type="submit">Submit</button>
+</form>
+<a href="{% url 'Preschool_Play:index' %}">Return to main menu</a><br>

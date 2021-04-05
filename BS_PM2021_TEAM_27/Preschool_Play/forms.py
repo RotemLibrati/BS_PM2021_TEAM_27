@@ -22,3 +22,11 @@ class DeleteMediaForm(forms.Form):
     set = Media.objects.all()
     MEDIA = list(map(lambda x: (str(x.name), str(x.name)), set))
     name = forms.CharField(widget=forms.Select(choices=MEDIA))
+
+
+class MessageForm(forms.Form):
+    set = User.objects.all()
+    USERS = list(map(lambda x: (str(x.username), str(x.username)), set))
+    receiver = forms.CharField(widget=forms.Select(choices=USERS))
+    subject = forms.CharField(max_length=50, initial='message subject')
+    body = forms.CharField(max_length=5000, widget=forms.Textarea)

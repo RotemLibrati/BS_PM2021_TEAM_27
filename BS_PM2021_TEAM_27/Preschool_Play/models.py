@@ -56,3 +56,5 @@ class Score(models.Model):
 
     def __str__(self):
         return f'Child: {self.child.__str__()}, Amount: {self.amount.__str__()}, Comment: {self.comment}, Date: {self.date.__str__()}'
+
+
