@@ -27,9 +27,15 @@ pipeline {
                 steps {
             dir('./') {
               withEnv(["HOME=${env.WORKSPACE}"]) {
-                sh script: "cd BS_PM2021_TEAM_27"
-                sh "ls"
-                sh script: "python -m coverage run manage.py test --tag=unit-test"
+              sh """ #!/bin/bash
+                cd BS_PM2021_TEAM_27
+                ls
+                cd BS_PM2021_TEAM_27
+                ls
+                python -m coverage run manage.py test --tag=unit-test
+                """
+
+
 
               }
             }
