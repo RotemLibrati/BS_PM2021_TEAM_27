@@ -1,37 +1,38 @@
 pipeline {
-    agent none
+    agent { docker { image 'python:3.8-buster' } }
+    triggers {
+      githubPush()
+  }
+
     stages {
-        stage('build') {
-            agent {
-                docker {
-                    image 'python:3.8'
-                }
-            }
+        stage('Build') {
             steps {
-                sh '''
-                    set +e
-                    python -m venv .venv
-                    . .venv/bin/activate
-                    pip install -r backend/requirements.txt
-                '''
-            }
-        }
-        stage('test') {
-            agent {
-                docker {
-                    image 'python:3.8'
-                }
-            }
-            steps {
-                 sh '''
-                    set +e
-                    python -m venv .venv
-                    . .venv/bin/activate
-                    pip install -r backend/requirements.txt
-                    python backend/test.py
-                '''
+                sh 'python --version'
             }
 
         }
+        stage('setup'){
+          steps{
+            withEnv(["HOME=${env.WORKSPACE}"]){
+
+            dir('jenkins'){
+            sh 'python -m pip install -r requirements.txt'
+            }
+            echo 'hello'
+          }
+          }
+        }
+
+          stage('Run Unit Tests') {
+                steps {
+            dir("ganMoodle_project") {
+              withEnv(["HOME=${env.WORKSPACE}"]) {
+                sh "python -m coverage run manage.py test --tag=unit-test"
+
+              }
+            }
+          }
+            }
     }
+
 }
