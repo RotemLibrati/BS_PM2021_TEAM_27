@@ -1,4 +1,3 @@
-from builtins import sorted
 from datetime import timezone
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import AnonymousUser
@@ -9,13 +8,9 @@ from django.db.models import Sum
 from django.db.models.functions import ExtractDay, ExtractMonth, ExtractYear
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
-
-
 from .models import *
 import json
 from .forms import AddMediaForm, DeleteMediaForm, LoginForm
-
-
 
 
 def index(request):
@@ -34,8 +29,9 @@ def admin_graphs(request):
     if request.user.is_authenticated:
         context['profile'] = UserProfile.objects.get(user=request.user)
     if context['profile'].is_admin:
-        context['scoreData'] = list(Score.objects.values(d=ExtractDay('date'), m=ExtractMonth('date'), y=ExtractYear('date')).annotate(
-            Sum('amount')))
+        context['scoreData'] = list(
+            Score.objects.values(d=ExtractDay('date'), m=ExtractMonth('date'), y=ExtractYear('date')).annotate(
+                Sum('amount')))
         return render(request, 'Preschool_Play/admin-graphs.html', context)
     return render(request, 'Preschool_Play/error.html', {'message': 'Unauthorized user'})
 
@@ -61,8 +57,8 @@ def send_game_info(request):
 
 def show_suspend_user(request):
     user_profile = UserProfile.objects.all()
-    users = [] # List of unsuspended users
-    suspend_user = [] # lost of suspended users
+    users = []  # List of unsuspended users
+    suspend_user = []  # lost of suspended users
     for user in user_profile:
         if user.suspension_time >= timezone.now():
             suspend_user.append(user)
@@ -74,11 +70,12 @@ def show_suspend_user(request):
 
 def filter_suspension(request):
     user_profile = UserProfile.objects.all()
-    suspend_user = [] # list of suspended users
+    suspend_user = []  # list of suspended users
     for user in user_profile:
         if user.suspension_time >= timezone.now():
             suspend_user.append(user)
-    suspend_user.sort(key=lambda r: r.suspension_time) # filter by time left and keeping track of the time user has been suspended.
+    suspend_user.sort(
+        key=lambda r: r.suspension_time)  # filter by time left and keeping track of the time user has been suspended.
     context = {'suspend_user': suspend_user}
     return render(request, 'Preschool_Play/filter-suspension.html', context)
 
@@ -134,7 +131,7 @@ def search_user(request):
             if x.user.first_name == fname and x.user.last_name == lname:
                 context['profile'] = x
         return render(request, 'Preschool_Play/search-user.html', context)
-    return render(request, 'Preschool_Play/error.html', {'message':'unauthorized'})
+    return render(request, 'Preschool_Play/error.html', {'message': 'unauthorized'})
 
 
 def login_view(request):
@@ -157,6 +154,7 @@ def login_view(request):
         'form': form,
     }
     return render(request, 'Preschool_Play/login.html', context)
+
 
 @login_required
 def logout(request):
