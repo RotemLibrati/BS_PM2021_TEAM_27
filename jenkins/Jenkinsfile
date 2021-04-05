@@ -28,6 +28,10 @@ pipeline {
               withEnv(["HOME=${env.WORKSPACE}"]) {
               sh """
                 ls
+                cd jenkins
+                python -m pip install -r requirements.txt
+                cd ..
+                ls
                 cd BS_PM2021_TEAM_27
                 ls
                 python -m coverage run manage.py test --tag=unit-test
