@@ -1,11 +1,136 @@
+from django.test import TestCase
 from django.contrib.auth.models import User
 from django.urls import reverse, resolve
+from django.test import TestCase, Client
+from .models import *
 from django.test import TestCase, Client, tag
 from .models import *
 from datetime import datetime
 from . import views
 # py manage.py test
 # Create your tests here.
+
+
+class TestInboxView(TestCase):
+    def test_without_login(self):
+        c = Client()
+        response = c.get(reverse('Preschool_Play:inbox'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Not logged in")
+
+    def test_with_no_messages(self):
+        c = Client()
+        user = User.objects.create_user(username='tester', password='qwerty246')
+        user.save()
+        user_profile = UserProfile.objects.create(user=user)
+        user_profile.save()
+        c.force_login(user)
+        response = c.get(reverse('Preschool_Play:inbox'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'Preschool_Play/inbox.html')
+        self.assertEquals(len(response.context['messages_received']), 0)
+        self.assertEquals(len(response.context['messages_sent']), 0)
+
+    def test_with_message_received(self):
+        c = Client()
+        user = User.objects.create_user(username='tester1', password='qwerty246')
+        user.save()
+        user_profile = UserProfile.objects.create(user=user)
+        user_profile.save()
+        user2 = User.objects.create_user(username='tester2', password='qwerty246')
+        user2.save()
+        user_profile2 = UserProfile.objects.create(user=user2)
+        user_profile2.save()
+        message = Message(sender=user2, receiver=user, body='hello')
+        message.save()
+        c.force_login(user)
+        response = c.get(reverse('Preschool_Play:inbox'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'Preschool_Play/inbox.html')
+        self.assertEquals(len(response.context['messages_received']), 1)
+        self.assertEquals(len(response.context['messages_sent']), 0)
+
+    def test_with_message_sent(self):
+        c = Client()
+        user = User.objects.create_user(username='tester1', password='qwerty246')
+        user.save()
+        user_profile = UserProfile.objects.create(user=user)
+        user_profile.save()
+        user2 = User.objects.create_user(username='tester2', password='qwerty246')
+        user2.save()
+        user_profile2 = UserProfile.objects.create(user=user2)
+        user_profile2.save()
+        message = Message(sender=user2, receiver=user, body='hello')
+        message.save()
+        c.force_login(user2)
+        response = c.get(reverse('Preschool_Play:inbox'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'Preschool_Play/inbox.html')
+        self.assertEquals(len(response.context['messages_received']), 0)
+        self.assertEquals(len(response.context['messages_sent']), 1)
+
+
+class TestViewMessage(TestCase):
+    def test_message_content(self):
+        c = Client()
+        user = User.objects.create_user(username='tester1', password='qwerty246')
+        user.save()
+        user_profile = UserProfile.objects.create(user=user)
+        user_profile.save()
+        user2 = User.objects.create_user(username='tester2', password='qwerty246')
+        user2.save()
+        user_profile2 = UserProfile.objects.create(user=user2)
+        user_profile2.save()
+        message = Message(sender=user2, receiver=user, body='hello')
+        message.save()
+        c.force_login(user2)
+        response = c.get(reverse('Preschool_Play:view-message', args=[message.id]))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'Preschool_Play/message.html')
+        self.assertContains(response, 'hello')
+
+    # def test_message_does_not_exist(self):
+    #     c = Client()
+    #     user = User.objects.create_user(username='tester1', password='qwerty246')
+    #     user.save()
+    #     user_profile = UserProfile.objects.create(user=user)
+    #     user_profile.save()
+    #     c.force_login(user)
+    #     response = c.get(reverse('Preschool_Play:view-message', args=[3]))
+    #     self.assertEqual(response.status_code, 200)
+        #self.assertTemplateUsed(response, 'Preschool_Play/error.html')
+        #self.assertContains(response, 'Message getting failed')
+
+
+class TestNewMessage(TestCase):
+    def test_new_message_template_content(self):
+        c = Client()
+        user = User.objects.create_user(username='tester1', password='qwerty246')
+        user.save()
+        user_profile = UserProfile.objects.create(user=user)
+        user_profile.save()
+        c.force_login(user)
+        response = c.get(reverse('Preschool_Play:new-message'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'Preschool_Play/new-message.html')
+        self.assertContains(response, 'New message')
+
+    def test_message_post(self):
+        c = Client()
+        user = User.objects.create_user(username='tester1', password='qwerty246')
+        user.save()
+        user_profile = UserProfile.objects.create(user=user)
+        user_profile.save()
+        user2 = User.objects.create_user(username='tester2', password='qwerty246')
+        user2.save()
+        user_profile2 = UserProfile.objects.create(user=user2)
+        user_profile2.save()
+        message = {'receiver': user, 'subject': 'subject', 'body': 'body'}
+        c.force_login(user2)
+        response = c.post(reverse('Preschool_Play:new-message'), data=message)
+        self.assertRedirects(response, reverse('Preschool_Play:inbox'))
+        m = Message.objects.get(receiver=user, sender=user2)
+        self.assertIsNotNone(m)
 
 
 @tag('unit-test')
@@ -161,7 +286,26 @@ class TestParentView(TestCase):
 #         response = self.client.get(reverse('Preschool_Play:delete-media'))
 #         self.assertEqual(response.status_code, 200)
 #         self.assertContains(response, "Delete Media")
+class TestMediaView(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='Qwerty246')
+        self.user.save()
+        self.profile = UserProfile(user=self.user, is_admin=True)
+        self.profile.save()
+        self.client = Client()
+        self.client.login(username='testuser', password='Qwerty246')
 
+    def test_with_add_media(self):
+        response = self.client.get(reverse('Preschool_Play:add-media'))
+        self.assertEqual(response.status_code, 200)
+        add_media = Media(name='name', path='www/rrr/ttt', type='picture')
+        add_media.save()
+        self.assertContains(response, "Add Media")
+
+    def test_with_delete_media(self):
+        response = self.client.get(reverse('Preschool_Play:delete-media'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Delete Media")
 
 @tag('unit-test')
 class TestUrl(TestCase):
@@ -172,6 +316,13 @@ class TestUrl(TestCase):
         url = reverse('Preschool_Play:show-suspend-user')
         self.assertEqual(resolve(url).func, views.show_suspend_user)
 
+    def test_Preschool_Play_add_media_url_is_resolved(self):
+        url = reverse('Preschool_Play:add-media')
+        self.assertEqual(resolve(url).func, views.add_media)
+
+    def test_Preschool_Play_delete_media_url_is_resolved(self):
+        url = reverse('Preschool_Play:delete-media')
+        self.assertEqual(resolve(url).func, views.delete_media)
     # def test_Preschool_Play_add_media_url_is_resolved(self):
     #     url = reverse('Preschool_Play:add-media')
     #     self.assertEqual(resolve(url).func, views.add_media)
