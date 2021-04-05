@@ -132,7 +132,7 @@ def search_user(request):
         for x in unconfirmed_users:
             if x.user.first_name == fname and x.user.last_name == lname:
                 context['profile'] = x
-        return render(request, 'Preschool_Play/search-user.html', context)
+                return render(request, 'Preschool_Play/search-user.html', context)
     return render(request, 'Preschool_Play/error.html', {'message':'unauthorized'})
 
 

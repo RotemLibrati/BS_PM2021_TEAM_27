@@ -19,6 +19,14 @@ class UserProfile(models.Model):
     limit = models.DateTimeField(default=datetime(2000, 1, 1))
     auth = models.BooleanField(default=False)
 
+    def was_born_recently_for_parent(self):
+        if self.age <= 0:
+            return False
+        return self.age > 18
+
+    def __str__(self):
+        return str(self.user)
+
 
 class Message(models.Model):
     sender = models.ForeignKey(User, related_name='sent', on_delete=models.SET_NULL, null=True)
