@@ -27,6 +27,8 @@ pipeline {
                     . .venv/bin/activate
                     pip install -r backend/requirements.txt
                     python backend/test.py
+                    py manage.py test
+                    Preschool_Play/tests.py
                 '''
             }
         }
