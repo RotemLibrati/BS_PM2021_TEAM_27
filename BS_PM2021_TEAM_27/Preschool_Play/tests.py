@@ -84,27 +84,27 @@ class TestSearchUserView(TestCase):
         self.assertContains(response, 'nuser')
 
 
-@tag('unit-test')
-class TestMediaView(TestCase):
-    def setUp(self):
-        self.user = User.objects.create_user(username='testuser', password='Qwerty246')
-        self.user.save()
-        self.profile = UserProfile(user=self.user, is_admin=True)
-        self.profile.save()
-        self.client = Client()
-        self.client.login(username='testuser', password='Qwerty246')
-
-    def test_with_add_media(self):
-        response = self.client.get(reverse('Preschool_Play:add-media'))
-        self.assertEqual(response.status_code, 200)
-        add_media = Media(name='name', path='www/rrr/ttt', type='picture')
-        add_media.save()
-        self.assertContains(response, "Add Media")
-
-    def test_with_delete_media(self):
-        response = self.client.get(reverse('Preschool_Play:delete-media'))
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Delete Media")
+# @tag('unit-test')
+# class TestMediaView(TestCase):
+#     def setUp(self):
+#         self.user = User.objects.create_user(username='testuser', password='Qwerty246')
+#         self.user.save()
+#         self.profile = UserProfile(user=self.user, is_admin=True)
+#         self.profile.save()
+#         self.client = Client()
+#         self.client.login(username='testuser', password='Qwerty246')
+#
+#     def test_with_add_media(self):
+#         response = self.client.get(reverse('Preschool_Play:add-media'))
+#         self.assertEqual(response.status_code, 200)
+#         add_media = Media(name='name', path='www/rrr/ttt', type='picture')
+#         add_media.save()
+#         self.assertContains(response, "Add Media")
+#
+#     def test_with_delete_media(self):
+#         response = self.client.get(reverse('Preschool_Play:delete-media'))
+#         self.assertEqual(response.status_code, 200)
+#         self.assertContains(response, "Delete Media")
 
 
 @tag('unit-test')
@@ -116,10 +116,10 @@ class TestUrl(TestCase):
         url = reverse('Preschool_Play:show-suspend-user')
         self.assertEqual(resolve(url).func, views.show_suspend_user)
 
-    def test_Preschool_Play_add_media_url_is_resolved(self):
-        url = reverse('Preschool_Play:add-media')
-        self.assertEqual(resolve(url).func, views.add_media)
-
-    def test_Preschool_Play_delete_media_url_is_resolved(self):
-        url = reverse('Preschool_Play:delete-media')
-        self.assertEqual(resolve(url).func, views.delete_media)
+    # def test_Preschool_Play_add_media_url_is_resolved(self):
+    #     url = reverse('Preschool_Play:add-media')
+    #     self.assertEqual(resolve(url).func, views.add_media)
+    #
+    # def test_Preschool_Play_delete_media_url_is_resolved(self):
+    #     url = reverse('Preschool_Play:delete-media')
+    #     self.assertEqual(resolve(url).func, views.delete_media)
