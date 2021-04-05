@@ -12,9 +12,7 @@ from django.shortcuts import render
 
 from .models import *
 import json
-from .forms import AddMediaForm, DeleteMediaForm, LoginForm
-
-
+from .forms import AddMediaForm, DeleteMediaForm, LoginForm, MessageForm
 
 
 def index(request):
@@ -168,3 +166,83 @@ def logout(request):  # logout view
     if hasattr(request, 'user'):
         request.user = AnonymousUser()
     return HttpResponseRedirect(reverse('Preschool_Play:index'))
+
+
+def inbox(request):  # TODO: fix links menu in template
+    if request.user is None or not request.user.is_authenticated:
+        return HttpResponse("Not logged in")
+    current_user = request.user
+    messages_received = list(
+        Message.objects.filter(receiver=current_user, deleted_by_receiver=False).order_by('-sent_date'))
+    messages_sent = list(Message.objects.filter(sender=current_user, deleted_by_sender=False).order_by('-sent_date'))
+    return render(request, 'Preschool_Play/inbox.html', {'user': current_user,
+                                                       'messages_received': messages_received,
+                                                       'messages_sent': messages_sent
+                                                       })
+
+
+def view_message(request, message_id):
+    if request.user is None or not request.user.is_authenticated:
+        return HttpResponse("Not logged in")
+    try:
+        message = Message.objects.get(id=message_id)
+    except (TypeError, Message.DoesNotExist):
+        error = "Message getting failed."
+        return render(request, 'Preschool_Play/failure.html', {'error': error})
+    return render(request, 'Preschool_Play/message.html', {'user': request.user,
+                                                         'message': message,
+                                                         })
+
+
+def delete_message(request, message_id):
+    if request.user is None or not request.user.is_authenticated:
+        return HttpResponse("Not logged in")
+    try:
+        message = Message.objects.get(id=message_id)
+        if request.user == message.receiver:
+            message.deleted_by_receiver = True
+        if request.user == message.sender:
+            message.deleted_by_sender = True
+
+        message.save()
+
+        if message.deleted_by_sender and message.deleted_by_receiver:
+            message.delete()
+    except (TypeError, Message.DoesNotExist):
+        error = "Message deletion failed."
+        render(request, 'Preschool_Play/failure.html', {'error': error})
+    return HttpResponseRedirect(reverse('Preschool_Play:inbox'))
+
+
+def new_message(request, **kwargs):
+    if request.user is None or not request.user.is_authenticated:
+        return HttpResponse("Not logged in")
+    user_profile = UserProfile.objects.get(user=request.user)
+    user_list = User.objects.all()
+    profile_list = UserProfile.objects.all()
+    if request.method == 'POST':
+        form = MessageForm(request.POST)
+        request.user.reply = None
+        if form.is_valid():
+            sender = request.user
+            receiver_name = form.cleaned_data['receiver']
+            try:
+                receiver = User.objects.get(username=receiver_name)
+            except (TypeError, User.DoesNotExist):
+                error = "Could not find user."
+                render(request, 'Preschool_Play/failure.html', {'error': error})
+            subject = form.cleaned_data['subject']
+            body = form.cleaned_data['body']
+            sent_date = timezone.now()
+            message = Message(sender=sender, receiver=receiver, subject=subject, body=body, sent_date=sent_date)
+            message.save()
+            return HttpResponseRedirect(reverse('Preschool_Play:inbox'))
+            return HttpResponseRedirect(reverse('Preschool_Play:success-message'))
+    else:
+        form = MessageForm()
+        if kwargs:
+            if kwargs['reply']:
+                form = MessageForm({'receiver': kwargs['reply']})
+    return render(request, 'Preschool_Play/new-message.html', {
+        'form': form, 'users': user_list, 'user': request.user, 'user_profile': user_profile, 'profiles': profile_list
+    })
