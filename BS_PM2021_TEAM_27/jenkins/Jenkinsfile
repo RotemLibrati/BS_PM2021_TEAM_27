@@ -28,15 +28,10 @@ pipeline {
         }
         stage('Test')
         {
-            agent
-            {
-                docker
-                 {
-                    image 'qnib/pytest'
-                 }
-            }
+            none agent
+
             steps {
-                sh 'py manage.py test Preschool_Play/tests.py'
+                sh 'py manage.py test'
             }
         }
     }
