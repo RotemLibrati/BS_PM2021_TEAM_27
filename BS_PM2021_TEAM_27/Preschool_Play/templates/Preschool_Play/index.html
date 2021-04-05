@@ -5,11 +5,14 @@
     <title>Preschool Play</title>
 </head>
 <body>
-    <h1>Home Page</h1>
+<h1>Home Page</h1>
+     {% if user.is_authenticated %}
+
     {% if profile.is_admin %}
             <li><a href="{% url 'Preschool_Play:add-media' %}">Add Media</a><br>
 			<li><a href="{% url 'Preschool_Play:delete-media' %}">Delete Media</a><br>
     {% endif %}
-
+    <li><a href="{% url 'Preschool_Play:logout' %}">Logout</a><br>
+    {% endif %}
 </body>
 </html>

@@ -14,4 +14,6 @@ urlpatterns = [
     path('search-user', views.search_user, name='search-user'),
     path('add-media', views.add_media, name='add-media'),
     path('delete-media', views.delete_media, name='delete-media'),
+    path('login', views.login_view, name='login'),
+    path('logout/', views.logout, name='logout'),
 ]

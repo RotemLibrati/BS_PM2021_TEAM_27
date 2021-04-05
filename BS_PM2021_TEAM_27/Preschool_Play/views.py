@@ -1,7 +1,7 @@
 from builtins import sorted
 from datetime import timezone
-
-
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.models import AnonymousUser
 from django.urls import reverse
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
@@ -13,7 +13,7 @@ from django.shortcuts import render
 
 from .models import *
 import json
-from .forms import AddMediaForm, DeleteMediaForm
+from .forms import AddMediaForm, DeleteMediaForm, LoginForm
 
 
 
@@ -135,3 +135,37 @@ def search_user(request):
                 context['profile'] = x
         return render(request, 'Preschool_Play/search-user.html', context)
     return render(request, 'Preschool_Play/error.html', {'message':'unauthorized'})
+
+
+def login_view(request):
+    if request.method == "POST":
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            user = authenticate(username=form.cleaned_data['user_name'], password=form.cleaned_data['password'])
+            if user is not None:
+                login(request, user)
+                user = request.user
+                userprofile = UserProfile.objects.get(user=user)
+                if userprofile.last_login.date() < timezone.now().date():
+                    userprofile.daily_minutes = 0
+                userprofile.last_login = timezone.now()
+                userprofile.save()
+                return HttpResponseRedirect(reverse('Preschool_Play:index'))
+    else:
+        form = LoginForm()
+    context = {
+        'form': form,
+    }
+    return render(request, 'Preschool_Play/login.html', context)
+
+@login_required
+def logout(request):
+    userprofile = UserProfile.objects.get(user=request.user)
+    td = timezone.now() - userprofile.last_login
+    userprofile.total_minutes += (td.total_seconds() / 60)
+    userprofile.save()
+    request.session.flush()
+
+    if hasattr(request, 'user'):
+        request.user = AnonymousUser()
+    return HttpResponseRedirect(reverse('Preschool_Play:index'))
