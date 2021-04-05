@@ -15,7 +15,7 @@ pipeline {
           steps{
             withEnv(["HOME=${env.WORKSPACE}"]){
 
-            dir('jenkins'){
+            dir('./jenkins'){
             sh 'python -m pip install -r requirements.txt'
             }
             echo 'hello'
