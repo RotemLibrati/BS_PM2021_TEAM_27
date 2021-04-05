@@ -30,8 +30,6 @@ pipeline {
               sh """ #!/bin/bash
                 cd BS_PM2021_TEAM_27
                 ls
-                cd BS_PM2021_TEAM_27
-                ls
                 python -m coverage run manage.py test --tag=unit-test
                 """
 
