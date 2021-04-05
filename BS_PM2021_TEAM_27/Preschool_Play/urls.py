@@ -15,4 +15,9 @@ urlpatterns = [
     path('delete-media', views.delete_media, name='delete-media'),
     path('login', views.login_view, name='login'),
     path('logout/', views.logout, name='logout'),
+    path('inbox/', views.inbox, name='inbox'),
+    path('inbox/<int:message_id>/', views.view_message, name='view-message'),
+    path('inbox/delete/<int:message_id>/', views.delete_message, name='delete-message'),
+    path('inbox/new-message/', views.new_message, name='new-message'),
+    path('inbox/new-message/<str:reply>', views.new_message, name='new-message'),
 ]
