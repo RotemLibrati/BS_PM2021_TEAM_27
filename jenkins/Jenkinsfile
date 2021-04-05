@@ -9,6 +9,7 @@ pipeline {
             }
             steps {
                 sh '''
+                    set +e
                     python -m venv .venv
                     . .venv/bin/activate
                     pip install -r backend/requirements.txt
@@ -23,11 +24,11 @@ pipeline {
             }
             steps {
                  sh '''
+                    set +e
                     python -m venv .venv
                     . .venv/bin/activate
                     pip install -r backend/requirements.txt
                     python backend/test.py
-                    set +e
                 '''
             }
         }
