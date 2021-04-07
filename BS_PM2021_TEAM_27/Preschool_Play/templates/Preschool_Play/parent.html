@@ -2,9 +2,30 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Hello {{user.first_name}}</title>
+    <title>Parent Page</title>
 </head>
 <body>
+    hello {{user.first_name}} <br>
+
+{% block content %}
+    <h1>children</h1>
+    <div class="row">
+        {% for ch in children %}
+        <div class="col">
+
+
+            <div class="card" style="width: 18rem;">
+                    <img  class="card-img-top" src="https://digitalpedagogydotwordpressdotcom.files.wordpress.com/2019/09/google_contacts_logo.png?w=640" width="150" height="150" alt="Card image" >
+                    <div class="card-body">
+                    <h5 class="card-title">{{ ch.name }}</h5>
+                    <a href="#" class="btn btn-primary">play</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+{% endblock %}
 
 </body>
 </html>

@@ -246,3 +246,17 @@ def new_message(request, **kwargs):
     return render(request, 'Preschool_Play/new-message.html', {
         'form': form, 'users': user_list, 'user': request.user, 'user_profile': user_profile, 'profiles': profile_list
     })
+
+
+def parent(request):
+    children = Child.objects.filter(parent=request.user)
+    context = {'children': children}
+    return render(request, 'Preschool_Play/parent.html', context)
+
+
+
+
+
+
+
+

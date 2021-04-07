@@ -21,4 +21,8 @@ urlpatterns = [
     path('inbox/delete/<int:message_id>/', views.delete_message, name='delete-message'),
     path('inbox/new-message/', views.new_message, name='new-message'),
     path('inbox/new-message/<str:reply>', views.new_message, name='new-message'),
+    path('parent', views.parent, name='parent.html')
+
+
 ]
+
