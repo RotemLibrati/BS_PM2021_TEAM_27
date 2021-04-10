@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from datetime import timedelta, datetime
 
+from django.db.models import UniqueConstraint
+
 
 class UserProfile(models.Model):
     TYPES = (('parent', 'parent'), ('teacher', 'teacher'))
@@ -65,4 +67,17 @@ class Score(models.Model):
     def __str__(self):
         return f'Child: {self.child.__str__()}, Amount: {self.amount.__str__()}, Comment: {self.comment}, Date: {self.date.__str__()}'
 
+
+class ScoreTable(models.Model):
+    child = models.ForeignKey(Child, related_name='ScoreTable', on_delete=models.SET_NULL, null=True)
+    points = models.IntegerField(default=0)
+    game = models.CharField(max_length=50, blank=True, null=False)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['child', 'game'], name='constraint'),
+        ]
+
+    def __str__(self):
+        return f'Child: {self.child.__str__()}, Points: {self.points.__str__()}, Game: {self.game}'
 
