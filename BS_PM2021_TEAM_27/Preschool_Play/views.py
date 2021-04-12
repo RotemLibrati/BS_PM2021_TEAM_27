@@ -253,7 +253,10 @@ def parent(request):
     context = {'children': children}
     return render(request, 'Preschool_Play/parent.html', context)
 
-
+def scoretable(request):
+    user_list = Score.objects.all()
+    context = {'user_list': user_list}
+    return render(request, 'Preschool_Play/scoretable.html', context)
 
 
 

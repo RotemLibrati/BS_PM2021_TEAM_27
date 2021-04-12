@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+</head>
+<body>
+<table id="table_id" class="display" border='2' align="center"  style="width:100%">
+
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Game</th>
+        <th>Points</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr >
+        {% for t in user_list %}
+        <TD class="c3" align="center">{{ t.child.name }}</TD>
+        <TD class="c3" align="center">{{ t.game }}</TD>
+        <TD class="c3" align="center">{{ t.amount}}</TD>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<hr>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/jq-3.3.1/jszip-2.5.0/dt-1.10.24/af-2.3.5/b-1.7.0/b-colvis-1.7.0/b-html5-1.7.0/b-print-1.7.0/cr-1.5.3/fc-3.3.2/kt-2.6.1/r-2.2.7/rg-1.1.2/rr-1.2.7/sl-1.3.3/datatables.min.css"/>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/v/dt/jq-3.3.1/jszip-2.5.0/dt-1.10.24/af-2.3.5/b-1.7.0/b-colvis-1.7.0/b-html5-1.7.0/b-print-1.7.0/cr-1.5.3/fc-3.3.2/kt-2.6.1/r-2.2.7/rg-1.1.2/rr-1.2.7/sl-1.3.3/datatables.min.js"></script>
+<script>
+    $(document).ready( function () {
+    $('#table_id').DataTable({
+
+    }
+    );
+} );
+</script>
+</body>
+</html>
