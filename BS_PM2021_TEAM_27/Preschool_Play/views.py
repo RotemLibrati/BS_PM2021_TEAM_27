@@ -258,6 +258,23 @@ def scoretable(request):
     context = {'user_list': user_list}
     return render(request, 'Preschool_Play/scoretable.html', context)
 
+def suspension_for_teacher(request):
+    user = request.user
+    user_profile = UserProfile.objects.get(user=user)
+    if user_profile.type != 'teacher':
+        return HttpResponse("You are not teacher !!")
+
+    child = Child.objects.filter(teacher=user)
+    suspended_child = []
+    for c in child:
+        if c.suspension_time >= timezone.now():
+            suspended_child.append(c)
+    context = {'user_profile': user_profile, 'suspended_child': suspended_child}
+    return render(request, 'Preschool_Play/suspension-teacher.html', context)
+
+
+
+
 
 
 

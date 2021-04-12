@@ -22,6 +22,7 @@ urlpatterns = [
     path('inbox/new-message/', views.new_message, name='new-message'),
     path('inbox/new-message/<str:reply>', views.new_message, name='new-message'),
     path('parent', views.parent, name='parent.html'),
+    path('suspension-teacher', views.suspension_for_teacher, name='suspension_teacher.html'),
     path('scoretable', views.scoretable, name='scoretable.html')
 
 
