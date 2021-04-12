@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Suspension for teacher</title>
+</head>
+<body>
+    Hey {{ user_profile.user }} <br>
+    Your student that suspended: <br>
+    {% for c in suspended_child %}
+    {{ c.name }} <br>
+    {% endfor %}
+</body>
+</html>
