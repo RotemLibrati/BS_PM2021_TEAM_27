@@ -12,7 +12,7 @@ from django.shortcuts import render
 
 from .models import *
 import json
-from .forms import DeleteMediaForm, LoginForm, MessageForm
+from .forms import DeleteMediaForm, LoginForm, MessageForm, AddMediaForm
 
 
 def index(request):
