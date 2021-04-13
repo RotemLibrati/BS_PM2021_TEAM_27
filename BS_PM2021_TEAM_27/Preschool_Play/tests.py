@@ -81,7 +81,7 @@ class TestSearchUserView(TestCase):
         data = {'fname': 'nuser', 'lname': 'luser'}
         response = self.client.post(reverse('Preschool_Play:search-user'), data=data)
         self.assertTemplateUsed(response, 'Preschool_Play/search-user.html')
-        self.assertContains(response, 'nu2ser')
+        self.assertContains(response, 'nuser')
 
 
 # @tag('unit-test')
