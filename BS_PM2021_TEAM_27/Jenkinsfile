@@ -9,8 +9,6 @@ pipeline {
         stage('Run Unit Tests') {
           steps {
               sh """
-                  python BS_PM2021_TEAM_27/manage.py makemigrations
-                  python BS_PM2021_TEAM_27/manage.py migrate
                   python BS_PM2021_TEAM_27/manage.py test
               """
           }
