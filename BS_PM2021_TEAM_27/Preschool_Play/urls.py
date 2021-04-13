@@ -23,7 +23,7 @@ urlpatterns = [
     path('inbox/new-message/<str:reply>', views.new_message, name='new-message'),
     path('parent', views.parent, name='parent.html'),
     path('suspension-teacher', views.suspension_for_teacher, name='suspension_teacher.html'),
-
+    path('message-board', views.message_board, name='message-board'),
 
 ]
 

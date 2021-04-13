@@ -269,10 +269,10 @@ def suspension_for_teacher(request):
     return render(request, 'Preschool_Play/suspension-teacher.html', context)
 
 
-
-
-
-
-
+@login_required
+def message_board(request):
+    context = {}
+    context['messages'] = Message.objects.filter(is_public=True)
+    return render(request, 'Preschool_Play/message-board.html', context)
 
 

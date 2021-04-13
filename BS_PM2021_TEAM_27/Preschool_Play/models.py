@@ -30,15 +30,16 @@ class UserProfile(models.Model):
 
 class Message(models.Model):
     sender = models.ForeignKey(User, related_name='sent', on_delete=models.SET_NULL, null=True)
-    receiver = models.ForeignKey(User, related_name='received', on_delete=models.SET_NULL, null=True)
+    receiver = models.ForeignKey(User, related_name='received', on_delete=models.SET_NULL, null=True, blank=True)
     subject = models.CharField(max_length=50, blank=True)
     body = models.CharField(max_length=250, blank=True)
     sent_date = models.DateTimeField(auto_now_add=True)
     deleted_by_sender = models.BooleanField(default=False)
     deleted_by_receiver = models.BooleanField(default=False)
+    is_public = models.BooleanField(default=False)
 
     def __str__(self):
-        return str(self.sender + ' to ' + self.receiver)
+        return f"{self.sender}  to  {self.receiver}"
 
 
 class Media(models.Model):

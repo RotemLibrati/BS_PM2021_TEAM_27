@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Message Board</title>
+</head>
+<body>
+    <ul>
+    {% for mas in messages %}
+        <li> {{ mas }} : Subject: {{mas.subject}} <br> Body: {{mas.body}} <br></li>
+    {% endfor %}
+    </ul>
+</body>
+</html>
