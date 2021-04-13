@@ -7,7 +7,8 @@
 <body>
     <ul>
     {% for mas in messages %}
-        <li> {{ mas }} : Subject: {{mas.subject}} <br> Body: {{mas.body}} <br></li>
+        <li> {{ mas }} : Subject: {{mas.subject}} <br> Body: {{mas.body}} <br>
+            {% if is_teacher %} <a href="{% url 'Preschool_Play:message-board' mas.id %}" > Delete </a> {% endif %}</li>
     {% endfor %}
     </ul>
 </body>

@@ -270,8 +270,14 @@ def suspension_for_teacher(request):
 
 
 @login_required
-def message_board(request):
+def message_board(request, **kwargs):
     context = {}
+    usrprof = UserProfile.objects.get(user=request.user)
+    context['is_teacher'] = False
+    if usrprof.type == 'teacher':
+        context['is_teacher'] = True
+        if kwargs:
+            Message.objects.get(id=kwargs['delete_message']).delete()
     context['messages'] = Message.objects.filter(is_public=True)
     return render(request, 'Preschool_Play/message-board.html', context)
 

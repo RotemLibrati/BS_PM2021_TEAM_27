@@ -9,7 +9,7 @@
      {% if user.is_authenticated %}
 
     {% if profile.is_admin %}
-            <li><a href="{% url 'Preschool_Play:add-media' %}">Add Media</a><br>
+            <li><a href="{% url 'Preschool_Play:add-media' %}" >Add Media</a><br>
 			<li><a href="{% url 'Preschool_Play:delete-media' %}">Delete Media</a><br>
 
     {% endif %}
