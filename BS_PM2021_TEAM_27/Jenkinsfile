@@ -9,7 +9,7 @@ pipeline {
         stage('Run Unit Tests') {
           steps {
               sh """
-                  python manage.py test
+                  python BS_PM2021_TEAM_27/manage.py test
               """
           }
         }
