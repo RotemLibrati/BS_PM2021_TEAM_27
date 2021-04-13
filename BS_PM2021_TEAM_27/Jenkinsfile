@@ -1,0 +1,26 @@
+pipeline {
+    agent { dockerfile true }
+    triggers {
+      githubPush()
+  }
+
+    stages {
+        stage('setup DB') {
+            steps {
+                sh """
+                    py manage.py makemigrations
+                    py manage.py migrate
+                """
+            }
+
+        }
+        stage('Run Unit Tests') {
+          steps {
+              sh """
+                  py manage.py test
+              """
+          }
+        }
+    }
+
+}
