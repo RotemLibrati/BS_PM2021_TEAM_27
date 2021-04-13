@@ -12,7 +12,7 @@ from django.shortcuts import render
 
 from .models import *
 import json
-# from .forms import DeleteMediaForm, LoginForm, MessageForm, AddMediaForm
+from .forms import DeleteMediaForm, LoginForm, MessageForm, AddMediaForm
 
 
 def index(request):
@@ -80,37 +80,37 @@ def filter_suspension(request):
     return render(request, 'Preschool_Play/filter-suspension.html', context)
 
 
-# def add_media(request):
-#     if request.method == 'POST':
-#         form = AddMediaForm(request.POST)
-#         if form.is_valid():
-#             name = form.cleaned_data['name']
-#             path = form.cleaned_data['path']
-#             type = form.cleaned_data['type']
-#             media = Media.objects.all()
-#             for m in media:
-#                 if m.name == name:
-#                     return HttpResponse("This name is already exist")
-#             new = Media.objects.create(name=name, path=path, type=type)
-#             new.save()
-#             return HttpResponseRedirect(reverse('Preschool_Play:index'))
-#     else:
-#         form = AddMediaForm()
-#         context = {'form': form}
-#     return render(request, 'Preschool_Play/add-media.html', context)
+def add_media(request):
+    if request.method == 'POST':
+        form = AddMediaForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data['name']
+            path = form.cleaned_data['path']
+            type = form.cleaned_data['type']
+            media = Media.objects.all()
+            for m in media:
+                if m.name == name:
+                    return HttpResponse("This name is already exist")
+            new = Media.objects.create(name=name, path=path, type=type)
+            new.save()
+            return HttpResponseRedirect(reverse('Preschool_Play:index'))
+    else:
+        form = AddMediaForm()
+        context = {'form': form}
+    return render(request, 'Preschool_Play/add-media.html', context)
 
 
-# def delete_media(request):
-#     if request.method == 'POST':
-#         form = DeleteMediaForm(request.POST)
-#         if form.is_valid():
-#             name = form.cleaned_data['name']
-#             media_delete = Media.objects.filter(name=name).delete()
-#             return HttpResponseRedirect(reverse('Preschool_Play:index'))
-#     else:
-#         form = DeleteMediaForm()
-#     context = {'form': form}
-#     return render(request, 'Preschool_Play/delete-media.html', context)
+def delete_media(request):
+    if request.method == 'POST':
+        form = DeleteMediaForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data['name']
+            media_delete = Media.objects.filter(name=name).delete()
+            return HttpResponseRedirect(reverse('Preschool_Play:index'))
+    else:
+        form = DeleteMediaForm()
+    context = {'form': form}
+    return render(request, 'Preschool_Play/delete-media.html', context)
 
 
 def show_users(request):
@@ -134,26 +134,26 @@ def search_user(request):
     return render(request, 'Preschool_Play/error.html', {'message': 'unauthorized'})
 
 
-# def login_view(request):  # login view
-#     if request.method == "POST":
-#         form = LoginForm(request.POST)
-#         if form.is_valid():
-#             user = authenticate(username=form.cleaned_data['user_name'], password=form.cleaned_data['password'])
-#             if user is not None:
-#                 login(request, user)
-#                 user = request.user
-#                 userprofile = UserProfile.objects.get(user=user)
-#                 if userprofile.last_login.date() < timezone.now().date():
-#                     userprofile.daily_minutes = 0
-#                 userprofile.last_login = timezone.now()
-#                 userprofile.save()
-#                 return HttpResponseRedirect(reverse('Preschool_Play:index'))
-#     else:
-#         form = LoginForm()
-#     context = {
-#         'form': form,
-#     }
-#     return render(request, 'Preschool_Play/login.html', context)
+def login_view(request):  # login view
+    if request.method == "POST":
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            user = authenticate(username=form.cleaned_data['user_name'], password=form.cleaned_data['password'])
+            if user is not None:
+                login(request, user)
+                user = request.user
+                userprofile = UserProfile.objects.get(user=user)
+                if userprofile.last_login.date() < timezone.now().date():
+                    userprofile.daily_minutes = 0
+                userprofile.last_login = timezone.now()
+                userprofile.save()
+                return HttpResponseRedirect(reverse('Preschool_Play:index'))
+    else:
+        form = LoginForm()
+    context = {
+        'form': form,
+    }
+    return render(request, 'Preschool_Play/login.html', context)
 
 @login_required
 def logout(request):  # logout view
@@ -214,38 +214,38 @@ def delete_message(request, message_id):
     return HttpResponseRedirect(reverse('Preschool_Play:inbox'))
 
 
-# def new_message(request, **kwargs):
-#     if request.user is None or not request.user.is_authenticated:
-#         return HttpResponse("Not logged in")
-#     user_profile = UserProfile.objects.get(user=request.user)
-#     user_list = User.objects.all()
-#     profile_list = UserProfile.objects.all()
-#     if request.method == 'POST':
-#         form = MessageForm(request.POST)
-#         request.user.reply = None
-#         if form.is_valid():
-#             sender = request.user
-#             receiver_name = form.cleaned_data['receiver']
-#             try:
-#                 receiver = User.objects.get(username=receiver_name)
-#             except (TypeError, User.DoesNotExist):
-#                 error = "Could not find user."
-#                 render(request, 'Preschool_Play/failure.html', {'error': error})
-#             subject = form.cleaned_data['subject']
-#             body = form.cleaned_data['body']
-#             sent_date = timezone.now()
-#             message = Message(sender=sender, receiver=receiver, subject=subject, body=body, sent_date=sent_date)
-#             message.save()
-#             return HttpResponseRedirect(reverse('Preschool_Play:inbox'))
-#             return HttpResponseRedirect(reverse('Preschool_Play:success-message'))
-#     else:
-#         form = MessageForm()
-#         if kwargs:
-#             if kwargs['reply']:
-#                 form = MessageForm({'receiver': kwargs['reply']})
-#     return render(request, 'Preschool_Play/new-message.html', {
-#         'form': form, 'users': user_list, 'user': request.user, 'user_profile': user_profile, 'profiles': profile_list
-#     })
+def new_message(request, **kwargs):
+    if request.user is None or not request.user.is_authenticated:
+        return HttpResponse("Not logged in")
+    user_profile = UserProfile.objects.get(user=request.user)
+    user_list = User.objects.all()
+    profile_list = UserProfile.objects.all()
+    if request.method == 'POST':
+        form = MessageForm(request.POST)
+        request.user.reply = None
+        if form.is_valid():
+            sender = request.user
+            receiver_name = form.cleaned_data['receiver']
+            try:
+                receiver = User.objects.get(username=receiver_name)
+            except (TypeError, User.DoesNotExist):
+                error = "Could not find user."
+                render(request, 'Preschool_Play/failure.html', {'error': error})
+            subject = form.cleaned_data['subject']
+            body = form.cleaned_data['body']
+            sent_date = timezone.now()
+            message = Message(sender=sender, receiver=receiver, subject=subject, body=body, sent_date=sent_date)
+            message.save()
+            return HttpResponseRedirect(reverse('Preschool_Play:inbox'))
+            return HttpResponseRedirect(reverse('Preschool_Play:success-message'))
+    else:
+        form = MessageForm()
+        if kwargs:
+            if kwargs['reply']:
+                form = MessageForm({'receiver': kwargs['reply']})
+    return render(request, 'Preschool_Play/new-message.html', {
+        'form': form, 'users': user_list, 'user': request.user, 'user_profile': user_profile, 'profiles': profile_list
+    })
 
 
 def parent(request):
