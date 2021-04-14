@@ -2,20 +2,26 @@
     {% csrf_token %}
     <h2>New message</h2>
     <h3>Users:</h3><br>
-    {% if user_profile.type == 'teacher' %}
-    <h>Parent list:</h><br>
+    <h4>
+        Admins
+    </h4><br>
     <ul>
-        {% for f in profiles %}
-
-        {% if f.type == 'teacher' %}
-        <li>
-            <h>{{f}}</h><br>
-        </li>
-        {% endif %}
-
+        {% for a in admins %}
+        <li>{{a}}</li>
         {% endfor %}
     </ul>
-    {% endif%}
+    <h4>Teachers</h4><br>
+    <ul>
+        {% for t in teachers %}
+        <li>{{t}}</li>
+        {% endfor %}
+    </ul>
+    <h4>Parents</h4><br>
+    <ul>
+        {% for p in parents %}
+        <li>{{p}}</li>
+        {% endfor %}
+    </ul>
     {{form.as_p}}
     <button type="submit">Submit</button>
 </form>

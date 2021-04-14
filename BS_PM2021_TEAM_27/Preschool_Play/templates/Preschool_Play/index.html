@@ -14,6 +14,7 @@
 
     {% endif %}
     <li><a href="{% url 'Preschool_Play:message-board' %}">Message Board</a><br>
+    <li><a href="{% url 'Preschool_Play:inbox' %}">Inbox{% if unread %}({{unread}}){% endif %}</a><br>
     <li><a href="{% url 'Preschool_Play:logout' %}">Logout</a><br>
 
     {% endif %}

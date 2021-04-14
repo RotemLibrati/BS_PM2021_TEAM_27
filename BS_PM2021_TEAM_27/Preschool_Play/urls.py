@@ -6,8 +6,8 @@ app_name = 'Preschool_Play'
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('admingraphs', views.admin_graphs, name='admingraphs'),
-    # path('parentpage', views.parent_page, name='parentpage'),
+    path('scoregraphs', views.score_graphs, name='scoregraphs'),
+    path('scoregraphs/<str:name>', views.score_graphs, name='scoregraphs'),
     path('show-suspend-user', views.show_suspend_user, name='show-suspend-user'),
     path('filter-suspension', views.filter_suspension, name='filter-suspension'),
     path('show-users', views.show_users, name='show-users'),
@@ -21,8 +21,8 @@ urlpatterns = [
     path('inbox/delete/<int:message_id>/', views.delete_message, name='delete-message'),
     path('inbox/new-message/', views.new_message, name='new-message'),
     path('inbox/new-message/<str:reply>', views.new_message, name='new-message'),
-    path('parent', views.parent, name='parent.html'),
-    path('suspension-teacher', views.suspension_for_teacher, name='suspension_teacher.html'),
+    path('parent', views.parent, name='parent'),
+    path('suspension-teacher', views.suspension_for_teacher, name='suspension_teacher'),
     path('message-board/', views.message_board, name='message-board'),
     path('message-board/<int:delete_message>', views.message_board, name='message-board'),
 

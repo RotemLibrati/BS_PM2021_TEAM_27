@@ -12,7 +12,7 @@
     <li>
         From: {{message.sender}}. Subject: {{message.subject}}. Sent at: {{message.sent_date}}.
         <a href="{% url 'Preschool_Play:view-message' message.id %}"class="button alt small"> Open</a>
-        <a href="/sign-language-teacher/inbox/delete/{{ message.id }}"class="button alt small"> Delete</a>
+        <a href="/preschoolplay/inbox/delete/{{ message.id }}"class="button alt small"> Delete</a>
     </li>
     {% endfor %}
     {% endif %}
@@ -25,8 +25,8 @@
     {% for message in messages_sent %}
     <li>
         To: {{message.receiver}}. Subject: {{message.subject}}. Sent at: {{message.sent_date}}
-        <a href="/sign-language-teacher/inbox/{{ message.id }}"class="button alt small"> Open</a>
-        <a href="/sign-language-teacher/inbox/delete/{{ message.id }}"class="button alt small"> Delete</a>
+        <a href="/preschoolplay/inbox/{{ message.id }}"class="button alt small"> Open</a>
+        <a href="/preschoolplay/inbox/delete/{{ message.id }}"class="button alt small"> Delete</a>
     </li>
     {% endfor %}
     {% endif %}

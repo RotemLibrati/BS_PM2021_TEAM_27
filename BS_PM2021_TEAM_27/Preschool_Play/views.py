@@ -8,8 +8,7 @@ from django.db.models import Sum
 from django.db.models.functions import ExtractDay, ExtractMonth, ExtractYear
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
-
-
+from django import forms
 from .models import *
 import json
 from .forms import DeleteMediaForm, LoginForm, MessageForm, AddMediaForm
@@ -21,19 +20,41 @@ def index(request):
         context['user'] = request.user
     if request.user.is_authenticated:
         context['profile'] = UserProfile.objects.get(user=request.user)
+        unread_messages_amount = Message.objects.filter(receiver=request.user, is_unread=True).count()
+        if unread_messages_amount > 0:
+            context['unread'] = unread_messages_amount
     return render(request, 'Preschool_Play/index.html', context)
 
 
 @login_required
-def admin_graphs(request):
-    context = {}
-    context['user'] = request.user
+def score_graphs(request, **kwargs):
+    context = {'user': request.user}
     if request.user.is_authenticated:
         context['profile'] = UserProfile.objects.get(user=request.user)
     if context['profile'].is_admin:
-        context['scoreData'] = list(Score.objects.values(d=ExtractDay('date'), m=ExtractMonth('date'), y=ExtractYear('date')).annotate(
-            Sum('amount')))
-        return render(request, 'Preschool_Play/admin-graphs.html', context)
+        if kwargs:
+            if kwargs['name']:
+                children = list(Child.objects.filter(name=kwargs['name']))
+                if children.__len__() > 0:
+                    context['scoreData'] = list(
+                        Score.objects.filter(child=children[0]).values(d=ExtractDay('date'), m=ExtractMonth('date'),
+                                                                       y=ExtractYear('date')).annotate(
+                            Sum('amount')))
+        else:
+            context['scoreData'] = list(
+                Score.objects.values(d=ExtractDay('date'), m=ExtractMonth('date'), y=ExtractYear('date')).annotate(
+                    Sum('amount')))
+        return render(request, 'Preschool_Play/score-graphs.html', context)
+    else:
+        if kwargs:
+            if kwargs['name']:
+                children = list(Child.objects.filter(parent=request.user, name=kwargs['name']))
+                if children.__len__() > 0:
+                    context['scoreData'] = list(
+                        Score.objects.filter(child=children[0]).values(d=ExtractDay('date'), m=ExtractMonth('date'),
+                                                                       y=ExtractYear('date')).annotate(
+                            Sum('amount')))
+                    return render(request, 'Preschool_Play/score-graphs.html', context)
     return render(request, 'Preschool_Play/error.html', {'message': 'Unauthorized user'})
 
 
@@ -58,8 +79,8 @@ def send_game_info(request):
 
 def show_suspend_user(request):
     user_profile = UserProfile.objects.all()
-    users = [] # List of unsuspended users
-    suspend_user = [] # lost of suspended users
+    users = []  # List of unsuspended users
+    suspend_user = []  # lost of suspended users
     for user in user_profile:
         if user.suspension_time >= timezone.now():
             suspend_user.append(user)
@@ -71,11 +92,12 @@ def show_suspend_user(request):
 
 def filter_suspension(request):
     user_profile = UserProfile.objects.all()
-    suspend_user = [] # list of suspended users
+    suspend_user = []  # list of suspended users
     for user in user_profile:
         if user.suspension_time >= timezone.now():
             suspend_user.append(user)
-    suspend_user.sort(key=lambda r: r.suspension_time) # filter by time left and keeping track of the time user has been suspended.
+    suspend_user.sort(
+        key=lambda r: r.suspension_time)  # filter by time left and keeping track of the time user has been suspended.
     context = {'suspend_user': suspend_user}
     return render(request, 'Preschool_Play/filter-suspension.html', context)
 
@@ -155,6 +177,7 @@ def login_view(request):  # login view
     }
     return render(request, 'Preschool_Play/login.html', context)
 
+
 @login_required
 def logout(request):  # logout view
     userprofile = UserProfile.objects.get(user=request.user)
@@ -168,17 +191,16 @@ def logout(request):  # logout view
     return HttpResponseRedirect(reverse('Preschool_Play:index'))
 
 
-def inbox(request):  # TODO: fix links menu in template
-    if request.user is None or not request.user.is_authenticated:
-        return HttpResponse("Not logged in")
+@login_required
+def inbox(request):
     current_user = request.user
     messages_received = list(
         Message.objects.filter(receiver=current_user, deleted_by_receiver=False).order_by('-sent_date'))
     messages_sent = list(Message.objects.filter(sender=current_user, deleted_by_sender=False).order_by('-sent_date'))
     return render(request, 'Preschool_Play/inbox.html', {'user': current_user,
-                                                       'messages_received': messages_received,
-                                                       'messages_sent': messages_sent
-                                                       })
+                                                         'messages_received': messages_received,
+                                                         'messages_sent': messages_sent
+                                                         })
 
 
 def view_message(request, message_id):
@@ -186,12 +208,14 @@ def view_message(request, message_id):
         return HttpResponse("Not logged in")
     try:
         message = Message.objects.get(id=message_id)
+        message.is_unread = False
+        message.save()
     except (TypeError, Message.DoesNotExist):
         error = "Message getting failed."
         return render(request, 'Preschool_Play/failure.html', {'error': error})
     return render(request, 'Preschool_Play/message.html', {'user': request.user,
-                                                         'message': message,
-                                                         })
+                                                           'message': message,
+                                                           })
 
 
 def delete_message(request, message_id):
@@ -210,7 +234,7 @@ def delete_message(request, message_id):
             message.delete()
     except (TypeError, Message.DoesNotExist):
         error = "Message deletion failed."
-        render(request, 'Preschool_Play/failure.html', {'error': error})
+        return render(request, 'Preschool_Play/failure.html', {'error': error})
     return HttpResponseRedirect(reverse('Preschool_Play:inbox'))
 
 
@@ -218,8 +242,20 @@ def new_message(request, **kwargs):
     if request.user is None or not request.user.is_authenticated:
         return HttpResponse("Not logged in")
     user_profile = UserProfile.objects.get(user=request.user)
-    user_list = User.objects.all()
-    profile_list = UserProfile.objects.all()
+    teachers_users = None
+    parents_users = None
+    if user_profile.type == 'teacher':
+        teachers_users = User.objects.all()
+        parents_users = User.objects.filter(profile__type='parent', profile__child__teacher=request.user,
+                                            profile__is_admin=False)
+    if user_profile.type == 'parent':
+        teachers_users = User.objects.filter(student__parent=request.user)
+        parents_users = User.objects.filter(profile__type='parent', child__teacher__in=list(teachers_users),
+                                            profile__is_admin=False)
+    if user_profile.is_admin:
+        teachers_users = User.objects.filter(profile__type='teacher')
+        parents_users = User.objects.filter(profile__is_admin=False)
+    admin_users = User.objects.filter(profile__is_admin=True)
     if request.method == 'POST':
         form = MessageForm(request.POST)
         request.user.reply = None
@@ -237,14 +273,17 @@ def new_message(request, **kwargs):
             message = Message(sender=sender, receiver=receiver, subject=subject, body=body, sent_date=sent_date)
             message.save()
             return HttpResponseRedirect(reverse('Preschool_Play:inbox'))
-            return HttpResponseRedirect(reverse('Preschool_Play:success-message'))
     else:
         form = MessageForm()
         if kwargs:
             if kwargs['reply']:
                 form = MessageForm({'receiver': kwargs['reply']})
+        all_users = list(teachers_users) + list(parents_users) + list(admin_users)
+        form.fields['receiver'] = forms.CharField(
+            widget=forms.Select(choices=[(u.username, u.username) for u in all_users]))
+        form.fields['receiver'].initial = all_users[0].username
     return render(request, 'Preschool_Play/new-message.html', {
-        'form': form, 'users': user_list, 'user': request.user, 'user_profile': user_profile, 'profiles': profile_list
+        'form': form, 'teachers': teachers_users, 'parents': parents_users, 'user': request.user, 'admins': admin_users
     })
 
 
@@ -280,5 +319,3 @@ def message_board(request, **kwargs):
             Message.objects.get(id=kwargs['delete_message']).delete()
     context['messages'] = Message.objects.filter(is_public=True)
     return render(request, 'Preschool_Play/message-board.html', context)
-
-

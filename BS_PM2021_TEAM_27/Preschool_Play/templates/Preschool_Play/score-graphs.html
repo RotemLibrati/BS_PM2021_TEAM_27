@@ -17,7 +17,7 @@
         '{{date.d}}/{{date.m}}/{{date.y}}',
         {% endfor %}],
         datasets: [{
-            label: 'Daily sum of all children scores',
+            label: 'Daily sum of child/ren scores',
             data: [{% for date in scoreData %}
         {{date.amount__sum}},
         {% endfor %}],
