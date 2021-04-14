@@ -27,16 +27,34 @@ def index(request):
 
 
 @login_required
-def admin_graphs(request):
-    context = {}
-    context['user'] = request.user
+def score_graphs(request, **kwargs):
+    context = {'user': request.user}
     if request.user.is_authenticated:
         context['profile'] = UserProfile.objects.get(user=request.user)
     if context['profile'].is_admin:
-        context['scoreData'] = list(
-            Score.objects.values(d=ExtractDay('date'), m=ExtractMonth('date'), y=ExtractYear('date')).annotate(
-                Sum('amount')))
-        return render(request, 'Preschool_Play/admin-graphs.html', context)
+        if kwargs:
+            if kwargs['name']:
+                children = list(Child.objects.filter(name=kwargs['name']))
+                if children.__len__() > 0:
+                    context['scoreData'] = list(
+                        Score.objects.filter(child=children[0]).values(d=ExtractDay('date'), m=ExtractMonth('date'),
+                                                                       y=ExtractYear('date')).annotate(
+                            Sum('amount')))
+        else:
+            context['scoreData'] = list(
+                Score.objects.values(d=ExtractDay('date'), m=ExtractMonth('date'), y=ExtractYear('date')).annotate(
+                    Sum('amount')))
+        return render(request, 'Preschool_Play/score-graphs.html', context)
+    else:
+        if kwargs:
+            if kwargs['name']:
+                children = list(Child.objects.filter(parent=request.user, name=kwargs['name']))
+                if children.__len__() > 0:
+                    context['scoreData'] = list(
+                        Score.objects.filter(child=children[0]).values(d=ExtractDay('date'), m=ExtractMonth('date'),
+                                                                       y=ExtractYear('date')).annotate(
+                            Sum('amount')))
+                    return render(request, 'Preschool_Play/score-graphs.html', context)
     return render(request, 'Preschool_Play/error.html', {'message': 'Unauthorized user'})
 
 
