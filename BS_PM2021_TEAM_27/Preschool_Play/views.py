@@ -292,6 +292,13 @@ def parent(request):
     context = {'children': children}
     return render(request, 'Preschool_Play/parent.html', context)
 
+def scoretable(request):
+    user = request.user
+    user_profile = UserProfile.objects.get(user=user)
+    if user_profile.type == 'teacher':
+        user_list = Score.objects.filter(child__teacher=user)
+        context = {'user_list': user_list}
+    return render(request, 'Preschool_Play/scoretable_teacher.html', context)
 
 def suspension_for_teacher(request):
     user = request.user

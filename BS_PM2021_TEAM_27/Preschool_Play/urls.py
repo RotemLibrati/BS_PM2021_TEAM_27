@@ -25,6 +25,6 @@ urlpatterns = [
     path('suspension-teacher', views.suspension_for_teacher, name='suspension_teacher'),
     path('message-board/', views.message_board, name='message-board'),
     path('message-board/<int:delete_message>', views.message_board, name='message-board'),
-
+    path('scoretable_teacher', views.scoretable, name='scoretable_teacher'),
 ]
 
