@@ -123,3 +123,24 @@ class TestUrl(TestCase):
     # def test_Preschool_Play_delete_media_url_is_resolved(self):
     #     url = reverse('Preschool_Play:delete-media')
     #     self.assertEqual(resolve(url).func, views.delete_media)
+
+@tag('unit-test')
+class TestMessageBoardView(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='Qwerty246')
+        self.user.save()
+        self.profile = UserProfile(user=self.user, is_admin=False)
+        self.profile.save()
+
+    def test_message_creation(self):
+        mes = Message(sender=self.user, subject='hi', is_public=True)
+        mes.save()
+        self.client = Client()
+        self.client.login(username='testuser', password='Qwerty246')
+        response = self.client.get(reverse('Preschool_Play:message-board'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "hi")
+        self.assertContains(response, "testuser")
+        self.assertTemplateUsed(response, 'Preschool_Play/message-board.html')
+
+
