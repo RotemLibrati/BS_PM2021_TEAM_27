@@ -26,7 +26,7 @@ class DeleteMediaForm(forms.Form):
 
 
 class MessageForm(forms.Form):
-    set = UserProfile.objects.filter(is_admin=True)
+    set = UserProfile.objects.filter(is_admin=True) | UserProfile.objects.filter(type='teacher')
     USERS = list(map(lambda x: (str(x.user), str(x.user)), set))
     receiver = forms.CharField(widget=forms.Select(choices=USERS))
     subject = forms.CharField(max_length=50, initial='message subject')
