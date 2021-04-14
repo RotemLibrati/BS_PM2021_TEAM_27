@@ -36,6 +36,44 @@ class TestUserProfileModel(TestCase):
         self.assertEquals(user.auth, False, 'new user should not be authenticated by default')
 
 
+class TestScoreGraphsView(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='Qwerty246')
+        self.user.save()
+
+    def test_admin_access(self):
+        self.profile = UserProfile(user=self.user, is_admin=True)
+        self.profile.save()
+        self.client = Client()
+        self.client.login(username='testuser', password='Qwerty246')
+        response = self.client.get(reverse('Preschool_Play:scoregraphs'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Daily sum")
+        self.assertTemplateUsed(response, 'Preschool_Play/score-graphs.html')
+
+    def test_unauthorized_access(self):
+        self.profile = UserProfile(user=self.user, is_admin=False)
+        self.profile.save()
+        self.client = Client()
+        self.client.login(username='testuser', password='Qwerty246')
+        response = self.client.get(reverse('Preschool_Play:scoregraphs'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Unauthorized user")
+        self.assertTemplateUsed(response, 'Preschool_Play/error.html')
+
+    def test_parent_access(self):
+        self.profile = UserProfile(user=self.user, is_admin=False)
+        self.profile.save()
+        self.child = Child(name='son', parent=self.user)
+        self.child.save()
+        self.client = Client()
+        self.client.login(username='testuser', password='Qwerty246')
+        response = self.client.get(reverse('Preschool_Play:scoregraphs', kwargs={'name':'son'}))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Daily sum")
+        self.assertTemplateUsed(response, 'Preschool_Play/score-graphs.html')
+
+
 @tag('unit-test')
 class TestSuspensionView(TestCase):
     def setUp(self):
