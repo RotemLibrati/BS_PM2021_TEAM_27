@@ -122,6 +122,24 @@ class TestSearchUserView(TestCase):
         self.assertContains(response, 'nuser')
 
 
+class TestParentView(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='Qwerty246')
+        self.user.save()
+        self.profile = UserProfile(user=self.user, type='parent')
+        self.profile.save()
+        self.child = Child(name='son', parent=self.user)
+        self.child.save()
+
+    def test_child_is_visible_in_parent_page(self):
+        self.client = Client()
+        self.client.login(username='testuser', password='Qwerty246')
+        response = self.client.get(reverse('Preschool_Play:parent'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "son")
+        self.assertTemplateUsed(response, 'Preschool_Play/parent.html')
+
+
 # @tag('unit-test')
 # class TestMediaView(TestCase):
 #     def setUp(self):
