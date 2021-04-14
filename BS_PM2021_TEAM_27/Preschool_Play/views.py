@@ -8,8 +8,7 @@ from django.db.models import Sum
 from django.db.models.functions import ExtractDay, ExtractMonth, ExtractYear
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
-
-
+from django import forms
 from .models import *
 import json
 from .forms import DeleteMediaForm, LoginForm, MessageForm, AddMediaForm
@@ -225,8 +224,20 @@ def new_message(request, **kwargs):
     if request.user is None or not request.user.is_authenticated:
         return HttpResponse("Not logged in")
     user_profile = UserProfile.objects.get(user=request.user)
-    user_list = User.objects.all()
-    profile_list = UserProfile.objects.all()
+    teachers_users = None
+    parents_users = None
+    if user_profile.type == 'teacher':
+        teachers_users = User.objects.all()
+        parents_users = User.objects.filter(profile__type='parent', profile__child__teacher=request.user,
+                                            profile__is_admin=False)
+    if user_profile.type == 'parent':
+        teachers_users = User.objects.filter(student__parent=request.user)
+        parents_users = User.objects.filter(profile__type='parent', child__teacher__in=list(teachers_users),
+                                            profile__is_admin=False)
+    if user_profile.is_admin:
+        teachers_users = User.objects.filter(profile__type='teacher')
+        parents_users = User.objects.filter(profile__is_admin=False)
+    admin_users = User.objects.filter(profile__is_admin=True)
     if request.method == 'POST':
         form = MessageForm(request.POST)
         request.user.reply = None
@@ -249,8 +260,12 @@ def new_message(request, **kwargs):
         if kwargs:
             if kwargs['reply']:
                 form = MessageForm({'receiver': kwargs['reply']})
+        all_users = list(teachers_users) + list(parents_users) + list(admin_users)
+        form.fields['receiver'] = forms.CharField(
+            widget=forms.Select(choices=[(u.username, u.username) for u in all_users]))
+        form.fields['receiver'].initial = all_users[0].username
     return render(request, 'Preschool_Play/new-message.html', {
-        'form': form, 'users': user_list, 'user': request.user, 'user_profile': user_profile, 'profiles': profile_list
+        'form': form, 'teachers': teachers_users, 'parents': parents_users, 'user': request.user, 'admins': admin_users
     })
 
 
