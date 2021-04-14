@@ -37,6 +37,7 @@ class Message(models.Model):
     deleted_by_sender = models.BooleanField(default=False)
     deleted_by_receiver = models.BooleanField(default=False)
     is_public = models.BooleanField(default=False)
+    is_unread = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.sender}  to  {self.receiver}"
