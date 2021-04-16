@@ -55,12 +55,20 @@ class Media(models.Model):
         return f'Name: {self.name}. Path: {self.path}. Type: {self.type}'
 
 
+class Kindergarten(models.Model):
+    name = models.CharField(max_length=50, blank=True, null=False)
+    teacher = models.ForeignKey(UserProfile, related_name='teacher', on_delete=models.SET_NULL, null=True)
+
+    def __str__(self):
+        return f'Name Kindergarten: {self.name}, Teacher: {self.teacher} '
+
+
 class Child(models.Model):
     name = models.CharField(max_length=20)
     parent = models.ForeignKey(User, related_name='child', on_delete=models.SET_NULL, null=True)
     teacher = models.ForeignKey(User, related_name='student', on_delete=models.SET_NULL, null=True)
     suspension_time = models.DateTimeField(default=datetime(2000, 1, 1))
-    #kindergarten = models.ForeignKey(Kindergarten, related_name='name')
+    kindergarten = models.ForeignKey(Kindergarten, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return f'Name: {self.name}. Parent: {self.parent}'
@@ -75,12 +83,3 @@ class Score(models.Model):
 
     def __str__(self):
         return f'Child: {self.child.__str__()}, Amount: {self.amount.__str__()}, Comment: {self.comment}, Date: {self.date.__str__()}'
-
-
-class Kindergarten(models.Model):
-    name = models.CharField(max_length=50, blank=True, null=False)
-    teacher = models.ForeignKey(UserProfile, related_name='teacher',  on_delete=models.SET_NULL, blank=True, null=False)
-
-    def __str__(self):
-        return f'Name Kindergarten: {self.name}, Teacher: {self.teacher} '
-
