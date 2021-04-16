@@ -60,6 +60,7 @@ class Child(models.Model):
     parent = models.ForeignKey(User, related_name='child', on_delete=models.SET_NULL, null=True)
     teacher = models.ForeignKey(User, related_name='student', on_delete=models.SET_NULL, null=True)
     suspension_time = models.DateTimeField(default=datetime(2000, 1, 1))
+    #kindergarten = models.ForeignKey(Kindergarten, related_name='name')
 
     def __str__(self):
         return f'Name: {self.name}. Parent: {self.parent}'
@@ -76,16 +77,10 @@ class Score(models.Model):
         return f'Child: {self.child.__str__()}, Amount: {self.amount.__str__()}, Comment: {self.comment}, Date: {self.date.__str__()}'
 
 
-# class ScoreTable(models.Model):
-#     child = models.ForeignKey(Child, related_name='ScoreTable', on_delete=models.SET_NULL, null=True)
-#     points = models.IntegerField(default=0)
-#     game = models.CharField(max_length=50, blank=True, null=False)
-#
-#     class Meta:
-#         constraints = [
-#             models.UniqueConstraint(fields=['child', 'game'], name='constraint'),
-#         ]
-#
-#     def __str__(self):
-#         return f'Child: {self.child.__str__()}, Points: {self.points.__str__()}, Game: {self.game}'
+class Kindergarten(models.Model):
+    name = models.CharField(max_length=50, blank=True, null=False)
+    teacher = models.ForeignKey(UserProfile, related_name='teacher',  on_delete=models.SET_NULL, blank=True, null=False)
+
+    def __str__(self):
+        return f'Name Kindergarten: {self.name}, Teacher: {self.teacher} '
 
