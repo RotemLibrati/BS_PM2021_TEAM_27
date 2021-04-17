@@ -60,7 +60,7 @@ class Kindergarten(models.Model):
     teacher = models.ForeignKey(UserProfile, related_name='teacher', on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
-        return f'Name Kindergarten: {self.name}, Teacher: {self.teacher} '
+        return self.name
 
 
 class Child(models.Model):

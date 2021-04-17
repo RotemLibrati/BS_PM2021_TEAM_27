@@ -11,7 +11,7 @@ from django.shortcuts import render
 from django import forms
 from .models import *
 import json
-from .forms import DeleteMediaForm, LoginForm, MessageForm, AddMediaForm
+from .forms import DeleteMediaForm, LoginForm, MessageForm, AddMediaForm, KindergartenListForm
 
 
 def index(request):
@@ -292,6 +292,7 @@ def parent(request):
     context = {'children': children}
     return render(request, 'Preschool_Play/parent.html', context)
 
+
 def scoretable(request):
     user = request.user
     user_profile = UserProfile.objects.get(user=user)
@@ -299,6 +300,7 @@ def scoretable(request):
         user_list = Score.objects.filter(child__teacher=user)
         context = {'user_list': user_list}
     return render(request, 'Preschool_Play/scoretable_teacher.html', context)
+
 
 def suspension_for_teacher(request):
     user = request.user
@@ -326,3 +328,25 @@ def message_board(request, **kwargs):
             Message.objects.get(id=kwargs['delete_message']).delete()
     context['messages'] = Message.objects.filter(is_public=True)
     return render(request, 'Preschool_Play/message-board.html', context)
+
+
+def sort_child_according_kindergarten(request):
+    user = request.user
+    user_profile = UserProfile.objects.get(user=user)
+    if user_profile.is_admin:
+        if request.method == 'POST':
+            form = KindergartenListForm(request.POST)
+            if form.is_valid():
+                name = form.cleaned_data['name']
+                temp = Child.objects.all()
+                children = []
+                for c in temp:
+                    if str(c.kindergarten) == str(name):
+                        children.append(c)
+                context = {'name': name, 'children': children}
+                return render(request, 'Preschool_Play/sort-child.html', context)
+        else:
+            form = KindergartenListForm()
+            return render(request, 'Preschool_Play/show-kindergarten.html', {'form': form})
+    else:
+        return render(request, 'Preschool_Play/error.html', {'message': 'You don\'t have access'})

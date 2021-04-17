@@ -26,5 +26,7 @@ urlpatterns = [
     path('message-board/', views.message_board, name='message-board'),
     path('message-board/<int:delete_message>', views.message_board, name='message-board'),
     path('scoretable_teacher', views.scoretable, name='scoretable_teacher'),
+    path('sort-child', views.sort_child_according_kindergarten, name='sort-child'),
+    path('show-kindergarten', views.sort_child_according_kindergarten, name='show-kindergarten'),
 ]
 

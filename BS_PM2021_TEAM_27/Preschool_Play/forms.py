@@ -4,7 +4,7 @@ from django import forms
 from .models import UserProfile
 from django.contrib.auth.models import User
 
-from .models import Media
+from .models import Media, Kindergarten
 
 
 class LoginForm(forms.Form):
@@ -29,3 +29,9 @@ class MessageForm(forms.Form):
     receiver = forms.CharField()
     subject = forms.CharField(max_length=50, initial='message subject')
     body = forms.CharField(max_length=5000, widget=forms.Textarea)
+
+
+class KindergartenListForm(forms.Form):
+    set = Kindergarten.objects.all()
+    KINDERGARTEN = list(map(lambda x: (str(x.name), str(x.name)), set))
+    name = forms.CharField(widget=forms.Select(choices=KINDERGARTEN))
