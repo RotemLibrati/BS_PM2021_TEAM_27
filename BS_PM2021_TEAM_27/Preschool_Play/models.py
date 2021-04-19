@@ -83,3 +83,9 @@ class Score(models.Model):
 
     def __str__(self):
         return f'Child: {self.child.__str__()}, Amount: {self.amount.__str__()}, Comment: {self.comment}, Date: {self.date.__str__()}'
+
+
+class Notification(models.Model):
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    message = models.CharField(max_length=256)
+    seen = models.BooleanField(default=False)
