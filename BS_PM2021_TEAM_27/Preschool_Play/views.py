@@ -7,11 +7,12 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 from django.db.models.functions import ExtractDay, ExtractMonth, ExtractYear
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.db.models.signals import post_save
 from django import forms
 from .models import *
 import json
-from .forms import DeleteMediaForm, LoginForm, MessageForm, AddMediaForm, KindergartenListForm
+from .forms import DeleteMediaForm, LoginForm, MessageForm, AddMediaForm, KindergartenListForm, CreateUserForm, ProfileForm, ChildForm
+from django.shortcuts import render, get_object_or_404
 
 
 def index(request):
@@ -23,6 +24,12 @@ def index(request):
         unread_messages_amount = Message.objects.filter(receiver=request.user, is_unread=True).count()
         if unread_messages_amount > 0:
             context['unread'] = unread_messages_amount
+    if request.user.is_authenticated:
+        message = Notification.objects.filter(receiver=request.user, seen=False)
+        context['message'] = message
+        for m in message:
+            m.seen = True
+            m.save()
     return render(request, 'Preschool_Play/index.html', context)
 
 
@@ -350,3 +357,74 @@ def sort_child_according_kindergarten(request):
             return render(request, 'Preschool_Play/show-kindergarten.html', {'form': form})
     else:
         return render(request, 'Preschool_Play/error.html', {'message': 'You don\'t have access'})
+
+
+def new_user(request):
+    if request.method == 'POST':
+        user_form = CreateUserForm(request.POST)
+        if user_form.is_valid():
+            user_form.save()
+            user = get_object_or_404(User, username=user_form.cleaned_data['username'])
+            return HttpResponseRedirect(reverse('Preschool_Play:new-profile', args=[str(user.username)]))
+    else:
+        user_form = CreateUserForm()
+        context = {'user_form': user_form}
+        return render(request, 'Preschool_Play/new-user.html', context)
+
+
+def new_profile(request, username):
+    def attach_user(sender, **kwargs):
+        userprofile = kwargs['instance']
+        userprofile.user = user
+        post_save.disconnect(attach_user, sender=UserProfile)
+        userprofile.save()
+
+    if request.method == 'POST':
+        user = User.objects.get(username=username)
+        form = ProfileForm(request.POST)
+        if form.is_valid():
+            post_save.connect(attach_user, sender=UserProfile)
+            form.save()
+            alert = Notification(receiver=User.objects.get(username='admin'), message=f'New user sign up to your system {user}')
+            alert.save()
+            return HttpResponseRedirect(reverse('Preschool_Play:index'))
+    else:
+        user = User.objects.get(username=username)
+        form = ProfileForm()
+    context = {'user': user, 'form': form}
+    return render(request, 'Preschool_Play/new-profile.html', context)
+
+
+@login_required
+def add_child(request):
+    user = request.user
+    user_profile = UserProfile.objects.get(user=user)
+    if user_profile.type != 'parent':
+        return render(request, 'Preschool_Play/error.html', {'message': 'You don\'t parent'})
+    else:
+        if request.method == 'POST':
+            form = ChildForm(request.POST)
+            if form.is_valid():
+                name = form.cleaned_data['name_child']
+                teacher = form.cleaned_data['teacher']
+                kindergarten = form.cleaned_data['kindergarten']
+                chosen_teacher = UserProfile.objects.filter(type='teacher')
+                for t in chosen_teacher:
+                    if str(t.user) == teacher:
+                        finally_chosen_teacher = UserProfile.objects.get(user=t.user)
+                        temp = UserProfile.objects.get(user=t.user)
+                        chosen_kindergarten = Kindergarten.objects.get(teacher=temp)
+                        if chosen_kindergarten.name != kindergarten:
+                            return render(request, 'Preschool_Play/error.html', {'message': 'The teacher and the kindergarten are not suitable'})
+                        new_child = Child(name=name, parent=user, teacher=finally_chosen_teacher, kindergarten=chosen_kindergarten)
+                        new_child.save()
+                        alert = Notification(receiver=User.objects.get(username='admin'), message=f'{user} has registered his child to the system')
+                        alert.save()
+                        return HttpResponseRedirect(reverse('Preschool_Play:index'))
+        else:
+            form = ChildForm()
+            return render(request, 'Preschool_Play/create-child.html', {'form': form})
+
+
+
+

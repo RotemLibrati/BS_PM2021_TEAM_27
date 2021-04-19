@@ -1,7 +1,7 @@
 from builtins import super
-
+from django.contrib.auth.forms import UserCreationForm
 from django import forms
-from .models import UserProfile
+from .models import UserProfile, Child
 from django.contrib.auth.models import User
 
 from .models import Media, Kindergarten
@@ -35,3 +35,46 @@ class KindergartenListForm(forms.Form):
     set = Kindergarten.objects.all()
     KINDERGARTEN = list(map(lambda x: (str(x.name), str(x.name)), set))
     name = forms.CharField(widget=forms.Select(choices=KINDERGARTEN))
+
+
+class CreateUserForm(UserCreationForm):  # create user - django
+    class Meta:
+        model = User
+        fields = ('username',
+                  'first_name',
+                  'last_name',
+                  'email',
+                  'password1',
+                  'password2',
+                  )
+
+        def save(self, commit=True):
+            user = super(CreateUserForm, self).save(commit=False)
+            user.first_name = self.cleaned_data['first_name']
+            user.last_name = self.cleaned_data['last_name']
+            user.email = self.cleaned_data['email']
+
+            if commit:
+                user.save()
+            return user
+
+
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ('address', 'age', 'type')
+
+
+class ChildForm(forms.Form):
+    set = UserProfile.objects.filter(type='teacher')
+    set2 = Kindergarten.objects.all()
+    TEACHER = list(map(lambda x: (str(x.user), str(x.user)), set))
+    KINDERGARTEN = list(map(lambda x: (str(x.name), str(x.name)), set2))
+    name_child= forms.CharField(max_length=30)
+    teacher = forms.CharField(widget=forms.Select(choices=TEACHER))
+    kindergarten = forms.CharField(widget=forms.Select(choices=KINDERGARTEN))
+
+
+#
+# class TeacherForm(forms.Form):
+#     chosen_kindergarten = forms.CharField(max_length=30, label="Choose Your Son")

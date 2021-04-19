@@ -28,5 +28,8 @@ urlpatterns = [
     path('scoretable_teacher', views.scoretable, name='scoretable_teacher'),
     path('sort-child', views.sort_child_according_kindergarten, name='sort-child'),
     path('show-kindergarten', views.sort_child_according_kindergarten, name='show-kindergarten'),
+    path('<str:username>/new-profile/', views.new_profile, name='new-profile'),
+    path('new-user', views.new_user, name='new-user'),
+    path('create-child', views.add_child, name='create-child'),
 ]
 
