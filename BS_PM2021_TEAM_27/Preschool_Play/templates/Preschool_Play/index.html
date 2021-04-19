@@ -7,11 +7,21 @@
 <body>
 <h1>Home Page</h1>
      {% if user.is_authenticated %}
-
+    {% if message %}
+        {% for m in message %}
+            <script>
+                alert('{{m.message}}')
+            </script>
+        {% endfor %}
+    {% endif %}
     {% if profile.is_admin %}
             <li><a href="{% url 'Preschool_Play:add-media' %}" >Add Media</a><br>
 			<li><a href="{% url 'Preschool_Play:delete-media' %}">Delete Media</a><br>
 
+    {% endif %}
+
+    {% if profile.type == 'parent' %}
+        <li><a href="{% url 'Preschool_Play:create-child' %}">Add Child</a><br>
     {% endif %}
     <li><a href="{% url 'Preschool_Play:message-board' %}">Message Board</a><br>
     <li><a href="{% url 'Preschool_Play:inbox' %}">Inbox{% if unread %}({{unread}}){% endif %}</a><br>
@@ -19,7 +29,8 @@
 
     {% endif %}
     {% if not user.is_authenticated %}
-        <li><a href="{% url 'Preschool_Play:login' %}">Login</a><br>
+        <li><a href="{% url 'Preschool_Play:login' %}">Sign-In</a><br>
+        <li><a href="{% url 'Preschool_Play:new-user' %}">Sign-Up</a><br>
     {% endif %}
 </body>
 </html>
