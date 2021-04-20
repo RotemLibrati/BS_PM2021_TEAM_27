@@ -22,6 +22,7 @@
 
     {% if profile.type == 'parent' %}
         <li><a href="{% url 'Preschool_Play:create-child' %}">Add Child</a><br>
+        <li><a href="{% url 'Preschool_Play:delete-user' %}">Delete Child</a><br>
     {% endif %}
     <li><a href="{% url 'Preschool_Play:message-board' %}">Message Board</a><br>
     <li><a href="{% url 'Preschool_Play:inbox' %}">Inbox{% if unread %}({{unread}}){% endif %}</a><br>
