@@ -427,4 +427,31 @@ def add_child(request):
 
 
 
+@login_required
+def delete_note(request, note_id):
+    profile = UserProfile.objects.get(user=request.user)
+    if profile.type != 'teacher':
+        return render(request, 'Preschool_Play/error.html',
+                      {'message': 'Unauthorized user. Only teacher type allowed.'})
+    try:
+        note_to_delete = Note.objects.get(teacher=request.user, id=note_id)
+        note_to_delete.delete()
+    except (TypeError, Note.DoesNotExist):
+        return render(request, 'Preschool_Play/error.html',
+                      {'message': 'Unable to find requested note.'})
+    return render(request, 'Preschool_Play/notes.html', {'user': request.user, 'profile': profile})
 
+
+@login_required
+def view_note(request, note_id):
+    profile = UserProfile.objects.get(user=request.user)
+    if profile.type != 'teacher':
+        return render(request, 'Preschool_Play/error.html',
+                      {'message': 'Unauthorized user. Only teacher type allowed.'})
+    try:
+        teacher_note = Note.objects.get(id=note_id)
+    except (TypeError, Note.DoesNotExist):
+        return render(request, 'Preschool_Play/error.html',
+                      {'message': 'Unable to find requested note.'})
+    return render(request, 'Preschool_Play/view-note.html',
+                  {'note': teacher_note, 'user': request.user, 'profile': profile})
