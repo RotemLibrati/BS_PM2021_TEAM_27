@@ -89,3 +89,11 @@ class Notification(models.Model):
     receiver = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     message = models.CharField(max_length=256)
     seen = models.BooleanField(default=False)
+
+
+class Note(models.Model):
+    teacher = models.ForeignKey(User, related_name='note', on_delete=models.SET_NULL, null=True)
+    child = models.ForeignKey(Child, related_name='note', on_delete=models.SET_NULL, null=True)
+    date = models.DateTimeField(default=datetime.now, blank=True)
+    subject = models.CharField(max_length=250, blank=True, null=True)
+    body = models.CharField(max_length=500, blank=True, null=True)
