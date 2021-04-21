@@ -11,7 +11,8 @@ from django.db.models.signals import post_save
 from django import forms
 from .models import *
 import json
-from .forms import DeleteMediaForm, LoginForm, MessageForm, AddMediaForm, KindergartenListForm, CreateUserForm, ProfileForm, ChildForm
+from .forms import DeleteMediaForm, LoginForm, MessageForm, AddMediaForm, KindergartenListForm, CreateUserForm, \
+    ProfileForm, ChildForm
 from django.shortcuts import render, get_object_or_404
 
 
@@ -385,7 +386,8 @@ def new_profile(request, username):
         if form.is_valid():
             post_save.connect(attach_user, sender=UserProfile)
             form.save()
-            alert = Notification(receiver=User.objects.get(username='admin'), message=f'New user sign up to your system {user}')
+            alert = Notification(receiver=User.objects.get(username='admin'),
+                                 message=f'New user sign up to your system {user}')
             alert.save()
             return HttpResponseRedirect(reverse('Preschool_Play:index'))
     else:
@@ -415,10 +417,13 @@ def add_child(request):
                         temp = UserProfile.objects.get(user=t.user)
                         chosen_kindergarten = Kindergarten.objects.get(teacher=temp)
                         if chosen_kindergarten.name != kindergarten:
-                            return render(request, 'Preschool_Play/error.html', {'message': 'The teacher and the kindergarten are not suitable'})
-                        new_child = Child(name=name, parent=user, teacher=finally_chosen_teacher, kindergarten=chosen_kindergarten)
+                            return render(request, 'Preschool_Play/error.html',
+                                          {'message': 'The teacher and the kindergarten are not suitable'})
+                        new_child = Child(name=name, parent=user, teacher=finally_chosen_teacher,
+                                          kindergarten=chosen_kindergarten)
                         new_child.save()
-                        alert = Notification(receiver=User.objects.get(username='admin'), message=f'{user} has registered his child to the system')
+                        alert = Notification(receiver=User.objects.get(username='admin'),
+                                             message=f'{user} has registered his child to the system')
                         alert.save()
                         return HttpResponseRedirect(reverse('Preschool_Play:index'))
         else:

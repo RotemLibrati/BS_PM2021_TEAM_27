@@ -31,5 +31,9 @@ urlpatterns = [
     path('<str:username>/new-profile/', views.new_profile, name='new-profile'),
     path('new-user', views.new_user, name='new-user'),
     path('create-child', views.add_child, name='create-child'),
+    path('notes', views.notes, name='notes'),
+    path('notes/<str:orderby>', views.notes, name='notes'),
+    path('notes/delete/<int:note_id>', views.delete_note, name='delete-note'),
+    path('view-note/<int:note_id>', views.view_note, name='view-note'),
 ]
 
