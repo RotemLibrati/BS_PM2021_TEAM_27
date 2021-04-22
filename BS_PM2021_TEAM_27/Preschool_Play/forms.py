@@ -84,3 +84,7 @@ class DeleteUserForm(forms.Form):
 
     child = forms.ModelChoiceField(queryset=Child.objects.all())
     password = forms.CharField(widget=forms.PasswordInput)
+
+
+class DeletePrimaryUserForm(forms.Form):
+    password = forms.CharField(widget=forms.PasswordInput)

@@ -11,7 +11,8 @@ from django.db.models.signals import post_save
 from django import forms
 from .models import *
 import json
-from .forms import DeleteMediaForm, LoginForm, MessageForm, AddMediaForm, KindergartenListForm, CreateUserForm, ProfileForm, ChildForm, DeleteUserForm
+from .forms import DeleteMediaForm, LoginForm, MessageForm, AddMediaForm, KindergartenListForm,\
+    CreateUserForm, ProfileForm, ChildForm, DeleteUserForm, DeletePrimaryUserForm
 from django.shortcuts import render, get_object_or_404
 
 
@@ -441,7 +442,7 @@ def delete_user(request):
                 if user.check_password(password):
                     name.delete()
                 else:
-                    alert = Notification(receiver=user, message='The password is incorrect, you are taken to the home page')
+                    alert = Notification(receiver=user, message='The password is incorrect, you are passed to the home page')
                     alert.save()
                     return HttpResponseRedirect(reverse('Preschool_Play:index'))
         return HttpResponseRedirect(reverse('Preschool_Play:index'))
@@ -451,7 +452,32 @@ def delete_user(request):
     return render(request, 'Preschool_Play/delete-user.html', context)
 
 
-#TODO : DELETE PRIMARY USER and add commit of 125
-# def delete_primary_user(request):
-#     user = request.user
+def delete_primary_user(request):
+    if request.user is None or not request.user.is_authenticated:
+        return HttpResponse("Not logged in")
+    user = request.user
+    user_profile = UserProfile.objects.get(user=user)
+    if request.method == 'POST':
+        form = DeletePrimaryUserForm(request.POST)
+        if form.is_valid():
+            print("in form")
+            if "_make-unique" in request.POST:
+                password = form.cleaned_data['password']
+                if user.check_password(password):
+                    #request.user = AnonymousUser()
+                    #user_profile = AnonymousUser()
+                    #u = UserProfile.objects.get(user='rotem38')
+                    user_profile.delete()
+                    request.user.delete()
+                else:
+                    alert = Notification(receiver=user, message='The password is incorrect, you are passed to the home page')
+                    alert.save()
+                    return HttpResponseRedirect(reverse('Preschool_Play:index'))
+        return HttpResponseRedirect(reverse('Preschool_Play:index'))
+    else:
+        form = DeletePrimaryUserForm()
+    context = {'form': form, 'user_profile': user_profile}
+    return render(request, 'Preschool_Play/delete-primary-user.html', context)
+
+
 
