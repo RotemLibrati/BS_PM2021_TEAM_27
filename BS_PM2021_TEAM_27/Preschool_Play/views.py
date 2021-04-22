@@ -460,13 +460,9 @@ def delete_primary_user(request):
     if request.method == 'POST':
         form = DeletePrimaryUserForm(request.POST)
         if form.is_valid():
-            print("in form")
             if "_make-unique" in request.POST:
                 password = form.cleaned_data['password']
                 if user.check_password(password):
-                    #request.user = AnonymousUser()
-                    #user_profile = AnonymousUser()
-                    #u = UserProfile.objects.get(user='rotem38')
                     user_profile.delete()
                     request.user.delete()
                 else:
