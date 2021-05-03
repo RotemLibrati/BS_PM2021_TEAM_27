@@ -35,5 +35,6 @@ urlpatterns = [
     path('notes/<str:orderby>', views.notes, name='notes'),
     path('notes/delete/<int:note_id>', views.delete_note, name='delete-note'),
     path('view-note/<int:note_id>', views.view_note, name='view-note'),
+    path('child-area', views.child_area, name='child-area'),
 ]
 

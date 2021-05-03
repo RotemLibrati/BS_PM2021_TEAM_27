@@ -301,6 +301,10 @@ def parent(request):
     return render(request, 'Preschool_Play/parent.html', context)
 
 
+def child_area(request):
+    return render(request, 'Preschool_Play/child-area.html')
+
+
 def scoretable(request):
     user = request.user
     user_profile = UserProfile.objects.get(user=user)
