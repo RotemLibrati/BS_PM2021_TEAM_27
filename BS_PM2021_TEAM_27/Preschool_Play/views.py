@@ -296,8 +296,8 @@ def new_message(request, **kwargs):
 
 
 def parent(request):
-    children = Child.objects.filter(parent=request.user)
-    context = {'children': children}
+    children = Child.objects.filter(parent=request.user.profile)
+    context = {'children': children, 'user': request.user}
     return render(request, 'Preschool_Play/parent.html', context)
 
 
@@ -309,7 +309,7 @@ def scoretable(request):
     user = request.user
     user_profile = UserProfile.objects.get(user=user)
     if user_profile.type == 'teacher':
-        user_list = Score.objects.filter(child__teacher=user)
+        user_list = Score.objects.filter(child__teacher=user.profile)
         context = {'user_list': user_list}
     return render(request, 'Preschool_Play/scoretable_teacher.html', context)
 
