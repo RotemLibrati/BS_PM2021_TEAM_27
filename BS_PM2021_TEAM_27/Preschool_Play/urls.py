@@ -34,5 +34,6 @@ urlpatterns = [
     path('delete-user', views.delete_user, name='delete-user'),
     path('delete-primary-user', views.delete_primary_user, name='delete-primary-user'),
     path('FAQ', views.FAQ, name='FAQ'),
+    path('child-area/<str:name>', views.child_area, name='child-area'),
 ]
 

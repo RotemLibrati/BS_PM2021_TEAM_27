@@ -254,7 +254,7 @@ def new_message(request, **kwargs):
     parents_users = None
     if user_profile.type == 'teacher':
         teachers_users = User.objects.all()
-        parents_users = User.objects.filter(profile__type='parent', profile__child__teacher=request.user,
+        parents_users = User.objects.filter(profile__type='parent', profile__child__teacher=request.user.profile,
                                             profile__is_admin=False)
     if user_profile.type == 'parent':
         teachers_users = User.objects.filter(student__parent=request.user)
@@ -301,8 +301,10 @@ def parent(request):
     return render(request, 'Preschool_Play/parent.html', context)
 
 
-def child_area(request):
-    return render(request, 'Preschool_Play/child-area.html')
+def child_area(request, name):
+    child = Child.objects.get(parent=request.user.profile,name=name)
+    context = {'child': child}
+    return render(request, 'Preschool_Play/child-area.html', context)
 
 
 def scoretable(request):
@@ -494,7 +496,7 @@ def view_note(request, note_id):
     return render(request, 'Preschool_Play/view-note.html',
                   {'note': teacher_note, 'user': request.user, 'profile': profile})
 
-@login_required
+
 def FAQ(request):
     context = {}
     context['FAQ'] = FAQ.objects.all()
