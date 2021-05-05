@@ -65,7 +65,7 @@ class Kindergarten(models.Model):
 
 class Child(models.Model):
     name = models.CharField(max_length=20)
-    parent = models.ForeignKey(User, related_name='child', on_delete=models.SET_NULL, null=True)
+    parent = models.ForeignKey(UserProfile, related_name='child', on_delete=models.SET_NULL, null=True)
     teacher = models.ForeignKey(UserProfile, related_name='student', on_delete=models.SET_NULL, null=True)
     suspension_time = models.DateTimeField(default=datetime(2000, 1, 1))
     kindergarten = models.ForeignKey(Kindergarten, on_delete=models.SET_NULL, null=True)

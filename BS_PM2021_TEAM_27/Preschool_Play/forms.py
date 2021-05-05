@@ -1,6 +1,8 @@
 from builtins import super
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
+from django.forms import ModelForm
+
 from .models import UserProfile, Child
 from django.contrib.auth.models import User
 
@@ -75,6 +77,14 @@ class ChildForm(forms.Form):
     kindergarten = forms.CharField(widget=forms.Select(choices=KINDERGARTEN))
 
 
-#
-# class TeacherForm(forms.Form):
-#     chosen_kindergarten = forms.CharField(max_length=30, label="Choose Your Son")
+class DeleteUserForm(forms.Form):
+    def __init__(self, set1, *args, **kwargs):
+        super(DeleteUserForm, self).__init__(*args, **kwargs)
+        self.fields['child'].queryset = set1
+
+    child = forms.ModelChoiceField(queryset=Child.objects.all())
+    password = forms.CharField(widget=forms.PasswordInput)
+
+
+class DeletePrimaryUserForm(forms.Form):
+    password = forms.CharField(widget=forms.PasswordInput)

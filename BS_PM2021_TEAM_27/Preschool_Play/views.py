@@ -11,7 +11,8 @@ from django.db.models.signals import post_save
 from django import forms
 from .models import *
 import json
-from .forms import DeleteMediaForm, LoginForm, MessageForm, AddMediaForm, KindergartenListForm, CreateUserForm, ProfileForm, ChildForm
+from .forms import DeleteMediaForm, LoginForm, MessageForm, AddMediaForm, KindergartenListForm,\
+    CreateUserForm, ProfileForm, ChildForm, DeleteUserForm, DeletePrimaryUserForm
 from django.shortcuts import render, get_object_or_404
 
 
@@ -416,7 +417,7 @@ def add_child(request):
                         chosen_kindergarten = Kindergarten.objects.get(teacher=temp)
                         if chosen_kindergarten.name != kindergarten:
                             return render(request, 'Preschool_Play/error.html', {'message': 'The teacher and the kindergarten are not suitable'})
-                        new_child = Child(name=name, parent=user, teacher=finally_chosen_teacher, kindergarten=chosen_kindergarten)
+                        new_child = Child(name=name, parent=user_profile, teacher=finally_chosen_teacher, kindergarten=chosen_kindergarten)
                         new_child.save()
                         alert = Notification(receiver=User.objects.get(username='admin'), message=f'{user} has registered his child to the system')
                         alert.save()
@@ -425,6 +426,54 @@ def add_child(request):
             form = ChildForm()
             return render(request, 'Preschool_Play/create-child.html', {'form': form})
 
+
+def delete_user(request):
+    if request.user is None or not request.user.is_authenticated:
+        return HttpResponse("Not logged in")
+    user = request.user
+    user_profile = UserProfile.objects.get(user=user)
+    child = Child.objects.filter(parent=user_profile)
+    if request.method == 'POST':
+        form = DeleteUserForm(child, request.POST)
+        if form.is_valid():
+            if "_make-unique" in request.POST:
+                name = form.cleaned_data['child']
+                password = form.cleaned_data['password']
+                if user.check_password(password):
+                    name.delete()
+                else:
+                    alert = Notification(receiver=user, message='The password is incorrect, you are passed to the home page')
+                    alert.save()
+                    return HttpResponseRedirect(reverse('Preschool_Play:index'))
+        return HttpResponseRedirect(reverse('Preschool_Play:index'))
+    else:
+        form = DeleteUserForm(child)
+    context = {'form': form}
+    return render(request, 'Preschool_Play/delete-user.html', context)
+
+
+def delete_primary_user(request):
+    if request.user is None or not request.user.is_authenticated:
+        return HttpResponse("Not logged in")
+    user = request.user
+    user_profile = UserProfile.objects.get(user=user)
+    if request.method == 'POST':
+        form = DeletePrimaryUserForm(request.POST)
+        if form.is_valid():
+            if "_make-unique" in request.POST:
+                password = form.cleaned_data['password']
+                if user.check_password(password):
+                    user_profile.delete()
+                    request.user.delete()
+                else:
+                    alert = Notification(receiver=user, message='The password is incorrect, you are passed to the home page')
+                    alert.save()
+                    return HttpResponseRedirect(reverse('Preschool_Play:index'))
+        return HttpResponseRedirect(reverse('Preschool_Play:index'))
+    else:
+        form = DeletePrimaryUserForm()
+    context = {'form': form, 'user_profile': user_profile}
+    return render(request, 'Preschool_Play/delete-primary-user.html', context)
 
 
 
