@@ -56,12 +56,15 @@ def score_graphs(request, **kwargs):
     else:
         if kwargs:
             if 'name' in kwargs:
-                children = list(Child.objects.filter(parent=request.user, name=kwargs['name']))
+                children = list(Child.objects.filter(parent=request.user.profile, name=kwargs['name']))
+                if children.__len__() <= 0:
+                    children = list(Child.objects.filter(teacher=request.user.profile, name=kwargs['name']))
                 if children.__len__() > 0:
                     context['scoreData'] = list(
                         Score.objects.filter(child=children[0]).values(d=ExtractDay('date'), m=ExtractMonth('date'),
                                                                        y=ExtractYear('date')).annotate(
                             Sum('amount')))
+                    context['child'] = children[0]
                     return render(request, 'Preschool_Play/score-graphs.html', context)
     return render(request, 'Preschool_Play/error.html', {'message': 'Unauthorized user'})
 
@@ -249,6 +252,14 @@ def find_student_of_teacher(request):
     students = Child.objects.filter(teacher=chosen_teacher_profile)
     context = {'teacher_users': teacher_users, 'chosen_teacher_user': chosen_teacher_user, 'students': students}
     return render(request, 'Preschool_Play/find-student-of-teacher.html', context)
+
+
+@login_required
+def my_students(request):
+    if request.user.profile.type != 'teacher':
+        return render(request, 'Preschool_Play/failure.html', {'error': 'Unauthorized user.'})
+    students = list(Child.objects.filter(teacher=request.user.profile))
+    return render(request, 'Preschool_Play/my-students.html', {'students': students})
 
 
 def delete_message(request, message_id):

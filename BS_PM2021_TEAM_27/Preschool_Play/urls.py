@@ -30,10 +30,11 @@ urlpatterns = [
     path('show-kindergarten', views.sort_child_according_kindergarten, name='show-kindergarten'),
     path('<str:username>/new-profile/', views.new_profile, name='new-profile'),
     path('new-user', views.new_user, name='new-user'),
+    path('my-students', views.my_students, name='my-students'),
     path('find-student-of-teacher', views.find_student_of_teacher, name='find-student-of-teacher'),
     path('find-student-of-teacher/<str:teacher_fname>/<str:teacher_lname>', views.find_student_of_teacher, name='find-student-of-teacher'),
     path('create-child', views.add_child, name='create-child'),
-    # path('delete-user', views.delete_user, name='delete-user'),
-    # path('delete-primary-user', views.delete_primary_user, name='delete-primary-user'),
+    path('delete-user', views.delete_user, name='delete-user'),
+    path('delete-primary-user', views.delete_primary_user, name='delete-primary-user'),
 ]
 
