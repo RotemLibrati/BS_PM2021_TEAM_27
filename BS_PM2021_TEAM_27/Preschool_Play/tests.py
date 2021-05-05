@@ -20,7 +20,8 @@ class TestInboxView(TestCase):
 
     def test_with_no_messages(self):
         c = Client()
-        user = User.objects.create_user(username='tester', password='qwerty246')
+        user = User.objects.create_user(username='tester')
+        user.set_password('qwerty246')
         user.save()
         user_profile = UserProfile.objects.create(user=user)
         user_profile.save()
@@ -163,7 +164,8 @@ class TestUserProfileModel(TestCase):
 
 class TestScoreGraphsView(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username='testuser', password='Qwerty246')
+        self.user = User.objects.create_user(username='testuser')
+        self.user.set_password('Qwerty246')
         self.user.save()
 
     def test_admin_access(self):
@@ -201,7 +203,8 @@ class TestScoreGraphsView(TestCase):
     def test_teacher_access(self):
         self.profile = UserProfile(user=self.user, type='parent')
         self.profile.save()
-        self.teacher = User.objects.create_user(username='teacher_user', password='Qwerty246')
+        self.teacher = User.objects.create(username='teacher_user')
+        self.teacher.set_password('Qwerty246')
         self.teacher.save()
         self.teacher_profile = UserProfile(user=self.teacher, type='teacher')
         self.teacher_profile.save()
@@ -212,16 +215,17 @@ class TestScoreGraphsView(TestCase):
         self.score.save()
         self.client = Client()
         self.client.login(username='teacher_user', password='Qwerty246')
-        response = self.client.get(reverse('Preschool_Play:scoregraphs'), data={'name': 'ben'})
+        response = self.client.get(reverse('Preschool_Play:scoregraphs', kwargs={'name': 'ben'}))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "ben")
-        self.assertTemplateUsed(response, 'Preschool_Play/scoregraphs.html')
+        self.assertTemplateUsed(response, 'Preschool_Play/score-graphs.html')
 
 
 @tag('unit-test')
 class TestSuspensionView(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username='testuser', password='Qwerty246')
+        self.user = User.objects.create_user(username='testuser')
+        self.user.set_password('Qwerty246')
         self.user.save()
         self.profile = UserProfile(user=self.user, is_admin=True)
         self.profile.save()
@@ -331,7 +335,8 @@ class TestMyStudentsView(TestCase):
 #         self.assertContains(response, "Delete Media")
 class TestMediaView(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username='testuser', password='Qwerty246')
+        self.user = User.objects.create_user(username='testuser')
+        self.user.set_password('Qwerty246')
         self.user.save()
         self.profile = UserProfile(user=self.user, is_admin=True)
         self.profile.save()
@@ -377,7 +382,8 @@ class TestUrl(TestCase):
 @tag('unit-test')
 class TestMessageBoardView(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username='testuser', password='Qwerty246')
+        self.user = User.objects.create_user(username='testuser')
+        self.user.set_password('Qwerty246')
         self.user.save()
         self.profile = UserProfile(user=self.user, is_admin=False)
         self.profile.save()
@@ -396,7 +402,8 @@ class TestMessageBoardView(TestCase):
 
 class TestNewMessageView(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username='testuser', password='Qwerty246')
+        self.user = User.objects.create_user(username='testuser')
+        self.user.set_password('Qwerty246')
         self.user.save()
         self.profile = UserProfile(user=self.user, type='parent')
         self.profile.save()
