@@ -55,7 +55,7 @@ def score_graphs(request, **kwargs):
         return render(request, 'Preschool_Play/score-graphs.html', context)
     else:
         if kwargs:
-            if kwargs['name']:
+            if 'name' in kwargs:
                 children = list(Child.objects.filter(parent=request.user, name=kwargs['name']))
                 if children.__len__() > 0:
                     context['scoreData'] = list(

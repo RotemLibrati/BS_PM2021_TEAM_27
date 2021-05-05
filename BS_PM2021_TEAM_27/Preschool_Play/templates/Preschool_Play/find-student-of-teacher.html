@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Find Student By Teacher</title>
+</head>
+<body>
+    {% if chosen_teacher_user %}
+    <h2>Results for Teacher: {{chosen_teacher_user.first_name}} {{chosen_teacher_user.last_name}}</h2>
+    <ul>
+        {% for s in students %}
+        <li>{{s}}</li>
+        {% empty %}
+        <p>No students were found for this teacher.</p>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    <h2>Choose a teacher:</h2>
+    <ul>
+        {% for t in teacher_users %}
+        <li><b>Username:</b> {{t.username}}. <b>Name:</b> {{t.first_name}} {{t.last_name}}.</li>
+        {% endfor %}
+    </ul>
+    <form action="{% url 'Preschool_Play:find-student-of-teacher' %} " method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Find</button>
+    </form>
+</body>
+</html>
