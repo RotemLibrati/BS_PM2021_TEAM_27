@@ -189,7 +189,7 @@ class TestScoreGraphsView(TestCase):
     def test_parent_access(self):
         self.profile = UserProfile(user=self.user, is_admin=False)
         self.profile.save()
-        self.child = Child(name='son', parent=self.user)
+        self.child = Child(name='son', parent=self.profile)
         self.child.save()
         self.client = Client()
         self.client.login(username='testuser', password='Qwerty246')
@@ -197,6 +197,25 @@ class TestScoreGraphsView(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Daily sum")
         self.assertTemplateUsed(response, 'Preschool_Play/score-graphs.html')
+
+    def test_teacher_access(self):
+        self.profile = UserProfile(user=self.user, type='parent')
+        self.profile.save()
+        self.teacher = User.objects.create_user(username='teacher_user', password='Qwerty246')
+        self.teacher.save()
+        self.teacher_profile = UserProfile(user=self.teacher, type='teacher')
+        self.teacher_profile.save()
+        self.child = Child(name='ben', parent=self.profile, teacher=self.teacher_profile)
+        self.child.save()
+        self.score_date = datetime.now()
+        self.score = Score(child=self.child, amount=22, date=self.score_date)
+        self.score.save()
+        self.client = Client()
+        self.client.login(username='teacher_user', password='Qwerty246')
+        response = self.client.get(reverse('Preschool_Play:scoregraphs'), data={'name': 'ben'})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "ben")
+        self.assertTemplateUsed(response, 'Preschool_Play/scoregraphs.html')
 
 
 @tag('unit-test')
@@ -263,6 +282,30 @@ class TestParentView(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "son")
         self.assertTemplateUsed(response, 'Preschool_Play/parent.html')
+
+
+class TestMyStudentsView(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='Qwerty246')
+        self.user.save()
+        self.profile = UserProfile(user=self.user, type='parent')
+        self.profile.save()
+        self.teacher = User.objects.create_user(username='teacher_user', password='Qwerty246')
+        self.user.save()
+        self.teacher_profile = UserProfile(user=self.teacher, type='teacher')
+        self.teacher_profile.save()
+        self.child = Child(name='ben', parent=self.profile, teacher=self.teacher_profile)
+        self.child.save()
+        self.score_date = datetime.now()
+        self.score = Score(child=self.child, amount=22, date=self.score_date)
+
+    def test_with_teacher_login(self):
+        self.client = Client()
+        self.client.login(username='teacher_user', password='Qwerty246')
+        response = self.client.get(reverse('Preschool_Play:my-students'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "ben")
+        self.assertTemplateUsed(response, 'Preschool_Play/my-students.html')
 
 
 # @tag('unit-test')
