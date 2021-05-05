@@ -12,7 +12,7 @@ from django import forms
 from .models import *
 import json
 from .forms import DeleteMediaForm, LoginForm, MessageForm, AddMediaForm, KindergartenListForm,\
-    CreateUserForm, ProfileForm, ChildForm, DeleteUserForm, DeletePrimaryUserForm
+    CreateUserForm, ProfileForm, ChildForm, DeleteUserForm, DeletePrimaryUserForm, FindStudentForm
 from django.shortcuts import render, get_object_or_404
 
 
@@ -224,6 +224,31 @@ def view_message(request, message_id):
     return render(request, 'Preschool_Play/message.html', {'user': request.user,
                                                            'message': message,
                                                            })
+
+
+@login_required
+def find_student_of_teacher(request):
+    user_profile = UserProfile.objects.get(user=request.user)
+    if user_profile.type == 'parent' and not user_profile.is_admin:
+        return render(request, 'Preschool_Play/failure.html', {'error': 'Unauthorized access'})
+    teacher_username = None
+    if request.method == 'POST':
+        form = FindStudentForm(request.POST)
+        if form.is_valid():
+            teacher_username = form.cleaned_data['username']
+    teacher_users = User.objects.filter(profile__type='teacher')
+    if teacher_username is None:
+        form = FindStudentForm()
+        return render(request, 'Preschool_Play/find-student-of-teacher.html', {'teacher_users': teacher_users, 'form': form})
+    try:
+        chosen_teacher_user = User.objects.get(username=teacher_username)
+        chosen_teacher_profile = UserProfile.objects.get(user=chosen_teacher_user)
+    except (TypeError, User.DoesNotExist, UserProfile.DoesNotExist):
+        error = f"User with username \"{teacher_username}\" was not found."
+        return render(request, 'Preschool_Play/failure.html', {'error': error})
+    students = Child.objects.filter(teacher=chosen_teacher_profile)
+    context = {'teacher_users': teacher_users, 'chosen_teacher_user': chosen_teacher_user, 'students': students}
+    return render(request, 'Preschool_Play/find-student-of-teacher.html', context)
 
 
 def delete_message(request, message_id):

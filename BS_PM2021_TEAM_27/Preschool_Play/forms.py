@@ -86,5 +86,9 @@ class DeleteUserForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput)
 
 
+class FindStudentForm(forms.Form):
+    username = forms.CharField(max_length=250)
+
+
 class DeletePrimaryUserForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput)
