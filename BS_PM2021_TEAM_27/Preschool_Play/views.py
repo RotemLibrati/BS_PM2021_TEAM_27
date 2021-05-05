@@ -493,3 +493,11 @@ def view_note(request, note_id):
                       {'message': 'Unable to find requested note.'})
     return render(request, 'Preschool_Play/view-note.html',
                   {'note': teacher_note, 'user': request.user, 'profile': profile})
+
+@login_required
+def FAQ(request):
+    context = {}
+    context['FAQ'] = FAQ.objects.all()
+    return render(request, 'Preschool_Play/FAQ.html', context)
+
+

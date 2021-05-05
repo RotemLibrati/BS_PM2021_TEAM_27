@@ -9,3 +9,12 @@ admin.site.register(Score)
 admin.site.register(Kindergarten)
 admin.site.register(Notification)
 admin.site.register(Note)
+
+
+class FAQAdmin(admin.ModelAdmin):
+    list_display = ('question','answer')
+
+admin.site.register(FAQ,FAQAdmin)
+
+
+

@@ -31,7 +31,8 @@ urlpatterns = [
     path('<str:username>/new-profile/', views.new_profile, name='new-profile'),
     path('new-user', views.new_user, name='new-user'),
     path('create-child', views.add_child, name='create-child'),
-    path('delete-user', views.delete_user, name='delete-user'),
-    path('delete-primary-user', views.delete_primary_user, name='delete-primary-user'),
+    #path('delete-user', views.delete_user, name='delete-user'),
+    #path('delete-primary-user', views.delete_primary_user, name='delete-primary-user'),
+    path('FAQ', views.FAQ, name='FAQ'),
 ]
 
