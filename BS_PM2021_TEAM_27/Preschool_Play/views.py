@@ -332,8 +332,8 @@ def new_message(request, **kwargs):
 
 
 def parent(request):
-    children = Child.objects.filter(parent=request.user)
-    context = {'children': children}
+    children = Child.objects.filter(parent=request.user.profile)
+    context = {'children': children, 'user': request.user}
     return render(request, 'Preschool_Play/parent.html', context)
 
 
@@ -345,7 +345,7 @@ def scoretable(request):
     user = request.user
     user_profile = UserProfile.objects.get(user=user)
     if user_profile.type == 'teacher':
-        user_list = Score.objects.filter(child__teacher=user)
+        user_list = Score.objects.filter(child__teacher=user.profile)
         context = {'user_list': user_list}
     return render(request, 'Preschool_Play/scoretable_teacher.html', context)
 
@@ -529,3 +529,11 @@ def view_note(request, note_id):
                       {'message': 'Unable to find requested note.'})
     return render(request, 'Preschool_Play/view-note.html',
                   {'note': teacher_note, 'user': request.user, 'profile': profile})
+
+@login_required
+def FAQ(request):
+    context = {}
+    context['FAQ'] = FAQ.objects.all()
+    return render(request, 'Preschool_Play/FAQ.html', context)
+
+
