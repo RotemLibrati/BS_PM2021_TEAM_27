@@ -14,7 +14,7 @@ import json
 from .forms import DeleteMediaForm, LoginForm, MessageForm, AddMediaForm, KindergartenListForm,\
     CreateUserForm, ProfileForm, ChildForm, DeleteUserForm, DeletePrimaryUserForm
 from django.shortcuts import render, get_object_or_404
-
+from django.shortcuts import render,redirect
 
 def index(request):
     context = {}
@@ -504,3 +504,22 @@ def FAQ(request):
     return render(request, 'Preschool_Play/FAQ.html', context)
 
 
+def upload_video(request):
+    if request.method == 'POST':
+        title = request.POST['title']
+        video = request.POST['video']
+
+        content = Videos(title=title, video=video)
+        content.save()
+        return redirect('home')
+
+    return render(request, 'upload.html')
+
+
+def display(request):
+    videos = Videos.objects.all()
+    context = {
+        'videos': videos,
+    }
+
+    return render(request, 'videos.html', context)
