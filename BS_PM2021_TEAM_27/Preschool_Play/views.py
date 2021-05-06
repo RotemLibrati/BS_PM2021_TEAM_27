@@ -497,6 +497,7 @@ def view_note(request, note_id):
                   {'note': teacher_note, 'user': request.user, 'profile': profile})
 
 
+@login_required
 def FAQ(request):
     context = {}
     context['FAQ'] = FAQ.objects.all()
