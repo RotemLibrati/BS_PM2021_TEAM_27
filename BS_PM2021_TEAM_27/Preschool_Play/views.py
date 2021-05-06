@@ -11,8 +11,8 @@ from django.db.models.signals import post_save
 from django import forms
 from .models import *
 import json
-from .forms import DeleteMediaForm, LoginForm, MessageForm, AddMediaForm, KindergartenListForm,\
-    CreateUserForm, ProfileForm, ChildForm, DeleteUserForm, DeletePrimaryUserForm, FindStudentForm
+from .forms import DeleteMediaForm, LoginForm, MessageForm, AddMediaForm, KindergartenListForm, \
+    CreateUserForm, ProfileForm, ChildForm, DeleteUserForm, DeletePrimaryUserForm, FindStudentForm, NoteForm
 from django.shortcuts import render, get_object_or_404
 
 
@@ -528,6 +528,37 @@ def view_note(request, note_id):
                       {'message': 'Unable to find requested note.'})
     return render(request, 'Preschool_Play/view-note.html',
                   {'note': teacher_note, 'user': request.user, 'profile': profile})
+
+def new_note(request):
+    if request.user is None or not request.user.is_authenticated:
+        return HttpResponse("Not logged in")
+    user_profile = UserProfile.objects.get(user=request.user)
+    if user_profile.type == 'teacher':
+        if request.method == 'POST':
+            form = NoteForm(request.POST)
+            if form.is_valid():
+                try:
+                    child = Child.objects.get(name=form.cleaned_data['child'])
+                except (TypeError, User.DoesNotExist):
+                    error = "Could not find child."
+                    render(request, 'Preschool_Play/failure.html', {'error': error})
+                note = Note(teacher=request.user, child=child,
+                            subject=form.cleaned_data['subject'], body=form.cleaned_data['body'])
+                note.save()
+                return HttpResponseRedirect(reverse('Preschool_Play:notes'))
+        else:
+            childs = Child.objects.filter(teacher=request.user.profile)
+            form = NoteForm()
+            form.fields['child'] = forms.CharField(
+                widget=forms.Select(choices=[(u.name, u.name) for u in childs]))
+            return render(request, 'Preschool_Play/new-note.html',
+                          {'user': request.user, 'form': form})
+    return render(request,'Preschool_Play/error.html',{'error':'error: you are not a teacher'})
+
+@login_required
+def notes(request):
+    context = {'notes': Note.objects.all()}
+    return render(request, 'Preschool_Play/notes.html', context)
 
 @login_required
 def FAQ(request):

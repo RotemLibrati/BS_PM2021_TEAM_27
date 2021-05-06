@@ -37,5 +37,8 @@ urlpatterns = [
     path('delete-user', views.delete_user, name='delete-user'),
     path('delete-primary-user', views.delete_primary_user, name='delete-primary-user'),
     path('FAQ', views.FAQ, name='FAQ'),
+    path('view-note/<int:note_id>/', views.view_note, name='view-note'),
+    path('notes', views.notes, name='notes'),
+    path('new-note', views.new_note, name='new-note'),
 ]
 

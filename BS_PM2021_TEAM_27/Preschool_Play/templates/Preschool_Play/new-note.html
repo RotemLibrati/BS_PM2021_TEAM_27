@@ -1,0 +1,6 @@
+<form action="{% url 'Preschool_Play:new-note' %}" method="POST">
+    {% csrf_token %}
+    <h2>New Note</h2>
+    {{form.as_p}}
+    <button type="submit">Submit</button>
+</form>
