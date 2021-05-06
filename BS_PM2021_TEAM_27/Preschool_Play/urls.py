@@ -35,5 +35,7 @@ urlpatterns = [
     path('delete-primary-user', views.delete_primary_user, name='delete-primary-user'),
     path('FAQ', views.FAQ, name='FAQ'),
     path('child-area/<str:name>', views.child_area, name='child-area'),
+    path('upload/',upload_video,name='upload'),
+    path('videos/',display,name='videos'),
 ]
 
