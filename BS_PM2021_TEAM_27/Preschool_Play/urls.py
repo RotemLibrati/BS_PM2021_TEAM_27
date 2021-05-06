@@ -1,5 +1,8 @@
+from django.conf import settings
 from django.urls import path
-
+from django.urls import path
+from video_content.views import upload_video, display
+from django.conf.urls.static import static
 from . import views
 
 app_name = 'Preschool_Play'
@@ -39,3 +42,6 @@ urlpatterns = [
     path('videos/',display,name='videos'),
 ]
 
+
+urlpatterns  += static(settings.STATIC_URL,document_root=settings.STATIC_ROOT)
+urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
