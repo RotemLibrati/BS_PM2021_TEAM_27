@@ -520,6 +520,9 @@ def view_note(request, note_id):
                       {'message': 'Unauthorized user. Only teacher type allowed.'})
     try:
         teacher_note = Note.objects.get(id=note_id)
+        if teacher_note.teacher != request.user:
+            return render(request, 'Preschool_Play/error.html',
+                  {'message': 'Only the creator of the note may see it.'})
     except (TypeError, Note.DoesNotExist):
         return render(request, 'Preschool_Play/error.html',
                       {'message': 'Unable to find requested note.'})
