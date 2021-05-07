@@ -459,7 +459,15 @@ def add_child(request):
                         alert.save()
                         return HttpResponseRedirect(reverse('Preschool_Play:index'))
         else:
+            teachers = User.objects.filter(profile__type='teacher')
+            kindergartens = Kindergarten.objects.all()
             form = ChildForm()
+            form.fields['teacher'] = forms.CharField(
+                widget=forms.Select(choices=[(t.username, t.username) for t in teachers]))
+            form.fields['teacher'].initial = teachers[0].username
+            form.fields['kindergarten'] = forms.CharField(
+                widget=forms.Select(choices=[(k.name, k.name) for k in kindergartens]))
+            form.fields['kindergarten'].initial = kindergartens[0].name
             return render(request, 'Preschool_Play/create-child.html', {'form': form})
 
 
