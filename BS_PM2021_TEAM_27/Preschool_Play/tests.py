@@ -1,3 +1,5 @@
+from time import sleep
+
 from django.test import TestCase
 from django.contrib.auth.models import User
 from django.urls import reverse, resolve
@@ -7,6 +9,11 @@ from django.test import TestCase, Client, tag
 from .models import *
 from datetime import datetime
 from . import views
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from selenium import webdriver
+from django.test.utils import override_settings
+from django.conf import settings
+
 # py manage.py test
 # Create your tests here.
 
@@ -99,8 +106,8 @@ class TestViewMessage(TestCase):
     #     c.force_login(user)
     #     response = c.get(reverse('Preschool_Play:view-message', args=[3]))
     #     self.assertEqual(response.status_code, 200)
-        #self.assertTemplateUsed(response, 'Preschool_Play/error.html')
-        #self.assertContains(response, 'Message getting failed')
+    # self.assertTemplateUsed(response, 'Preschool_Play/error.html')
+    # self.assertContains(response, 'Message getting failed')
 
 
 class TestNewMessage(TestCase):
@@ -195,7 +202,7 @@ class TestScoreGraphsView(TestCase):
         self.child.save()
         self.client = Client()
         self.client.login(username='testuser', password='Qwerty246')
-        response = self.client.get(reverse('Preschool_Play:scoregraphs', kwargs={'name':'son'}))
+        response = self.client.get(reverse('Preschool_Play:scoregraphs', kwargs={'name': 'son'}))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Daily sum")
         self.assertTemplateUsed(response, 'Preschool_Play/score-graphs.html')
@@ -355,6 +362,7 @@ class TestMediaView(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Delete Media")
 
+
 @tag('unit-test')
 class TestUrl(TestCase):
     def setUp(self):
@@ -378,6 +386,7 @@ class TestUrl(TestCase):
     # def test_Preschool_Play_delete_media_url_is_resolved(self):
     #     url = reverse('Preschool_Play:delete-media')
     #     self.assertEqual(resolve(url).func, views.delete_media)
+
 
 @tag('unit-test')
 class TestMessageBoardView(TestCase):
@@ -421,3 +430,49 @@ class TestNewMessageView(TestCase):
     #     self.assertEqual(response.status_code, 200)
     #     self.assertContains(response, "teacher1")
     #     self.assertTemplateUsed(response, 'Preschool_Play/new-message.html')
+
+
+class TestIntegrationWithSelenium(StaticLiveServerTestCase):
+
+    def setUp(self):
+        admin_user = User.objects.create_user('admin', 'admin@test.com')
+        admin_user.set_password('qwerty246')
+        admin_user.is_staff = True
+        admin_user.is_superuser = True
+        admin_user.save()
+        admin_profile = UserProfile(user=admin_user, is_admin=True)
+        admin_profile.save()
+
+        teacher = User.objects.create_user(username='teacher1')
+        teacher.set_password('qwerty246')
+        teacher.save()
+        teacher_profile = UserProfile(user=teacher, type='teacher')
+        teacher_profile.save()
+        kg = Kindergarten(name='mypreschool', teacher=teacher_profile)
+        kg.save()
+        self.user = User.objects.create_user(username='user1')
+        self.user.set_password('qwerty246')
+        self.user.save()
+        self.profile = UserProfile(user=self.user, is_admin=True)
+        self.profile.save()
+        self.browser = webdriver.Chrome(
+            "C:\\Users\\Eilon\\AppData\\Local\\Programs\\Python\\Python38-32\\chromedriver.exe")
+
+    def tearDown(self):
+        self.browser.close()
+
+    @override_settings(DEBUG=True)
+    def test_login_then_add_and_delete_new_child(self):
+        self.browser.get(f'{self.live_server_url}/preschoolplay/login')
+        username_input = self.browser.find_element_by_name("user_name")
+        username_input.send_keys('user1')
+        password_input = self.browser.find_element_by_name("password")
+        password_input.send_keys('qwerty246')
+        self.browser.find_element_by_xpath('//button[@type="submit"]').click()
+        self.browser.find_element_by_xpath('//a[text()="Add Child"]').click()
+        child_name = self.browser.find_element_by_name("name_child")
+        child_name.send_keys('kid1')
+        self.browser.find_element_by_xpath('//button[@type="submit"]').click()
+        self.browser.find_element_by_xpath('//a[text()="Delete Child"]').click()
+        self.browser.find_element_by_xpath('//select/option[text()="Name: kid1. Parent: user1"]').click()
+        self.browser.find_element_by_xpath('//input[@type="submit"]').click()
