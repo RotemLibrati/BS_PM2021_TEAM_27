@@ -104,7 +104,7 @@ class Note(models.Model):
         return f'Child: {self.child}. Subject: {self.subject}. Date: {self.date}.'
 
 
-class FAQ(models.Model):
+class P_FAQ(models.Model):
     question = models.CharField(max_length=500)
     answer = models.CharField(max_length=1000)
 

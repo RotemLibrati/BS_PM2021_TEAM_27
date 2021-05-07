@@ -16,4 +16,4 @@ class FAQAdmin(admin.ModelAdmin):
     list_display = ('question', 'answer')
 
 
-admin.site.register(FAQ, FAQAdmin)
+admin.site.register(P_FAQ, FAQAdmin)

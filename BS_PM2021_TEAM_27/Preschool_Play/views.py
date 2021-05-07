@@ -498,10 +498,9 @@ def view_note(request, note_id):
 
 
 @login_required
-def FAQ(request):
-    context = {}
-    context['FAQ'] = FAQ.objects.all()
-    return render(request, 'Preschool_Play/FAQ.html', context)
+def P_FAQ(request):
+    context = {'FAQ': P_FAQ.objects.all()}
+    return render(request, 'Preschool_Play/P_FAQ.html', context)
 
 
 def upload_video(request):

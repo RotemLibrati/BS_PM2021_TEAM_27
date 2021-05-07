@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.urls import path
 from django.urls import path
-from video_content.views import upload_video, display
+#from video_content.views import upload_video, display
 from django.conf.urls.static import static
 from . import views
 
@@ -36,10 +36,10 @@ urlpatterns = [
     path('create-child', views.add_child, name='create-child'),
     path('delete-user', views.delete_user, name='delete-user'),
     path('delete-primary-user', views.delete_primary_user, name='delete-primary-user'),
-    path('FAQ', views.FAQ, name='FAQ'),
+    path('P_FAQ', views.P_FAQ, name='P_FAQ'),
     path('child-area/<str:name>', views.child_area, name='child-area'),
-    path('upload/',upload_video,name='upload'),
-    path('videos/',display,name='videos'),
+#    path('upload/',upload_video,name='upload'),
+#   path('videos/',display,name='videos'),
 ]
 
 
