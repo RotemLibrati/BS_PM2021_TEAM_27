@@ -1,18 +1,12 @@
-from time import sleep
-
-from django.test import TestCase
-from django.contrib.auth.models import User
-from django.urls import reverse, resolve
-from django.test import TestCase, Client
-from .models import *
-from django.test import TestCase, Client, tag
-from .models import *
-from datetime import datetime
-from . import views
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-from selenium import webdriver
+from django.test import TestCase, Client, tag
 from django.test.utils import override_settings
-from django.conf import settings
+from django.urls import reverse, resolve
+from selenium import webdriver
+
+from . import views
+from .models import *
+
 
 # py manage.py test
 # Create your tests here.
@@ -455,8 +449,7 @@ class TestIntegrationWithSelenium(StaticLiveServerTestCase):
         self.user.save()
         self.profile = UserProfile(user=self.user, is_admin=True)
         self.profile.save()
-        self.browser = webdriver.Chrome(
-            "C:\\Users\\Eilon\\AppData\\Local\\Programs\\Python\\Python38-32\\chromedriver.exe")
+        self.browser = webdriver.Chrome(executable_path="./chromedriver.exe")
 
     def tearDown(self):
         self.browser.close()
