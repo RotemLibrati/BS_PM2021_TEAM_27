@@ -431,8 +431,7 @@ class TestNewMessageView(TestCase):
 class TestIntegrationWithSelenium(StaticLiveServerTestCase):
 
     def setUp(self):
-        print('0000000000000000 ' + os.getcwd())
-        path = os.path.dirname(os.path.realpath('./geckodriver'))
+        path = os.getcwd() + '/BS_PM2021_TEAM_27/geckodriver'
         firefox_binary = FirefoxBinary(path)
         self.browser = webdriver.Firefox(firefox_binary=firefox_binary)
 
