@@ -1,3 +1,5 @@
+import os
+
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test import TestCase, Client, tag
 from django.test.utils import override_settings
@@ -429,8 +431,9 @@ class TestNewMessageView(TestCase):
 class TestIntegrationWithSelenium(StaticLiveServerTestCase):
 
     def setUp(self):
-        # firefox_binary = FirefoxBinary('./geckodriver')
-        self.browser = webdriver.Firefox(executable_path='./geckodriver')
+        path = os.path.dirname(os.path.realpath('./geckodriver'))
+        firefox_binary = FirefoxBinary(path)
+        self.browser = webdriver.Firefox(firefox_binary=firefox_binary)
 
         self.admin_user = User.objects.create_user('admin', 'admin@test.com')
         self.admin_user.set_password('qwerty246')
