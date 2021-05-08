@@ -432,10 +432,10 @@ class TestNewMessageView(TestCase):
 class TestIntegrationWithSelenium(StaticLiveServerTestCase):
 
     def setUp(self):
-        geckodriver_autoinstaller.install()
+        geckodriver_autoinstaller.install(True)
         # path = os.getcwd() + '/geckodriver'
         # firefox_binary = FirefoxBinary(path)
-        self.browser = webdriver.Firefox(executable_path='./geckodriver')
+        self.browser = webdriver.Firefox()
 
         self.admin_user = User.objects.create_user('admin', 'admin@test.com')
         self.admin_user.set_password('qwerty246')
