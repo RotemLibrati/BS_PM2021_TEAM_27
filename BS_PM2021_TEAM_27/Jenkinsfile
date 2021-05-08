@@ -10,6 +10,7 @@ pipeline {
           steps {
               sh """
                   cd BS_PM2021_TEAM_27
+                  chmod +x ./chromedriver.exe
                   python manage.py test
               """
           }
