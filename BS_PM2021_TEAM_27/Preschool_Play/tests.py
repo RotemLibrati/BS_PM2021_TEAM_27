@@ -427,13 +427,11 @@ class TestNewMessageView(TestCase):
 
 
 class TestIntegrationWithSelenium(StaticLiveServerTestCase):
-    is_installed = False
 
     def setUp(self):
-        if not self.is_installed:
-            get_driver = GetChromeDriver()
-            get_driver.install()
-            self.is_installed = True
+        get_driver = GetChromeDriver()
+        get_driver.install()
+        self.is_installed = True
 
         self.admin_user = User.objects.create_user('admin', 'admin@test.com')
         self.admin_user.set_password('qwerty246')
