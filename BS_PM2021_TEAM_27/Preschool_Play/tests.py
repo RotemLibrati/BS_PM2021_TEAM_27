@@ -1,11 +1,9 @@
-import os
-
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test import TestCase, Client, tag
 from django.test.utils import override_settings
 from django.urls import reverse, resolve
 from selenium import webdriver
-
+from get_chrome_driver import GetChromeDriver
 from . import views
 from .models import *
 
@@ -429,8 +427,14 @@ class TestNewMessageView(TestCase):
 
 
 class TestIntegrationWithSelenium(StaticLiveServerTestCase):
+    is_installed = False
 
     def setUp(self):
+        if not self.is_installed:
+            get_driver = GetChromeDriver()
+            get_driver.install()
+            self.is_installed = True
+
         self.admin_user = User.objects.create_user('admin', 'admin@test.com')
         self.admin_user.set_password('qwerty246')
         self.admin_user.is_staff = True
@@ -450,7 +454,7 @@ class TestIntegrationWithSelenium(StaticLiveServerTestCase):
         self.user.save()
         self.profile = UserProfile(user=self.user, is_admin=True)
         self.profile.save()
-        self.browser = webdriver.Chrome(executable_path="./chromedriver-linux")
+        self.browser = webdriver.Chrome()
 
     def tearDown(self):
         self.browser.close()
