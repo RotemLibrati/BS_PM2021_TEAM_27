@@ -435,7 +435,8 @@ class TestIntegrationWithSelenium(StaticLiveServerTestCase):
         # geckodriver_autoinstaller.install(True)
         # path = os.getcwd() + '/geckodriver-linux64'
         # firefox_binary = FirefoxBinary(path)
-        self.browser = webdriver.Firefox(executable_path='./geckodriver-linux64')
+        path = os.path.dirname(os.path.realpath('./geckodriver-linux64'))
+        self.browser = webdriver.Firefox(executable_path=path, firefox_binary=path)
 
         self.admin_user = User.objects.create_user('admin', 'admin@test.com')
         self.admin_user.set_password('qwerty246')
