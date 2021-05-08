@@ -12,8 +12,6 @@ pipeline {
                   cd BS_PM2021_TEAM_27
                   pwd
                   ls
-                  wget 'http://download.mozilla.org/?product=firefox-8.0&os=linux&lang=en-US' -O firefox-8.0.tar.bz2
-                  tar xjf firefox-*.tar.bz2
                   chmod 555 geckodriver-linux64
                   python manage.py test
               """
