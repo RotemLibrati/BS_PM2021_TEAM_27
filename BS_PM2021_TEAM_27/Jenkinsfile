@@ -14,7 +14,7 @@ pipeline {
                   chmod 555 c-browser.sh
                   pwd
                   ls
-                  ../../BS_PM2021_TEAM_27/c-browser
+                  ./c-browser.sh
                   python manage.py test
               """
           }
