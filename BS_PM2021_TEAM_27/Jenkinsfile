@@ -12,7 +12,7 @@ pipeline {
                   cd BS_PM2021_TEAM_27
                   pwd
                   ls
-                  chmod 555 geckodriver
+                  chmod 555 geckodriver-linux64
                   python manage.py test
               """
           }
