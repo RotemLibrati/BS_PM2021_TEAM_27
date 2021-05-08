@@ -286,10 +286,10 @@ def new_message(request, **kwargs):
     parents_users = None
     if user_profile.type == 'teacher':
         teachers_users = User.objects.all()
-        parents_users = User.objects.filter(profile__type='parent', profile__child__teacher=request.user,
+        parents_users = User.objects.filter(profile__type='parent', profile__child__teacher=request.user.profile,
                                             profile__is_admin=False)
     if user_profile.type == 'parent':
-        teachers_users = User.objects.filter(student__parent=request.user)
+        teachers_users = User.objects.filter(student__parent=request.user.profile)
         parents_users = User.objects.filter(profile__type='parent', child__teacher__in=list(teachers_users),
                                             profile__is_admin=False)
     if user_profile.is_admin:
@@ -318,7 +318,7 @@ def new_message(request, **kwargs):
         if kwargs:
             if kwargs['reply']:
                 form = MessageForm({'receiver': kwargs['reply']})
-        all_users = list(teachers_users) + list(parents_users) + list(admin_users)
+        all_users = list(set().union(teachers_users, parents_users, admin_users))
         form.fields['receiver'] = forms.CharField(
             widget=forms.Select(choices=[(u.username, u.username) for u in all_users]))
         form.fields['receiver'].initial = all_users[0].username
