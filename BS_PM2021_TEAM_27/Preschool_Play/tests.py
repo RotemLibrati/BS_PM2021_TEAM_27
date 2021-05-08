@@ -277,7 +277,7 @@ class TestParentView(TestCase):
         self.user.save()
         self.profile = UserProfile(user=self.user, type='parent')
         self.profile.save()
-        self.child = Child(name='son', parent=self.user)
+        self.child = Child(name='son', parent=self.user.profile)
         self.child.save()
 
     def test_child_is_visible_in_parent_page(self):
@@ -414,7 +414,7 @@ class TestNewMessageView(TestCase):
         self.teacher_user.save()
         self.teacher_profile = UserProfile(user=self.teacher_user, type='teacher')
         self.teacher_profile.save()
-        self.child = Child(name='ben', parent=self.user, teacher=self.teacher_profile)
+        self.child = Child(name='ben', parent=self.user.profile, teacher=self.teacher_profile)
         self.child.save()
         self.client = Client()
         self.client.login(username='testuser', password='Qwerty246')
