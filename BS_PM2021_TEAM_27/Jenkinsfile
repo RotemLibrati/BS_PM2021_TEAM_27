@@ -9,11 +9,11 @@ pipeline {
         stage('Run Unit Tests') {
           steps {
               sh """
-                  chmod -R 555 BS_PM2021_TEAM_27
+                  chmod -R 777 BS_PM2021_TEAM_27
                   cd BS_PM2021_TEAM_27
                   pwd
                   ls
-                  chmod 555 geckodriver-linux64
+                  chmod 777 geckodriver-linux64
                   chmod 777 geckodriver.log
                   python manage.py test
               """
