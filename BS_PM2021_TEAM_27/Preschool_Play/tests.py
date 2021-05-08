@@ -429,7 +429,7 @@ class TestNewMessageView(TestCase):
 class TestIntegrationWithSelenium(StaticLiveServerTestCase):
 
     def setUp(self):
-        firefox_binary = FirefoxBinary('./')
+        firefox_binary = FirefoxBinary('./geckodriver')
         self.browser = webdriver.Firefox(firefox_binary=firefox_binary)
 
         self.admin_user = User.objects.create_user('admin', 'admin@test.com')
