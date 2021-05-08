@@ -433,7 +433,7 @@ class TestIntegrationWithSelenium(StaticLiveServerTestCase):
 
     def setUp(self):
         geckodriver_autoinstaller.install(True)
-        # path = os.getcwd() + '/geckodriver'
+        # path = os.getcwd() + '/geckodriver-linux64'
         # firefox_binary = FirefoxBinary(path)
         self.browser = webdriver.Firefox()
 
