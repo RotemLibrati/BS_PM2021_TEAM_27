@@ -432,8 +432,8 @@ class TestIntegrationWithSelenium(StaticLiveServerTestCase):
 
     def setUp(self):
         path = os.getcwd() + '/BS_PM2021_TEAM_27/geckodriver'
-        firefox_binary = FirefoxBinary(path)
-        self.browser = webdriver.Firefox(firefox_binary=firefox_binary)
+        # firefox_binary = FirefoxBinary(path)
+        self.browser = webdriver.Firefox(executable_path=path)
 
         self.admin_user = User.objects.create_user('admin', 'admin@test.com')
         self.admin_user.set_password('qwerty246')
