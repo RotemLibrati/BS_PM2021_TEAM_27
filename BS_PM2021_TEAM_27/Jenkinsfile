@@ -10,7 +10,7 @@ pipeline {
           steps {
               sh """
                   cd BS_PM2021_TEAM_27
-                  python manage.py test BS_PM2021_TEAM_27
+                  python manage.py test
               """
           }
         }
