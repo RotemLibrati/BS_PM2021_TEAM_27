@@ -1,3 +1,5 @@
+import sys
+
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test import TestCase, Client, tag
 from django.test.utils import override_settings
@@ -448,6 +450,7 @@ class TestIntegrationWithSelenium(StaticLiveServerTestCase):
         self.user.save()
         self.profile = UserProfile(user=self.user, is_admin=True)
         self.profile.save()
+        print('pppppppppppppppppppppppppp ' + sys.path)
         self.browser = webdriver.Chrome(executable_path="./chromedriver.exe")
 
     def tearDown(self):
