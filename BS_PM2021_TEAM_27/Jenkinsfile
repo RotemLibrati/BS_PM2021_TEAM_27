@@ -10,7 +10,7 @@ pipeline {
           steps {
               sh """
                   cd BS_PM2021_TEAM_27
-                  chmod 555 chromedriver-linux
+                  chmod 555 chromedriver-linux2
                   python manage.py test
               """
           }
