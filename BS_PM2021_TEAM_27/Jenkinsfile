@@ -10,7 +10,7 @@ pipeline {
           steps {
               sh """
                   cd BS_PM2021_TEAM_27
-                  sudo apt-get install -y chromium-browser
+                  apt-get install -y chromium-browser
                   chmod 555 chromedriver-linux
                   python manage.py test
               """
