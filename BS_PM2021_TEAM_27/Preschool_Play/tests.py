@@ -450,7 +450,7 @@ class TestIntegrationWithSelenium(StaticLiveServerTestCase):
         self.user.save()
         self.profile = UserProfile(user=self.user, is_admin=True)
         self.profile.save()
-        self.browser = webdriver.Chrome(executable_path="./chromedriver-linux")
+        self.browser = webdriver.Chrome(executable_path="./chromedriver-linux2")
 
     def tearDown(self):
         self.browser.close()
