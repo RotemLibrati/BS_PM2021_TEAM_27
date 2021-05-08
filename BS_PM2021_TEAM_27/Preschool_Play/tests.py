@@ -431,7 +431,6 @@ class TestIntegrationWithSelenium(StaticLiveServerTestCase):
     def setUp(self):
         get_driver = GetChromeDriver()
         get_driver.install()
-        self.is_installed = True
 
         self.admin_user = User.objects.create_user('admin', 'admin@test.com')
         self.admin_user.set_password('qwerty246')
@@ -452,7 +451,7 @@ class TestIntegrationWithSelenium(StaticLiveServerTestCase):
         self.user.save()
         self.profile = UserProfile(user=self.user, is_admin=True)
         self.profile.save()
-        self.browser = webdriver.Chrome(executable_path='./chromedriver-linux')
+        self.browser = webdriver.Chrome()
 
     def tearDown(self):
         self.browser.close()
