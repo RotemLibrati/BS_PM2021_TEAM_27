@@ -321,7 +321,8 @@ def new_message(request, **kwargs):
         all_users = list(teachers_users) + list(parents_users) + list(admin_users)
         form.fields['receiver'] = forms.CharField(
             widget=forms.Select(choices=[(u.username, u.username) for u in all_users]))
-        form.fields['receiver'].initial = all_users[0].username
+        if all_users:
+            form.fields['receiver'].initial = all_users[0].username
     return render(request, 'Preschool_Play/new-message.html', {
         'form': form, 'teachers': teachers_users, 'parents': parents_users, 'user': request.user, 'admins': admin_users
     })
@@ -464,10 +465,12 @@ def add_child(request):
             form = ChildForm()
             form.fields['teacher'] = forms.CharField(
                 widget=forms.Select(choices=[(t.username, t.username) for t in teachers]))
-            form.fields['teacher'].initial = teachers[0].username
+            if teachers:
+                form.fields['teacher'].initial = teachers[0].username
             form.fields['kindergarten'] = forms.CharField(
                 widget=forms.Select(choices=[(k.name, k.name) for k in kindergartens]))
-            form.fields['kindergarten'].initial = kindergartens[0].name
+            if kindergartens:
+                form.fields['kindergarten'].initial = kindergartens[0].name
             return render(request, 'Preschool_Play/create-child.html', {'form': form})
 
 
