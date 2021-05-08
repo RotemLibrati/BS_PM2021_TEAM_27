@@ -3,6 +3,7 @@ from django.test import TestCase, Client, tag
 from django.test.utils import override_settings
 from django.urls import reverse, resolve
 from selenium import webdriver
+from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 from . import views
 from .models import *
 
@@ -428,6 +429,9 @@ class TestNewMessageView(TestCase):
 class TestIntegrationWithSelenium(StaticLiveServerTestCase):
 
     def setUp(self):
+        firefox_binary = FirefoxBinary('./')
+        self.browser = webdriver.Firefox(firefox_binary=firefox_binary)
+
         self.admin_user = User.objects.create_user('admin', 'admin@test.com')
         self.admin_user.set_password('qwerty246')
         self.admin_user.is_staff = True
@@ -447,7 +451,6 @@ class TestIntegrationWithSelenium(StaticLiveServerTestCase):
         self.user.save()
         self.profile = UserProfile(user=self.user, is_admin=True)
         self.profile.save()
-        self.browser = webdriver.Firefox(executable_path='./geckodriver-linux64')
 
     def tearDown(self):
         self.browser.close()
