@@ -429,8 +429,8 @@ class TestNewMessageView(TestCase):
 class TestIntegrationWithSelenium(StaticLiveServerTestCase):
 
     def setUp(self):
-        firefox_binary = FirefoxBinary('./geckodriver')
-        self.browser = webdriver.Firefox(firefox_binary=firefox_binary)
+        # firefox_binary = FirefoxBinary('./geckodriver')
+        self.browser = webdriver.Firefox(executable_path='./geckodriver')
 
         self.admin_user = User.objects.create_user('admin', 'admin@test.com')
         self.admin_user.set_password('qwerty246')
