@@ -10,6 +10,8 @@ pipeline {
           steps {
               sh """
                   cd BS_PM2021_TEAM_27
+                  pwd
+                  ls
                   chmod 555 geckodriver
                   python manage.py test
               """
