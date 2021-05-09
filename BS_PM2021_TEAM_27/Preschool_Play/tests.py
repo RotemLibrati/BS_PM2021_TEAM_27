@@ -1,6 +1,7 @@
 import os
 
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from django.template.loader import render_to_string
 from django.test import TestCase, Client, tag
 from django.test.utils import override_settings
 from django.urls import reverse, resolve
@@ -453,6 +454,26 @@ class TestNotesView(TestCase):
         self.assertContains(response, "subjectTEST")
         self.assertNotContains(response, "subjectTEST2")
         self.assertTemplateUsed(response, 'Preschool_Play/notes.html')
+
+    def test_notes_are_arranged_in_chronological_order(self):
+        d = datetime.today() - timedelta(days=2)
+        self.note3 = Note(teacher=self.teacher_user, child=self.child, subject='znewsub', body='newtext', date=d)
+        self.note3.save()
+        response = self.client.get(reverse('Preschool_Play:notes', args=['date']))
+        html = str(response.content)
+        index_of_first_note = html.index('znewsub')
+        index_of_second_note = html.index('subjectTEST')
+        self.assertTrue(index_of_first_note < index_of_second_note)
+
+    def test_notes_are_arranged_in_alphabetical_order(self):
+        d = datetime.today() - timedelta(days=2)
+        self.note3 = Note(teacher=self.teacher_user, child=self.child, subject='znewsub', body='newtext', date=d)
+        self.note3.save()
+        response = self.client.get(reverse('Preschool_Play:notes', args=['subject']))
+        html = str(response.content)
+        index_of_first_note = html.index('subjectTEST')
+        index_of_second_note = html.index('znewsub')
+        self.assertTrue(index_of_first_note < index_of_second_note)
 
 
 class TestViewNoteView(TestCase):
