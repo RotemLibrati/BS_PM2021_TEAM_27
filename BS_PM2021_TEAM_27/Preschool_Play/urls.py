@@ -39,6 +39,7 @@ urlpatterns = [
     path('view-FAQ', views.view_FAQ, name='view-FAQ'),
     path('view-note/<int:note_id>/', views.view_note, name='view-note'),
     path('notes', views.notes, name='notes'),
+    path('notes/<str:orderby>', views.notes, name='notes'),
     path('new-note', views.new_note, name='new-note'),
 ]
 

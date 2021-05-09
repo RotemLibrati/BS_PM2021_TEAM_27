@@ -6,14 +6,14 @@
 </head>
 <body>
     Order by:<br>
-    <a href="{% url 'Preschool_Play:notes' '-date' %}"class="button alt small">Date</a>
-    <a href="{% url 'Preschool_Play:notes' 'subject' %}"class="button alt small">Subject</a>
+    <a href="{% url 'Preschool_Play:notes' 'date' %}">Date</a>
+    <a href="{% url 'Preschool_Play:notes' 'subject' %}">Subject</a>
     <ol>
         {% for note in notes %}
         <li>
             {{note}}
-            <a href="{% url 'Preschool_Play:view-note' note.id %}"class="button alt small">Open</a>
-            <a href="{% url 'Preschool_Play:delete-note' note.id %}"class="button alt small">Delete</a>
+
+
         </li>
         {% empty %}
         <p>No notes available.</p>

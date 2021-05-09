@@ -1,6 +1,7 @@
 import os
 
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from django.template.loader import render_to_string
 from django.test import TestCase, Client, tag
 from django.test.utils import override_settings
 from django.urls import reverse, resolve
@@ -422,11 +423,126 @@ class TestNewMessageView(TestCase):
         self.client = Client()
         self.client.login(username='testuser', password='Qwerty246')
 
-    # def test_teacher_of_child_shows_up_in_new_message_page(self):
-    #     response = self.client.get(reverse('Preschool_Play:new-message'))
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertContains(response, "teacher1")
-    #     self.assertTemplateUsed(response, 'Preschool_Play/new-message.html')
+
+class TestNotesView(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser')
+        self.user.set_password('Qwerty246')
+        self.user.save()
+        self.profile = UserProfile(user=self.user, type='parent')
+        self.profile.save()
+        self.teacher_user = User.objects.create_user(username='teacher1', password='Qwerty246')
+        self.teacher_user.save()
+        self.teacher_profile = UserProfile(user=self.teacher_user, type='teacher')
+        self.teacher_profile.save()
+        self.child = Child(name='ben', parent=self.user.profile, teacher=self.teacher_profile)
+        self.child.save()
+        self.teacher2_user = User.objects.create_user(username='teacher2', password='Qwerty246')
+        self.teacher2_user.save()
+        self.teacher2_profile = UserProfile(user=self.teacher2_user, type='teacher')
+        self.teacher2_profile.save()
+        self.note = Note(teacher=self.teacher_user, child=self.child, subject='subjectTEST', body='bodyTEST')
+        self.note.save()
+        self.note2 = Note(teacher=self.teacher2_user, child=self.child, subject='subjectTEST2', body='bodyTEST2')
+        self.note2.save()
+        self.client = Client()
+        self.client.login(username='teacher1', password='Qwerty246')
+
+    def test_notes_of_teacher_show_up_and_not_notes_of_other_teachers(self):
+        response = self.client.get(reverse('Preschool_Play:notes'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "subjectTEST")
+        self.assertNotContains(response, "subjectTEST2")
+        self.assertTemplateUsed(response, 'Preschool_Play/notes.html')
+
+    def test_notes_are_arranged_in_chronological_order(self):
+        d = datetime.today() - timedelta(days=2)
+        self.note3 = Note(teacher=self.teacher_user, child=self.child, subject='znewsub', body='newtext', date=d)
+        self.note3.save()
+        response = self.client.get(reverse('Preschool_Play:notes', args=['date']))
+        html = str(response.content)
+        index_of_first_note = html.index('znewsub')
+        index_of_second_note = html.index('subjectTEST')
+        self.assertTrue(index_of_first_note < index_of_second_note)
+
+    def test_notes_are_arranged_in_alphabetical_order(self):
+        d = datetime.today() - timedelta(days=2)
+        self.note3 = Note(teacher=self.teacher_user, child=self.child, subject='znewsub', body='newtext', date=d)
+        self.note3.save()
+        response = self.client.get(reverse('Preschool_Play:notes', args=['subject']))
+        html = str(response.content)
+        index_of_first_note = html.index('subjectTEST')
+        index_of_second_note = html.index('znewsub')
+        self.assertTrue(index_of_first_note < index_of_second_note)
+
+
+class TestViewNoteView(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser')
+        self.user.set_password('Qwerty246')
+        self.user.save()
+        self.profile = UserProfile(user=self.user, type='parent')
+        self.profile.save()
+        self.teacher_user = User.objects.create_user(username='teacher1', password='Qwerty246')
+        self.teacher_user.save()
+        self.teacher_profile = UserProfile(user=self.teacher_user, type='teacher')
+        self.teacher_profile.save()
+        self.child = Child(name='ben', parent=self.user.profile, teacher=self.teacher_profile)
+        self.child.save()
+        self.note = Note(teacher=self.teacher_user, child=self.child, subject='subjectTEST', body='bodyTEST')
+        self.note.save()
+        self.note = Note.objects.get(teacher=self.teacher_user, child=self.child, subject='subjectTEST', body='bodyTEST')
+        self.noteId = self.note.id
+        self.client = Client()
+        self.client.login(username='teacher1', password='Qwerty246')
+
+
+    def test_content_of_note_shows_up(self):
+        response = self.client.get(reverse('Preschool_Play:view-note', args=[self.noteId]))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'Preschool_Play/view-note.html')
+        self.assertContains(response, 'subjectTEST')
+        self.assertContains(response, 'bodyTEST')
+
+
+class TestNewNoteView(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser')
+        self.user.set_password('Qwerty246')
+        self.user.save()
+        self.profile = UserProfile(user=self.user, type='parent')
+        self.profile.save()
+        self.teacher_user = User.objects.create_user(username='teacher1', password='Qwerty246')
+        self.teacher_user.save()
+        self.teacher_profile = UserProfile(user=self.teacher_user, type='teacher')
+        self.teacher_profile.save()
+        self.child = Child(name='ben', parent=self.user.profile, teacher=self.teacher_profile)
+        self.child.save()
+        self.client = Client()
+        self.client.login(username='teacher1', password='Qwerty246')
+
+    def test_blabla(self):
+        response = self.client.get(reverse('Preschool_Play:new-note'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'Preschool_Play/new-note.html')
+        self.assertContains(response, 'New Note')
+
+    def test_glagla(self):
+        # note = {'teacher': self.teacher_user, 'child': self.child, 'subject': 'subjectTEST', 'body': 'bodyTEST'}
+        url = reverse('Preschool_Play:new-note')
+        print(url)
+        response = self.client.post('./preschoolplay/new-note', {'teacher': self.teacher_user, 'child': self.child, 'subject': 'subjectTEST', 'body': 'bodyTEST'})
+        print(response)
+        # response = self.client.post(reverse('Preschool_Play:new-note'), data=note)
+        # self.assertRedirects(response, reverse('Preschool_Play:notes'))
+        m = Note.objects.get(teacher=self.teacher_user)
+        self.assertIsNotNone(m)
+
+# def test_teacher_of_child_shows_up_in_new_message_page(self):
+#     response = self.client.get(reverse('Preschool_Play:new-message'))
+#     self.assertEqual(response.status_code, 200)
+#     self.assertContains(response, "teacher1")
+#     self.assertTemplateUsed(response, 'Preschool_Play/new-message.html')
 
 
 class TestIntegrationWithSelenium(StaticLiveServerTestCase):
