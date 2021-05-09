@@ -397,9 +397,13 @@ def new_profile(request, username):
 
 
 @login_required
-def add_child(request):
+def add_child(request, **kwargs):
     user = request.user
     user_profile = UserProfile.objects.get(user=user)
+    teachers_users = None
+    kindergarten = None
+    teachers_users = UserProfile.objects.filter(type='teacher')
+    kindergarten = Kindergarten.objects.all()
     if user_profile.type != 'parent':
         return render(request, 'Preschool_Play/error.html', {'message': 'You don\'t parent'})
     else:
@@ -424,7 +428,17 @@ def add_child(request):
                         return HttpResponseRedirect(reverse('Preschool_Play:index'))
         else:
             form = ChildForm()
-            return render(request, 'Preschool_Play/create-child.html', {'form': form})
+            all_users = list(teachers_users)
+            all_kindergarten = list(kindergarten)
+            form.fields['teacher'] = forms.CharField(
+                widget=forms.Select(choices=[(u.user, u.user) for u in all_users]))
+            form.fields['teacher'].initial = all_users[0].user
+            form.fields['kindergarten'] = forms.CharField(
+                widget=forms.Select(choices=[(n.name, n.name) for n in kindergarten]))
+            form.fields['kindergarten'].initial = kindergarten[0].name
+        return render(request, 'Preschool_Play/create-child.html', {
+            'form': form, 'teachers': teachers_users
+        })
 
 
 def delete_user(request):

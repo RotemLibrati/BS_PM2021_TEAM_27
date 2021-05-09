@@ -68,13 +68,9 @@ class ProfileForm(forms.ModelForm):
 
 
 class ChildForm(forms.Form):
-    set = UserProfile.objects.filter(type='teacher')
-    set2 = Kindergarten.objects.all()
-    TEACHER = list(map(lambda x: (str(x.user), str(x.user)), set))
-    KINDERGARTEN = list(map(lambda x: (str(x.name), str(x.name)), set2))
     name_child= forms.CharField(max_length=30)
-    teacher = forms.CharField(widget=forms.Select(choices=TEACHER))
-    kindergarten = forms.CharField(widget=forms.Select(choices=KINDERGARTEN))
+    teacher = forms.CharField()
+    kindergarten = forms.CharField()
 
 
 class DeleteUserForm(forms.Form):
