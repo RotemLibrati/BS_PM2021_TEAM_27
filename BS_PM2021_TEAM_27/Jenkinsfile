@@ -1,5 +1,7 @@
 pipeline {
-    agent { dockerfile true }
+    agent {
+        docker { image 'eilonc285/repos-team27:team27' }
+    }
     triggers {
       githubPush()
   }
