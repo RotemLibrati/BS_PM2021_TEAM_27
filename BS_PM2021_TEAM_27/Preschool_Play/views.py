@@ -510,6 +510,7 @@ def upload_video(request):
         title = request.POST['title']
         video = request.POST['video']
         #Videos.objects.create(title=title, video=video).save()
+
         #obj.save()
 
         content = Videos(title=title, video=video)
