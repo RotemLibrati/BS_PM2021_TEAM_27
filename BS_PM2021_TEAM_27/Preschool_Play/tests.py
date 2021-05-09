@@ -505,3 +505,20 @@ class TestIntegrationWithSelenium(StaticLiveServerTestCase):
         self.browser.find_element_by_xpath('//a[text()=" Open"]').click()
         message_subject = self.browser.find_element_by_xpath('//h3')
         self.assertEquals('this new app' in message_subject.text, True)
+
+class TestViewFAQView(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser')
+        self.user.set_password('Qwerty246')
+        self.user.save()
+        self.profile = UserProfile(user=self.user, is_admin=False)
+        self.profile.save()
+        self.client = Client()
+        self.client.login(username='testuser', password='Qwerty246')
+
+    def test_FAQ_shows_up_on_page(self):
+        self.faq = FAQ(question = 'question1', answer='answer2')
+        self.faq.save()
+        response = self.client.get(reverse('Preschool_Play:view-FAQ'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "question1")

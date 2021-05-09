@@ -105,8 +105,6 @@ class Note(models.Model):
 
 
 class FAQ(models.Model):
-    _ids = count(0)
-    id = next(_ids)
     question = models.CharField(max_length=500)
     answer = models.CharField(max_length=1000)
 

@@ -572,9 +572,9 @@ def notes(request):
     return render(request, 'Preschool_Play/notes.html', context)
 
 @login_required
-def FAQ(request):
+def view_FAQ(request):
     context = {}
     context['FAQ'] = FAQ.objects.all()
-    return render(request, 'Preschool_Play/FAQ.html', context)
+    return render(request, 'Preschool_Play/view-FAQ.html', context)
 
 
