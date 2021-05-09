@@ -202,7 +202,7 @@ def logout(request):  # logout view
 def inbox(request):
     current_user = request.user
     messages_received = list(
-        Message.objects.filter(deleted_by_receiver=False).order_by('-sent_date'))
+        Message.objects.filter(receiver=current_user, deleted_by_receiver=False).order_by('-sent_date'))
     messages_sent = list(Message.objects.filter(sender=current_user, deleted_by_sender=False).order_by('-sent_date'))
     return render(request, 'Preschool_Play/inbox.html', {'user': current_user,
                                                          'messages_received': messages_received,
