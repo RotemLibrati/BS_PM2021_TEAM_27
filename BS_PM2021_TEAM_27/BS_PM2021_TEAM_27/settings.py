@@ -15,9 +15,13 @@ from builtins import str
 from pathlib import Path
 import os.path
 
+from django.conf import settings
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+print("before")
+print(settings.BASE_DIR)
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
@@ -69,6 +73,14 @@ TEMPLATES = [
         },
     },
 ]
+
+
+
+STATIC_ROOT = os.path.join(BASE_DIR,'assets')
+
+
+
+
 
 WSGI_APPLICATION = 'BS_PM2021_TEAM_27.wsgi.application'
 
@@ -126,3 +138,11 @@ USE_TZ = False
 DEFAULT_AUTO_FIELD='django.db.models.AutoField'
 
 STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "assert")
+]
+
+MEDIA_URL ='/BS_PM2021_TEAM_27/Preschool_Play/media/uploads/'
+
+MEDIA_ROOT = os.path.join(BASE_DIR,'media')

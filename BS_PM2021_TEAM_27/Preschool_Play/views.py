@@ -9,6 +9,8 @@ from django.db.models.functions import ExtractDay, ExtractMonth, ExtractYear
 from django.http import HttpResponse, HttpResponseRedirect
 from django.db.models.signals import post_save
 from django import forms
+
+
 from .models import *
 import json
 from .forms import DeleteMediaForm, LoginForm, MessageForm, AddMediaForm, KindergartenListForm,\
@@ -127,7 +129,7 @@ def add_media(request):
     else:
         form = AddMediaForm()
         context = {'form': form}
-    return render(request, 'Preschool_Play/add-media.html', context)
+    return render(request, 'Preschool_Play/add-uploads.html', context)
 
 
 def delete_media(request):
@@ -140,7 +142,7 @@ def delete_media(request):
     else:
         form = DeleteMediaForm()
     context = {'form': form}
-    return render(request, 'Preschool_Play/delete-media.html', context)
+    return render(request, 'Preschool_Play/delete-uploads.html', context)
 
 
 def show_users(request):
@@ -490,4 +492,27 @@ def delete_primary_user(request):
     return render(request, 'Preschool_Play/delete-primary-user.html', context)
 
 
+def show_video(request):
+    videos = Videos.objects.all()
+    context = {
+        'videos': videos,
+    }
+    print(videos)
+    return render(request, 'Preschool_Play/videos.html', context)
 
+def upload_video(request):
+    user = request.user
+    user_profile = UserProfile.objects.get(user=user)
+    if user_profile.type != 'teacher':
+        return render(request, 'Preschool_Play/error.html',
+                      {'message': 'You are cant upload uploads because you are not a teacher !'})
+    if request.method == 'POST':
+        title = request.POST['title']
+        video = request.POST['video']
+        #Videos.objects.create(title=title, video=video).save()
+        #obj.save()
+
+        content = Videos(title=title, video=video)
+        content.save()
+        return HttpResponseRedirect(reverse('Preschool_Play:index'))
+    return render(request, 'Preschool_Play/upload.html')

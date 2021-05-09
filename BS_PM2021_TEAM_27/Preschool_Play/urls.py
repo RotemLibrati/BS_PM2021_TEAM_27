@@ -1,7 +1,7 @@
 from django.urls import path
-
 from . import views
-
+from django.conf import settings
+from django.conf.urls.static import static
 app_name = 'Preschool_Play'
 
 urlpatterns = [
@@ -12,8 +12,8 @@ urlpatterns = [
     path('filter-suspension', views.filter_suspension, name='filter-suspension'),
     path('show-users', views.show_users, name='show-users'),
     path('search-user', views.search_user, name='search-user'),
-    path('add-media', views.add_media, name='add-media'),
-    path('delete-media', views.delete_media, name='delete-media'),
+    path('add-uploads', views.add_media, name='add-uploads'),
+    path('delete-uploads', views.delete_media, name='delete-uploads'),
     path('login', views.login_view, name='login'),
     path('logout/', views.logout, name='logout'),
     path('inbox/', views.inbox, name='inbox'),
@@ -33,5 +33,8 @@ urlpatterns = [
     path('create-child', views.add_child, name='create-child'),
     path('delete-user', views.delete_user, name='delete-user'),
     path('delete-primary-user', views.delete_primary_user, name='delete-primary-user'),
+    path('upload', views.upload_video, name='upload'),
+    path('videos', views.show_video, name='videos'),
 ]
 
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

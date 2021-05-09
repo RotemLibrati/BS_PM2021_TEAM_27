@@ -84,3 +84,4 @@ class DeleteUserForm(forms.Form):
 
 class DeletePrimaryUserForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput)
+
