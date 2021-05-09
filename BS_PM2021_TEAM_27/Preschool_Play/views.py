@@ -11,8 +11,8 @@ from django.db.models.signals import post_save
 from django import forms
 from .models import *
 import json
-from .forms import DeleteMediaForm, LoginForm, MessageForm, AddMediaForm, KindergartenListForm,\
-    CreateUserForm, ProfileForm, ChildForm, DeleteUserForm, DeletePrimaryUserForm, FindStudentForm
+from .forms import DeleteMediaForm, LoginForm, MessageForm, AddMediaForm, KindergartenListForm, \
+    CreateUserForm, ProfileForm, ChildForm, DeleteUserForm, DeletePrimaryUserForm, FindStudentForm, NoteForm
 from django.shortcuts import render, get_object_or_404
 
 
@@ -286,11 +286,11 @@ def new_message(request, **kwargs):
     parents_users = None
     if user_profile.type == 'teacher':
         teachers_users = User.objects.all()
-        parents_users = User.objects.filter(profile__type='parent', profile__child__teacher=request.user,
+        parents_users = User.objects.filter(profile__type='parent', profile__child__teacher=request.user.profile,
                                             profile__is_admin=False)
     if user_profile.type == 'parent':
-        teachers_users = User.objects.filter(profile__student__parent=request.user.profile)
-        parents_users = User.objects.filter(profile__type='parent', profile__child__teacher__in=list(teachers_users),
+        teachers_users = User.objects.filter(student__parent=request.user.profile)
+        parents_users = User.objects.filter(profile__type='parent', child__teacher__in=list(teachers_users),
                                             profile__is_admin=False)
     if user_profile.is_admin:
         teachers_users = User.objects.filter(profile__type='teacher')
@@ -318,7 +318,7 @@ def new_message(request, **kwargs):
         if kwargs:
             if kwargs['reply']:
                 form = MessageForm({'receiver': kwargs['reply']})
-        all_users = list(teachers_users) + list(parents_users) + list(admin_users)
+        all_users = list(set().union(teachers_users, parents_users, admin_users))
         form.fields['receiver'] = forms.CharField(
             widget=forms.Select(choices=[(u.username, u.username) for u in all_users]))
         if all_users:
@@ -531,11 +531,45 @@ def view_note(request, note_id):
                       {'message': 'Unauthorized user. Only teacher type allowed.'})
     try:
         teacher_note = Note.objects.get(id=note_id)
+        if teacher_note.teacher != request.user:
+            return render(request, 'Preschool_Play/error.html',
+                  {'message': 'Only the creator of the note may see it.'})
     except (TypeError, Note.DoesNotExist):
         return render(request, 'Preschool_Play/error.html',
                       {'message': 'Unable to find requested note.'})
     return render(request, 'Preschool_Play/view-note.html',
                   {'note': teacher_note, 'user': request.user, 'profile': profile})
+
+def new_note(request):
+    if request.user is None or not request.user.is_authenticated:
+        return HttpResponse("Not logged in")
+    user_profile = UserProfile.objects.get(user=request.user)
+    if user_profile.type == 'teacher':
+        if request.method == 'POST':
+            form = NoteForm(request.POST)
+            if form.is_valid():
+                try:
+                    child = Child.objects.get(name=form.cleaned_data['child'])
+                except (TypeError, User.DoesNotExist):
+                    error = "Could not find child."
+                    render(request, 'Preschool_Play/failure.html', {'error': error})
+                note = Note(teacher=request.user, child=child,
+                            subject=form.cleaned_data['subject'], body=form.cleaned_data['body'])
+                note.save()
+                return HttpResponseRedirect(reverse('Preschool_Play:notes'))
+        else:
+            childs = Child.objects.filter(teacher=request.user.profile)
+            form = NoteForm()
+            form.fields['child'] = forms.CharField(
+                widget=forms.Select(choices=[(u.name, u.name) for u in childs]))
+            return render(request, 'Preschool_Play/new-note.html',
+                          {'user': request.user, 'form': form})
+    return render(request,'Preschool_Play/error.html',{'error':'error: you are not a teacher'})
+
+@login_required
+def notes(request):
+    context = {'notes': Note.objects.all()}
+    return render(request, 'Preschool_Play/notes.html', context)
 
 @login_required
 def FAQ(request):
