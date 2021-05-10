@@ -25,6 +25,9 @@
         <li><a href="{% url 'Preschool_Play:delete-user' %}">Delete Child</a><br>
         <li><a href="{% url 'Preschool_Play:delete-primary-user' %}">Delete Primary User</a><br>
     {% endif %}
+    {% if profile.type == 'teacher' %}
+        <li><a href="{% url 'Preschool_Play:upload' %}">Upload Video</a><br>
+    {% endif %}
     <li><a href="{% url 'Preschool_Play:message-board' %}">Message Board</a><br>
     <li><a href="{% url 'Preschool_Play:inbox' %}">Inbox{% if unread %}({{unread}}){% endif %}</a><br>
     <li><a href="{% url 'Preschool_Play:logout' %}">Logout</a><br>

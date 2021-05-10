@@ -91,13 +91,9 @@ class Notification(models.Model):
     seen = models.BooleanField(default=False)
 
 
-class Videos(models.Model):
+class Video(models.Model):
     title = models.CharField(max_length=100)
-    video = models.FileField(upload_to='uploads/')
-
-    class Meta:
-        verbose_name = 'video'
-        verbose_name_plural = 'video'
+    video = models.FileField(upload_to='videos/', null=True, verbose_name="")
 
     def __str__(self):
         return self.title

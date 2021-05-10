@@ -69,6 +69,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.media',
             ],
         },
     },
@@ -143,6 +144,6 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "assert")
 ]
 
-MEDIA_URL ='/BS_PM2021_TEAM_27/Preschool_Play/media/uploads/'
+MEDIA_URL ='/media/videos/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR,'media')

@@ -14,7 +14,7 @@ from django import forms
 from .models import *
 import json
 from .forms import DeleteMediaForm, LoginForm, MessageForm, AddMediaForm, KindergartenListForm,\
-    CreateUserForm, ProfileForm, ChildForm, DeleteUserForm, DeletePrimaryUserForm
+    CreateUserForm, ProfileForm, ChildForm, DeleteUserForm, DeletePrimaryUserForm, VideoForm
 from django.shortcuts import render, get_object_or_404
 
 
@@ -493,12 +493,12 @@ def delete_primary_user(request):
 
 
 def show_video(request):
-    videos = Videos.objects.all()
+    videos = Video.objects.all()
     context = {
         'videos': videos,
     }
-    print(videos)
     return render(request, 'Preschool_Play/videos.html', context)
+
 
 def upload_video(request):
     user = request.user
@@ -507,13 +507,19 @@ def upload_video(request):
         return render(request, 'Preschool_Play/error.html',
                       {'message': 'You are cant upload uploads because you are not a teacher !'})
     if request.method == 'POST':
-        title = request.POST['title']
-        video = request.POST['video']
-        #Videos.objects.create(title=title, video=video).save()
+        form = VideoForm(request.POST or None, request.FILES or None)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse('Preschool_Play:index'))
+    else:
+        form = VideoForm(request.POST or None, request.FILES or None)
+        context = {'form': form}
+    return render(request, 'Preschool_Play/upload.html', context)
 
-        #obj.save()
 
-        content = Videos(title=title, video=video)
-        content.save()
-        return HttpResponseRedirect(reverse('Preschool_Play:index'))
-    return render(request, 'Preschool_Play/upload.html')
+
+
+
+
+
+
