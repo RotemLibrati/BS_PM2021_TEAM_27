@@ -12,8 +12,8 @@ urlpatterns = [
     path('filter-suspension', views.filter_suspension, name='filter-suspension'),
     path('show-users', views.show_users, name='show-users'),
     path('search-user', views.search_user, name='search-user'),
-    path('add-uploads', views.add_media, name='add-uploads'),
-    path('delete-uploads', views.delete_media, name='delete-uploads'),
+    path('add-media', views.add_media, name='add-media'),
+    path('delete-media', views.delete_media, name='delete-media'),
     path('login', views.login_view, name='login'),
     path('logout/', views.logout, name='logout'),
     path('inbox/', views.inbox, name='inbox'),
@@ -35,6 +35,7 @@ urlpatterns = [
     path('delete-primary-user', views.delete_primary_user, name='delete-primary-user'),
     path('upload', views.upload_video, name='upload'),
     path('videos', views.show_video, name='videos'),
+    path('child-area/<str:name>', views.child_area, name='child-area'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

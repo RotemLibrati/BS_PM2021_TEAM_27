@@ -129,7 +129,7 @@ def add_media(request):
     else:
         form = AddMediaForm()
         context = {'form': form}
-    return render(request, 'Preschool_Play/add-uploads.html', context)
+    return render(request, 'Preschool_Play/add-media.html', context)
 
 
 def delete_media(request):
@@ -142,7 +142,7 @@ def delete_media(request):
     else:
         form = DeleteMediaForm()
     context = {'form': form}
-    return render(request, 'Preschool_Play/delete-uploads.html', context)
+    return render(request, 'Preschool_Play/delete-media.html', context)
 
 
 def show_users(request):
@@ -298,9 +298,21 @@ def new_message(request, **kwargs):
 
 
 def parent(request):
-    children = Child.objects.filter(parent=request.user)
+    user_parent = request.user
+    user_profile = UserProfile.objects.get(user=user_parent)
+    children = Child.objects.filter(parent=user_profile)
     context = {'children': children}
     return render(request, 'Preschool_Play/parent.html', context)
+
+
+def child_area(request, name):
+    user_parent = request.user
+    user_profile = UserProfile.objects.get(user=user_parent)
+    child = Child.objects.get(parent=user_profile, name=name)
+    teacher = child.teacher
+    videos = Video.objects.filter(create=teacher)
+    context = {'child': child, 'videos': videos}
+    return render(request, 'Preschool_Play/child-area.html', context)
 
 
 def scoretable(request):
@@ -414,6 +426,14 @@ def add_child(request, **kwargs):
             if form.is_valid():
                 name = form.cleaned_data['name_child']
                 teacher = form.cleaned_data['teacher']
+                child_names = Child.objects.all()
+                child_list = list(child_names)
+                print(child_list)
+                for n in child_list:
+                    print(n)
+                    if name == n.name:
+                        return render(request, 'Preschool_Play/error.html',
+                                      {'message': 'You try to add name exist'})
                 kindergarten = form.cleaned_data['kindergarten']
                 chosen_teacher = UserProfile.objects.filter(type='teacher')
                 for t in chosen_teacher:
@@ -493,11 +513,11 @@ def delete_primary_user(request):
 
 
 def show_video(request):
-    videos = Video.objects.all()
-    context = {
-        'videos': videos,
-    }
-    return render(request, 'Preschool_Play/videos.html', context)
+    # videos = Video.objects.all()
+    # context = {
+    #     'videos': videos,
+    # }
+    return render(request, 'Preschool_Play/videos.html')
 
 
 def upload_video(request):
@@ -505,11 +525,15 @@ def upload_video(request):
     user_profile = UserProfile.objects.get(user=user)
     if user_profile.type != 'teacher':
         return render(request, 'Preschool_Play/error.html',
-                      {'message': 'You are cant upload uploads because you are not a teacher !'})
+                      {'message': 'You are cant upload media because you are not a teacher !'})
     if request.method == 'POST':
         form = VideoForm(request.POST or None, request.FILES or None)
+
         if form.is_valid():
             form.save()
+            last = Video.objects.last()
+            last.create = user_profile
+            last.save()
             return HttpResponseRedirect(reverse('Preschool_Play:index'))
     else:
         form = VideoForm(request.POST or None, request.FILES or None)

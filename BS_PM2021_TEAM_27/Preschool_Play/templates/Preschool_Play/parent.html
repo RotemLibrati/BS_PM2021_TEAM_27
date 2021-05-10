@@ -5,7 +5,7 @@
     <title>Parent Page</title>
 </head>
 <body>
-    hello {{user.first_name}} <br>
+    hello {{user.username}} <br>
 
 {% block content %}
     <h1>children</h1>
@@ -18,7 +18,7 @@
                     <img  class="card-img-top" src="https://digitalpedagogydotwordpressdotcom.files.wordpress.com/2019/09/google_contacts_logo.png?w=640" width="150" height="150" alt="Card image" >
                     <div class="card-body">
                     <h5 class="card-title">{{ ch.name }}</h5>
-                    <a href="#" class="btn btn-primary">play</a>
+                    <a href="{% url 'Preschool_Play:child-area' ch.name %}" class="btn btn-primary">Private Area</a>
                 </div>
             </div>
         </div>

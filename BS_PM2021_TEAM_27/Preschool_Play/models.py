@@ -94,6 +94,7 @@ class Notification(models.Model):
 class Video(models.Model):
     title = models.CharField(max_length=100)
     video = models.FileField(upload_to='videos/', null=True, verbose_name="")
+    create = models.ForeignKey(UserProfile, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return self.title
