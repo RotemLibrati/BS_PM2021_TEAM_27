@@ -9,7 +9,7 @@ from django.db.models.functions import ExtractDay, ExtractMonth, ExtractYear
 from django.http import HttpResponse, HttpResponseRedirect
 from django.db.models.signals import post_save
 from django import forms
-
+from profanity import *
 
 from .models import *
 import json
@@ -277,8 +277,10 @@ def new_message(request, **kwargs):
             except (TypeError, User.DoesNotExist):
                 error = "Could not find user."
                 render(request, 'Preschool_Play/failure.html', {'error': error})
+            is_profane = False
             subject = form.cleaned_data['subject']
             body = form.cleaned_data['body']
+            is_profane = has_profanity(subject) or has_profanity(body)
             sent_date = timezone.now()
             message = Message(sender=sender, receiver=receiver, subject=subject, body=body, sent_date=sent_date)
             message.save()
