@@ -138,6 +138,26 @@ class TestNewMessage(TestCase):
         m = Message.objects.get(receiver=user, sender=user2)
         self.assertIsNotNone(m)
 
+    def test_sending_message_to_admin(self):
+        c = Client()
+        user = User.objects.create_user(username='tester1', password='qwerty246')
+        user.save()
+        user_profile = UserProfile.objects.create(user=user)
+        user_profile.save()
+        user2 = User.objects.create_user(username='admin')
+        user2.set_password('qwerty246')
+        user2.is_staff = True
+        user2.is_superuser = True
+        user2.save()
+        user_profile2 = UserProfile.objects.create(user=user2, is_admin=True)
+        user_profile2.save()
+        message = {'receiver': user, 'subject': 'subject', 'body': 'body'}
+        c.force_login(user)
+        response = c.post(reverse('Preschool_Play:new-message'), data=message)
+        self.assertRedirects(response, reverse('Preschool_Play:inbox'))
+        m = Message.objects.get(receiver=user2, sender=user)
+        self.assertIsNotNone(m)
+
 
 @tag('unit-test')
 class TestUserProfileModel(TestCase):
@@ -328,14 +348,14 @@ class TestMyStudentsView(TestCase):
 #         self.client.login(username='testuser', password='Qwerty246')
 #
 #     def test_with_add_media(self):
-#         response = self.client.get(reverse('Preschool_Play:add-media'))
+#         response = self.client.get(reverse('Preschool_Play:add-uploads'))
 #         self.assertEqual(response.status_code, 200)
 #         add_media = Media(name='name', path='www/rrr/ttt', type='picture')
 #         add_media.save()
 #         self.assertContains(response, "Add Media")
 #
 #     def test_with_delete_media(self):
-#         response = self.client.get(reverse('Preschool_Play:delete-media'))
+#         response = self.client.get(reverse('Preschool_Play:delete-uploads'))
 #         self.assertEqual(response.status_code, 200)
 #         self.assertContains(response, "Delete Media")
 class TestMediaView(TestCase):
@@ -378,11 +398,11 @@ class TestUrl(TestCase):
         url = reverse('Preschool_Play:delete-media')
         self.assertEqual(resolve(url).func, views.delete_media)
     # def test_Preschool_Play_add_media_url_is_resolved(self):
-    #     url = reverse('Preschool_Play:add-media')
+    #     url = reverse('Preschool_Play:add-uploads')
     #     self.assertEqual(resolve(url).func, views.add_media)
     #
     # def test_Preschool_Play_delete_media_url_is_resolved(self):
-    #     url = reverse('Preschool_Play:delete-media')
+    #     url = reverse('Preschool_Play:delete-uploads')
     #     self.assertEqual(resolve(url).func, views.delete_media)
 
 
@@ -621,3 +641,20 @@ class TestIntegrationWithSelenium(StaticLiveServerTestCase):
         self.browser.find_element_by_xpath('//a[text()=" Open"]').click()
         message_subject = self.browser.find_element_by_xpath('//h3')
         self.assertEquals('this new app' in message_subject.text, True)
+
+class TestViewFAQView(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser')
+        self.user.set_password('Qwerty246')
+        self.user.save()
+        self.profile = UserProfile(user=self.user, is_admin=False)
+        self.profile.save()
+        self.client = Client()
+        self.client.login(username='testuser', password='Qwerty246')
+
+    def test_FAQ_shows_up_on_page(self):
+        self.faq = FAQ(question = 'question1', answer='answer2')
+        self.faq.save()
+        response = self.client.get(reverse('Preschool_Play:view-FAQ'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "question1")
