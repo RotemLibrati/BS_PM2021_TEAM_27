@@ -13,7 +13,7 @@ from profanity import *
 
 from .models import *
 import json
-from .forms import DeleteMediaForm, LoginForm, MessageForm, AddMediaForm, KindergartenListForm,\
+from .forms import DeleteMediaForm, LoginForm, MessageForm, AddMediaForm, KindergartenListForm, \
     CreateUserForm, ProfileForm, ChildForm, DeleteUserForm, DeletePrimaryUserForm, VideoForm
 from django.shortcuts import render, get_object_or_404
 
@@ -288,16 +288,27 @@ def new_message(request, **kwargs):
                 body = censor_profanity(body)
             message_is_profane = subject_is_profane or body_is_profane
             if message_is_profane and not user_profile.is_admin:
+                if user_profile.profanity_warning:
+                    s_time = datetime.now() + timedelta(hours=48)
+                    user_profile.suspension_time = s_time
+                    user_profile.save()
+                    admin_notification = Notification(receiver=admin_users[0],
+                                                      message=f'User {request.user.username} has been suspended for '
+                                                              f'48 hours - until {s_time}.')
+                    admin_notification.save()
+                else:
+                    user_notification = Notification(receiver=request.user,
+                                                     message='WARNING: profanity is not allowed. '
+                                                             'If you receive another warning in '
+                                                             'the future hours you will be '
+                                                             'suspended for 48 hours.')
+                    user_notification.save()
+                    admin_notification = Notification(receiver=admin_users[0],
+                                                      message=f'User {request.user.username} has '
+                                                              f'received a profanity warning.')
+                    admin_notification.save()
                 user_profile.profanity_warning = True
                 user_profile.save()
-                user_notification = Notification(receiver=request.user, message='WARNING: profanity is not allowed. '
-                                                                                'If you receive another warning in '
-                                                                                'the future hours you will be '
-                                                                                'suspended for 48 hours.')
-                user_notification.save()
-                admin_notification = Notification(receiver=admin_users[0], message=f'User {request.user.username} has '
-                                                                                   f'received a profanity warning.')
-                admin_notification.save()
             sent_date = timezone.now()
             message = Message(sender=sender, receiver=receiver, subject=subject, body=body, sent_date=sent_date)
             message.save()
@@ -419,7 +430,8 @@ def new_profile(request, username):
         if form.is_valid():
             post_save.connect(attach_user, sender=UserProfile)
             form.save()
-            alert = Notification(receiver=User.objects.get(username='admin'), message=f'New user sign up to your system {user}')
+            alert = Notification(receiver=User.objects.get(username='admin'),
+                                 message=f'New user sign up to your system {user}')
             alert.save()
             return HttpResponseRedirect(reverse('Preschool_Play:index'))
     else:
@@ -461,10 +473,13 @@ def add_child(request, **kwargs):
                         temp = UserProfile.objects.get(user=t.user)
                         chosen_kindergarten = Kindergarten.objects.get(teacher=temp)
                         if chosen_kindergarten.name != kindergarten:
-                            return render(request, 'Preschool_Play/error.html', {'message': 'The teacher and the kindergarten are not suitable'})
-                        new_child = Child(name=name, parent=user_profile, teacher=finally_chosen_teacher, kindergarten=chosen_kindergarten)
+                            return render(request, 'Preschool_Play/error.html',
+                                          {'message': 'The teacher and the kindergarten are not suitable'})
+                        new_child = Child(name=name, parent=user_profile, teacher=finally_chosen_teacher,
+                                          kindergarten=chosen_kindergarten)
                         new_child.save()
-                        alert = Notification(receiver=User.objects.get(username='admin'), message=f'{user} has registered his child to the system')
+                        alert = Notification(receiver=User.objects.get(username='admin'),
+                                             message=f'{user} has registered his child to the system')
                         alert.save()
                         return HttpResponseRedirect(reverse('Preschool_Play:index'))
         else:
@@ -497,7 +512,8 @@ def delete_user(request):
                 if user.check_password(password):
                     name.delete()
                 else:
-                    alert = Notification(receiver=user, message='The password is incorrect, you are passed to the home page')
+                    alert = Notification(receiver=user,
+                                         message='The password is incorrect, you are passed to the home page')
                     alert.save()
                     return HttpResponseRedirect(reverse('Preschool_Play:index'))
         return HttpResponseRedirect(reverse('Preschool_Play:index'))
@@ -521,7 +537,8 @@ def delete_primary_user(request):
                     user_profile.delete()
                     request.user.delete()
                 else:
-                    alert = Notification(receiver=user, message='The password is incorrect, you are passed to the home page')
+                    alert = Notification(receiver=user,
+                                         message='The password is incorrect, you are passed to the home page')
                     alert.save()
                     return HttpResponseRedirect(reverse('Preschool_Play:index'))
         return HttpResponseRedirect(reverse('Preschool_Play:index'))
@@ -558,11 +575,3 @@ def upload_video(request):
         form = VideoForm(request.POST or None, request.FILES or None)
         context = {'form': form}
     return render(request, 'Preschool_Play/upload.html', context)
-
-
-
-
-
-
-
-
