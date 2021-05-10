@@ -20,6 +20,7 @@ class UserProfile(models.Model):
     level = models.IntegerField(default=1)
     limit = models.DateTimeField(default=datetime(2000, 1, 1))
     auth = models.BooleanField(default=False)
+    profanity_warning = models.BooleanField(default=False)
 
     def was_born_recently_for_parent(self):
         if self.age <= 0:

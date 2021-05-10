@@ -287,6 +287,17 @@ def new_message(request, **kwargs):
             if body_is_profane:
                 body = censor_profanity(body)
             message_is_profane = subject_is_profane or body_is_profane
+            if message_is_profane and not user_profile.is_admin:
+                user_profile.profanity_warning = True
+                user_profile.save()
+                user_notification = Notification(receiver=request.user, message='WARNING: profanity is not allowed. '
+                                                                                'If you receive another warning in '
+                                                                                'the future hours you will be '
+                                                                                'suspended for 48 hours.')
+                user_notification.save()
+                admin_notification = Notification(receiver=admin_users[0], message=f'User {request.user.username} has '
+                                                                                   f'received a profanity warning.')
+                admin_notification.save()
             sent_date = timezone.now()
             message = Message(sender=sender, receiver=receiver, subject=subject, body=body, sent_date=sent_date)
             message.save()
