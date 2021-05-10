@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from django.forms import ModelForm
 
-from .models import UserProfile, Child
+from .models import UserProfile, Child, Video
 from django.contrib.auth.models import User
 
 from .models import Media, Kindergarten
@@ -68,7 +68,7 @@ class ProfileForm(forms.ModelForm):
 
 
 class ChildForm(forms.Form):
-    name_child = forms.CharField(max_length=30)
+    name_child= forms.CharField(max_length=30)
     teacher = forms.CharField()
     kindergarten = forms.CharField()
 
@@ -82,14 +82,11 @@ class DeleteUserForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput)
 
 
-class FindStudentForm(forms.Form):
-    username = forms.CharField(max_length=250)
-
-
 class DeletePrimaryUserForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput)
 
-class NoteForm(forms.Form):
-    child = forms.CharField(max_length=50)
-    subject = forms.CharField(max_length=50, initial='message subject')
-    body = forms.CharField(max_length=5000, widget=forms.Textarea)
+class VideoForm(forms.ModelForm):
+    class Meta:
+        model= Video
+        fields= ["title", "video"]
+

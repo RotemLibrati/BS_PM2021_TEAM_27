@@ -6,5 +6,15 @@
 </head>
 <body>
     <h1>WELCOME TO YOUR PERSONAL AREA!</h1>
+    <h4>Name: {{child.name}}</h4>
+    <h4>Parent: {{child.parent}}</h4>
+    <h4>Teacher: {{child.teacher}}</h4>
+    <h4>Kindergarten: {{child.kindergarten}}</h4>
+{% for video in videos %}
+<video width="300" height="300" controls >
+<source src="{{video.video.url}}" type="video/mp4">
+<b>{{video.title}}</b>
+</video>
+    {% endfor %}
 </body>
 </html>

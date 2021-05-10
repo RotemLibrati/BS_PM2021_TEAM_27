@@ -1,5 +1,3 @@
-from itertools import count
-
 from django.db import models
 from django.contrib.auth.models import User
 from datetime import timedelta, datetime
@@ -93,18 +91,10 @@ class Notification(models.Model):
     seen = models.BooleanField(default=False)
 
 
-class Note(models.Model):
-    teacher = models.ForeignKey(User, related_name='note', on_delete=models.SET_NULL, null=True)
-    child = models.ForeignKey(Child, related_name='note', on_delete=models.SET_NULL, null=True)
-    date = models.DateTimeField(default=datetime.now, blank=True)
-    subject = models.CharField(max_length=250, blank=True, null=True)
-    body = models.CharField(max_length=500, blank=True, null=True)
+class Video(models.Model):
+    title = models.CharField(max_length=100)
+    video = models.FileField(upload_to='videos/', null=True, verbose_name="")
+    create = models.ForeignKey(UserProfile, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
-        return f'Child: {self.child}. Subject: {self.subject}. Date: {self.date}.'
-
-
-class FAQ(models.Model):
-    question = models.CharField(max_length=500)
-    answer = models.CharField(max_length=1000)
-
+        return self.title

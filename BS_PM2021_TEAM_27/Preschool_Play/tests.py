@@ -328,14 +328,14 @@ class TestMyStudentsView(TestCase):
 #         self.client.login(username='testuser', password='Qwerty246')
 #
 #     def test_with_add_media(self):
-#         response = self.client.get(reverse('Preschool_Play:add-media'))
+#         response = self.client.get(reverse('Preschool_Play:add-uploads'))
 #         self.assertEqual(response.status_code, 200)
 #         add_media = Media(name='name', path='www/rrr/ttt', type='picture')
 #         add_media.save()
 #         self.assertContains(response, "Add Media")
 #
 #     def test_with_delete_media(self):
-#         response = self.client.get(reverse('Preschool_Play:delete-media'))
+#         response = self.client.get(reverse('Preschool_Play:delete-uploads'))
 #         self.assertEqual(response.status_code, 200)
 #         self.assertContains(response, "Delete Media")
 class TestMediaView(TestCase):
@@ -378,11 +378,11 @@ class TestUrl(TestCase):
         url = reverse('Preschool_Play:delete-media')
         self.assertEqual(resolve(url).func, views.delete_media)
     # def test_Preschool_Play_add_media_url_is_resolved(self):
-    #     url = reverse('Preschool_Play:add-media')
+    #     url = reverse('Preschool_Play:add-uploads')
     #     self.assertEqual(resolve(url).func, views.add_media)
     #
     # def test_Preschool_Play_delete_media_url_is_resolved(self):
-    #     url = reverse('Preschool_Play:delete-media')
+    #     url = reverse('Preschool_Play:delete-uploads')
     #     self.assertEqual(resolve(url).func, views.delete_media)
 
 
