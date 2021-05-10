@@ -27,6 +27,7 @@
     {% endif %}
     {% if profile.type == 'teacher' %}
         <li><a href="{% url 'Preschool_Play:upload' %}">Upload Video</a><br>
+        <li><a href="{% url 'Preschool_Play:scoretable' %}">Score Table</a><br>
     {% endif %}
     <li><a href="{% url 'Preschool_Play:score-graphs' %}">Score Graphs</a><br>
     <li><a href="{% url 'Preschool_Play:message-board' %}">Message Board</a><br>

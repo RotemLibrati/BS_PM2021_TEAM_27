@@ -389,9 +389,9 @@ def scoretable(request):
     user = request.user
     user_profile = UserProfile.objects.get(user=user)
     if user_profile.type == 'teacher':
-        user_list = Score.objects.filter(child__teacher=user)
+        user_list = Score.objects.filter(child__teacher=user.profile)
         context = {'user_list': user_list}
-    return render(request, 'Preschool_Play/scoretable_teacher.html', context)
+    return render(request, 'Preschool_Play/scoretable-teacher.html', context)
 
 
 def suspension_for_teacher(request):
