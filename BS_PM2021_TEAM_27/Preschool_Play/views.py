@@ -277,10 +277,16 @@ def new_message(request, **kwargs):
             except (TypeError, User.DoesNotExist):
                 error = "Could not find user."
                 render(request, 'Preschool_Play/failure.html', {'error': error})
-            is_profane = False
+            message_is_profane = False
             subject = form.cleaned_data['subject']
+            subject_is_profane = has_profanity(subject)
+            if subject_is_profane:
+                subject = censor_profanity(subject)
             body = form.cleaned_data['body']
-            is_profane = has_profanity(subject) or has_profanity(body)
+            body_is_profane = has_profanity(body)
+            if body_is_profane:
+                body = censor_profanity(body)
+            message_is_profane = subject_is_profane or body_is_profane
             sent_date = timezone.now()
             message = Message(sender=sender, receiver=receiver, subject=subject, body=body, sent_date=sent_date)
             message.save()
