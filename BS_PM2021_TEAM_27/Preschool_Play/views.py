@@ -14,7 +14,7 @@ from profanity import *
 from .models import *
 import json
 from .forms import DeleteMediaForm, LoginForm, MessageForm, AddMediaForm, KindergartenListForm, \
-    CreateUserForm, ProfileForm, ChildForm, DeleteUserForm, DeletePrimaryUserForm, VideoForm
+    CreateUserForm, ProfileForm, ChildForm, DeleteUserForm, DeletePrimaryUserForm, VideoForm, ScoreDataForm
 from django.shortcuts import render, get_object_or_404
 
 
@@ -37,34 +37,74 @@ def index(request):
 
 
 @login_required
-def score_graphs(request, **kwargs):
+def score_graphs(request):
     context = {'user': request.user}
-    if request.user.is_authenticated:
-        context['profile'] = UserProfile.objects.get(user=request.user)
-    if context['profile'].is_admin:
-        if kwargs:
-            if kwargs['name']:
-                children = list(Child.objects.filter(name=kwargs['name']))
-                if children.__len__() > 0:
+    if request.method == 'POST':
+        form = ScoreDataForm(request.POST)
+        if form.is_valid():
+            pair = form.cleaned_data['child_parent_pair']
+            pair = pair.split(':')
+            user_is_admin = False
+            if request.user.profile.is_admin:
+                children = list(Child.objects.all().order_by('parent__user__username', 'name'))
+                user_is_admin = True
+            elif request.user.profile.type == 'teacher':
+                children = list(Child.objects.filter(teacher=request.user.profile).order_by('parent__user__username', 'name'))
+            else:
+                children = list(Child.objects.filter(parent=request.user.profile).order_by('name'))
+            if pair[0] == 'All' and user_is_admin:
+                context['scoreData'] = list(
+                    Score.objects.values(d=ExtractDay('date'), m=ExtractMonth('date'), y=ExtractYear('date')).annotate(
+                        Sum('amount')))
+                context['child_name'] = 'All'
+            else:
+                parent_user_of_chosen_child = User.objects.get(username=pair[1])
+                chosen_child = Child.objects.get(name=pair[0], parent=parent_user_of_chosen_child.profile)
+                context['child_name'] = chosen_child.name
+                if user_is_admin or request.user == parent_user_of_chosen_child or request.user.profile == chosen_child.teacher:
                     context['scoreData'] = list(
-                        Score.objects.filter(child=children[0]).values(d=ExtractDay('date'), m=ExtractMonth('date'),
-                                                                       y=ExtractYear('date')).annotate(
+                        Score.objects.filter(child=chosen_child).values(d=ExtractDay('date'), m=ExtractMonth('date'), y=ExtractYear('date')).annotate(
                             Sum('amount')))
+                else:
+                    return render(request, 'Preschool_Play/error.html', {'message': 'Unauthorized user'})
+            form = ScoreDataForm()
+            pairs_choices = [(f'{c.name}:{c.parent.user.username}', f'P: {c.parent.user.username}. C: {c.name}.') for c in
+                             children]
+            if user_is_admin:
+                pairs_choices.insert(0, ('All:All', 'All'))
+            form.fields['child_parent_pair'] = forms.CharField(widget=forms.Select(choices=pairs_choices))
+            form.fields['child_parent_pair'].initial = pairs_choices[0][0]
+            context['form'] = form
+            return render(request, 'Preschool_Play/score-graphs.html', context)
+    else:
+        user_is_admin = False
+        if request.user.profile.is_admin:
+            children = list(Child.objects.all().order_by('parent__user__username', 'name'))
+            user_is_admin = True
+        elif request.user.profile.type == 'teacher':
+            children = list(Child.objects.filter(teacher=request.user.profile).order_by('parent__user__username', 'name'))
         else:
+            children = list(Child.objects.filter(parent=request.user.profile).order_by('name'))
+        if user_is_admin:
             context['scoreData'] = list(
                 Score.objects.values(d=ExtractDay('date'), m=ExtractMonth('date'), y=ExtractYear('date')).annotate(
                     Sum('amount')))
+        else:
+            context['scoreData'] = list(
+                Score.objects.filter(child=children[0]).values(d=ExtractDay('date'), m=ExtractMonth('date'),
+                                                               y=ExtractYear('date')).annotate(
+                    Sum('amount')))
+        form = ScoreDataForm()
+        pairs_choices = [(f'{c.name}:{c.parent.user.username}', f'P: {c.parent.user.username}. C: {c.name}.') for c in children]
+        if user_is_admin:
+            pairs_choices.insert(0, ('All:All', 'All'))
+            context['child_name'] = 'All'
+        else:
+            context['child_name'] = children[0].name
+        form.fields['child_parent_pair'] = forms.CharField(widget=forms.Select(choices=pairs_choices))
+        form.fields['child_parent_pair'].initial = pairs_choices[0][0]
+        context['form'] = form
         return render(request, 'Preschool_Play/score-graphs.html', context)
-    else:
-        if kwargs:
-            if kwargs['name']:
-                children = list(Child.objects.filter(parent=request.user, name=kwargs['name']))
-                if children.__len__() > 0:
-                    context['scoreData'] = list(
-                        Score.objects.filter(child=children[0]).values(d=ExtractDay('date'), m=ExtractMonth('date'),
-                                                                       y=ExtractYear('date')).annotate(
-                            Sum('amount')))
-                    return render(request, 'Preschool_Play/score-graphs.html', context)
     return render(request, 'Preschool_Play/error.html', {'message': 'Unauthorized user'})
 
 
@@ -259,7 +299,7 @@ def new_message(request, **kwargs):
         parents_users = User.objects.filter(profile__type='parent', profile__child__teacher=request.user,
                                             profile__is_admin=False)
     if user_profile.type == 'parent':
-        teachers_users = User.objects.filter(student__parent=request.user)
+        teachers_users = User.objects.filter(profile__student__parent=request.user.profile)
         parents_users = User.objects.filter(profile__type='parent', child__teacher__in=list(teachers_users),
                                             profile__is_admin=False)
     if user_profile.is_admin:

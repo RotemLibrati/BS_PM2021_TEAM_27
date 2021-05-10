@@ -6,8 +6,7 @@ app_name = 'Preschool_Play'
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('scoregraphs', views.score_graphs, name='scoregraphs'),
-    path('scoregraphs/<str:name>', views.score_graphs, name='scoregraphs'),
+    path('score-graphs', views.score_graphs, name='score-graphs'),
     path('show-suspend-user', views.show_suspend_user, name='show-suspend-user'),
     path('filter-suspension', views.filter_suspension, name='filter-suspension'),
     path('show-users', views.show_users, name='show-users'),
