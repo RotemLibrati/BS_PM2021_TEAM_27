@@ -1,27 +1,6 @@
 <form action="{% url 'Preschool_Play:new-message' %}" method="POST">
     {% csrf_token %}
     <h2>New message</h2>
-    <h3>Users:</h3><br>
-    <h4>
-        Admins
-    </h4><br>
-    <ul>
-        {% for a in admins %}
-        <li>{{a}}</li>
-        {% endfor %}
-    </ul>
-    <h4>Teachers</h4><br>
-    <ul>
-        {% for t in teachers %}
-        <li>{{t}}</li>
-        {% endfor %}
-    </ul>
-    <h4>Parents</h4><br>
-    <ul>
-        {% for p in parents %}
-        <li>{{p}}</li>
-        {% endfor %}
-    </ul>
     {{form.as_p}}
     <button type="submit">Submit</button>
 </form>

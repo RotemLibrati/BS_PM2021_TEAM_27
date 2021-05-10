@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Teacher notes</title>
+</head>
+<body>
+    Order by:<br>
+    <a href="{% url 'Preschool_Play:notes' 'date' %}">Date</a>
+    <a href="{% url 'Preschool_Play:notes' 'subject' %}">Subject</a>
+    <ol>
+        {% for note in notes %}
+        <li>
+            {{note}}
+
+
+        </li>
+        {% empty %}
+        <p>No notes available.</p>
+        {% endfor %}
+    </ol>
+</body>
+</html>

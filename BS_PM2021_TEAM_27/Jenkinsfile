@@ -1,5 +1,7 @@
 pipeline {
-    agent { dockerfile true }
+    agent {
+        docker { image 'eilonc285/repos-team27:team27' }
+    }
     triggers {
       githubPush()
   }
@@ -9,7 +11,8 @@ pipeline {
         stage('Run Unit Tests') {
           steps {
               sh """
-                  python BS_PM2021_TEAM_27/manage.py test BS_PM2021_TEAM_27
+                  cd BS_PM2021_TEAM_27
+                  python manage.py test
               """
           }
         }
