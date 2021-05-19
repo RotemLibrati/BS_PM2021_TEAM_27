@@ -318,7 +318,7 @@ def child_area(request, name):
     if child.auth == False:
         return render(request, 'Preschool_Play/error.html', {'message': 'You have to wait for your teacher to approve you'})
     teacher = child.teacher
-    videos = Video.objects.filter(create=teacher)
+    videos = Video.objects.filter(create=teacher, type='video')
     context = {'child': child, 'videos': videos}
     return render(request, 'Preschool_Play/child-area.html', context)
 
@@ -547,6 +547,7 @@ def upload_video(request):
             form.save()
             last = Video.objects.last()
             last.create = user_profile
+            last.type = 'video'
             last.save()
             return HttpResponseRedirect(reverse('Preschool_Play:index'))
     else:
