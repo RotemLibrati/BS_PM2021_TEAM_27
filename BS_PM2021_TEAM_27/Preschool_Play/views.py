@@ -309,8 +309,6 @@ def child_area(request, name):
     user_parent = request.user
     user_profile = UserProfile.objects.get(user=user_parent)
     child = Child.objects.get(parent=user_profile, name=name)
-    if child.auth == False:
-        return render(request, 'Preschool_Play/error.html', {'message': 'You have to wait for your teacher to approve you'})
     teacher = child.teacher
     videos = Video.objects.filter(create=teacher)
     context = {'child': child, 'videos': videos}
@@ -449,9 +447,6 @@ def add_child(request, **kwargs):
                         new_child.save()
                         alert = Notification(receiver=User.objects.get(username='admin'), message=f'{user} has registered his child to the system')
                         alert.save()
-                        alert = Notification(receiver=User.objects.get(username=finally_chosen_teacher.user),
-                                             message=f'{user} has registered his child to the system')
-                        alert.save()
                         return HttpResponseRedirect(reverse('Preschool_Play:index'))
         else:
             form = ChildForm()
@@ -544,7 +539,6 @@ def upload_video(request):
         form = VideoForm(request.POST or None, request.FILES or None)
         context = {'form': form}
     return render(request, 'Preschool_Play/upload.html', context)
-
 
 def approve_student(request):
     user=request.user

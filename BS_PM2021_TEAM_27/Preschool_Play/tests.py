@@ -138,6 +138,26 @@ class TestNewMessage(TestCase):
         m = Message.objects.get(receiver=user, sender=user2)
         self.assertIsNotNone(m)
 
+    def test_sending_message_to_admin(self):
+        c = Client()
+        user = User.objects.create_user(username='tester1', password='qwerty246')
+        user.save()
+        user_profile = UserProfile.objects.create(user=user)
+        user_profile.save()
+        user2 = User.objects.create_user(username='admin')
+        user2.set_password('qwerty246')
+        user2.is_staff = True
+        user2.is_superuser = True
+        user2.save()
+        user_profile2 = UserProfile.objects.create(user=user2, is_admin=True)
+        user_profile2.save()
+        message = {'receiver': user, 'subject': 'subject', 'body': 'body'}
+        c.force_login(user)
+        response = c.post(reverse('Preschool_Play:new-message'), data=message)
+        self.assertRedirects(response, reverse('Preschool_Play:inbox'))
+        m = Message.objects.get(receiver=user2, sender=user)
+        self.assertIsNotNone(m)
+
 
 @tag('unit-test')
 class TestUserProfileModel(TestCase):

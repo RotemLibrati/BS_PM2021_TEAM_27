@@ -30,6 +30,7 @@
         <li><a href="{% url 'Preschool_Play:upload' %}">Upload Video</a><br>
         <li><a href="{% url 'Preschool_Play:approve-student' %}">Approve Student</a><br>
     {% endif %}
+    <li><a href="{% url 'Preschool_Play:score-graphs' %}">Score Graphs</a><br>
     <li><a href="{% url 'Preschool_Play:message-board' %}">Message Board</a><br>
     <li><a href="{% url 'Preschool_Play:inbox' %}">Inbox{% if unread %}({{unread}}){% endif %}</a><br>
     <li><a href="{% url 'Preschool_Play:logout' %}">Logout</a><br>
