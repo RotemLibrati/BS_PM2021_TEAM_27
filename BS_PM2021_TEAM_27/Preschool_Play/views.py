@@ -109,6 +109,12 @@ def score_graphs(request):
 
 
 @login_required
+def game(request, child_name):
+    context = {'user': request.user, 'child_name':child_name}
+    return render(request, 'Preschool_Play/connect-dots.html', context)
+
+
+@login_required
 def send_game_info(request):
     data = request.body.decode('utf-8')
     received_json_data = json.loads(data)
@@ -118,7 +124,7 @@ def send_game_info(request):
     try:
         connected_user = request.user
         child = Child.objects.get(name=child_name)
-        if child.parent == connected_user:
+        if child.parent == connected_user.profile:
             sc = Score(child=child, amount=_amount, comment=_comment)
             sc.save()
             return HttpResponse("Score saved")
