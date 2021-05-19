@@ -70,6 +70,7 @@ class Child(models.Model):
     teacher = models.ForeignKey(UserProfile, related_name='student', on_delete=models.SET_NULL, null=True)
     suspension_time = models.DateTimeField(default=datetime(2000, 1, 1))
     kindergarten = models.ForeignKey(Kindergarten, on_delete=models.SET_NULL, null=True)
+    auth = models.BooleanField(default=False)
 
     def __str__(self):
         return f'Name: {self.name}. Parent: {self.parent}'

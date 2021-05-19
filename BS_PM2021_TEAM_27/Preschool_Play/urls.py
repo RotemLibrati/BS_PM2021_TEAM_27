@@ -37,6 +37,9 @@ urlpatterns = [
     path('upload', views.upload_video, name='upload'),
     path('videos', views.show_video, name='videos'),
     path('child-area/<str:name>', views.child_area, name='child-area'),
+    path('approve-student', views.approve_student, name='approve-student'),
+    path('approve-student/<str:name>', views.wait_for_approve, name='wait-for-approve'),
+    path('final-approve/<str:name>', views.final_approve, name='final-approve'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
