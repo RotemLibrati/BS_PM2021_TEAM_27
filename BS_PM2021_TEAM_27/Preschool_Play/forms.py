@@ -22,9 +22,7 @@ class AddMediaForm(forms.Form):
 
 
 class DeleteMediaForm(forms.Form):
-    set = Media.objects.all()
-    MEDIA = list(map(lambda x: (str(x.name), str(x.name)), set))
-    name = forms.CharField(widget=forms.Select(choices=MEDIA))
+    name = forms.CharField(max_length=30)
 
 
 class MessageForm(forms.Form):

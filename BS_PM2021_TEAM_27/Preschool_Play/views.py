@@ -132,7 +132,9 @@ def add_media(request):
     return render(request, 'Preschool_Play/add-media.html', context)
 
 
-def delete_media(request):
+def delete_media(request, **kwargs):
+    all_media = None
+    media = Media.objects.all()
     if request.method == 'POST':
         form = DeleteMediaForm(request.POST)
         if form.is_valid():
@@ -141,7 +143,11 @@ def delete_media(request):
             return HttpResponseRedirect(reverse('Preschool_Play:index'))
     else:
         form = DeleteMediaForm()
-    context = {'form': form}
+        all_media = list(media)
+        form.fields['name'] = forms.CharField(
+            widget=forms.Select(choices=[(u.name, u.name) for u in all_media]))
+        form.fields['name'].initial = all_media[0].name
+    context = {'form': form, 'media': media}
     return render(request, 'Preschool_Play/delete-media.html', context)
 
 
@@ -432,7 +438,6 @@ def add_child(request, **kwargs):
                 child_list = list(child_names)
                 print(child_list)
                 for n in child_list:
-                    print(n)
                     if name == n.name:
                         return render(request, 'Preschool_Play/error.html',
                                       {'message': 'You try to add name exist'})
@@ -457,12 +462,16 @@ def add_child(request, **kwargs):
             form = ChildForm()
             all_users = list(teachers_users)
             all_kindergarten = list(kindergarten)
-            form.fields['teacher'] = forms.CharField(
-                widget=forms.Select(choices=[(u.user, u.user) for u in all_users]))
-            form.fields['teacher'].initial = all_users[0].user
-            form.fields['kindergarten'] = forms.CharField(
-                widget=forms.Select(choices=[(n.name, n.name) for n in kindergarten]))
-            form.fields['kindergarten'].initial = kindergarten[0].name
+            try:
+                form.fields['teacher'] = forms.CharField(
+                    widget=forms.Select(choices=[(u.user, u.user) for u in all_users]))
+                form.fields['teacher'].initial = all_users[0].user
+                form.fields['kindergarten'] = forms.CharField(
+                    widget=forms.Select(choices=[(n.name, n.name) for n in kindergarten]))
+                form.fields['kindergarten'].initial = kindergarten[0].name
+            except:
+                error = "Teacher is not exist."
+                render(request, 'Preschool_Play/error.html', {'error': error})
         return render(request, 'Preschool_Play/create-child.html', {
             'form': form, 'teachers': teachers_users
         })
