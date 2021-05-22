@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Approve Student</title>
+</head>
+<body>
+    <h1>Your student that waiting for your approve</h1>
+    {% for s in student %}
+    <li><a href="{% url 'Preschool_Play:wait-for-approve' s.name %}">{{ s.name }}</a><br>
+    {% endfor %}
+</body>
+</html>

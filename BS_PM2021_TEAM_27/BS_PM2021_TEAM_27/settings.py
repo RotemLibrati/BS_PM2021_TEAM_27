@@ -15,9 +15,11 @@ from builtins import str
 from pathlib import Path
 import os.path
 
+from django.conf import settings
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
@@ -65,10 +67,19 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.media',
             ],
         },
     },
 ]
+
+
+
+STATIC_ROOT = os.path.join(BASE_DIR,'assets')
+
+
+
+
 
 WSGI_APPLICATION = 'BS_PM2021_TEAM_27.wsgi.application'
 
@@ -123,4 +134,14 @@ USE_TZ = False
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
+DEFAULT_AUTO_FIELD='django.db.models.AutoField'
+
 STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "assert")
+]
+
+MEDIA_URL ='/media/videos/'
+
+MEDIA_ROOT = os.path.join(BASE_DIR,'media')

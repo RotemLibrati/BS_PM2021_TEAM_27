@@ -1,12 +1,15 @@
-from django.test import TestCase
-from django.contrib.auth.models import User
-from django.urls import reverse, resolve
-from django.test import TestCase, Client
-from .models import *
+import os
+
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from django.template.loader import render_to_string
 from django.test import TestCase, Client, tag
-from .models import *
-from datetime import datetime
+from django.test.utils import override_settings
+from django.urls import reverse, resolve
+from selenium import webdriver
+from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
+import geckodriver_autoinstaller
 from . import views
+from .models import *
 
 
 # py manage.py test
@@ -156,7 +159,6 @@ class TestNewMessage(TestCase):
         self.assertIsNotNone(m)
 
 
-
 @tag('unit-test')
 class TestUserProfileModel(TestCase):
     def test_was_born_recently_with_negative_age(self):
@@ -299,7 +301,7 @@ class TestParentView(TestCase):
         self.user.save()
         self.profile = UserProfile(user=self.user, type='parent')
         self.profile.save()
-        self.child = Child(name='son', parent=self.user)
+        self.child = Child(name='son', parent=self.user.profile)
         self.child.save()
 
     def test_child_is_visible_in_parent_page(self):
@@ -346,14 +348,14 @@ class TestMyStudentsView(TestCase):
 #         self.client.login(username='testuser', password='Qwerty246')
 #
 #     def test_with_add_media(self):
-#         response = self.client.get(reverse('Preschool_Play:add-media'))
+#         response = self.client.get(reverse('Preschool_Play:add-uploads'))
 #         self.assertEqual(response.status_code, 200)
 #         add_media = Media(name='name', path='www/rrr/ttt', type='picture')
 #         add_media.save()
 #         self.assertContains(response, "Add Media")
 #
 #     def test_with_delete_media(self):
-#         response = self.client.get(reverse('Preschool_Play:delete-media'))
+#         response = self.client.get(reverse('Preschool_Play:delete-uploads'))
 #         self.assertEqual(response.status_code, 200)
 #         self.assertContains(response, "Delete Media")
 class TestMediaView(TestCase):
@@ -396,11 +398,11 @@ class TestUrl(TestCase):
         url = reverse('Preschool_Play:delete-media')
         self.assertEqual(resolve(url).func, views.delete_media)
     # def test_Preschool_Play_add_media_url_is_resolved(self):
-    #     url = reverse('Preschool_Play:add-media')
+    #     url = reverse('Preschool_Play:add-uploads')
     #     self.assertEqual(resolve(url).func, views.add_media)
     #
     # def test_Preschool_Play_delete_media_url_is_resolved(self):
-    #     url = reverse('Preschool_Play:delete-media')
+    #     url = reverse('Preschool_Play:delete-uploads')
     #     self.assertEqual(resolve(url).func, views.delete_media)
 
 
@@ -436,7 +438,7 @@ class TestNewMessageView(TestCase):
         self.teacher_user.save()
         self.teacher_profile = UserProfile(user=self.teacher_user, type='teacher')
         self.teacher_profile.save()
-        self.child = Child(name='ben', parent=self.user, teacher=self.teacher_profile)
+        self.child = Child(name='ben', parent=self.user.profile, teacher=self.teacher_profile)
         self.child.save()
         self.client = Client()
         self.client.login(username='testuser', password='Qwerty246')
@@ -472,6 +474,26 @@ class TestNotesView(TestCase):
         self.assertContains(response, "subjectTEST")
         self.assertNotContains(response, "subjectTEST2")
         self.assertTemplateUsed(response, 'Preschool_Play/notes.html')
+
+    def test_notes_are_arranged_in_chronological_order(self):
+        d = datetime.today() - timedelta(days=2)
+        self.note3 = Note(teacher=self.teacher_user, child=self.child, subject='znewsub', body='newtext', date=d)
+        self.note3.save()
+        response = self.client.get(reverse('Preschool_Play:notes', args=['date']))
+        html = str(response.content)
+        index_of_first_note = html.index('znewsub')
+        index_of_second_note = html.index('subjectTEST')
+        self.assertTrue(index_of_first_note < index_of_second_note)
+
+    def test_notes_are_arranged_in_alphabetical_order(self):
+        d = datetime.today() - timedelta(days=2)
+        self.note3 = Note(teacher=self.teacher_user, child=self.child, subject='znewsub', body='newtext', date=d)
+        self.note3.save()
+        response = self.client.get(reverse('Preschool_Play:notes', args=['subject']))
+        html = str(response.content)
+        index_of_first_note = html.index('subjectTEST')
+        index_of_second_note = html.index('znewsub')
+        self.assertTrue(index_of_first_note < index_of_second_note)
 
 
 class TestViewNoteView(TestCase):
@@ -541,3 +563,98 @@ class TestNewNoteView(TestCase):
 #     self.assertEqual(response.status_code, 200)
 #     self.assertContains(response, "teacher1")
 #     self.assertTemplateUsed(response, 'Preschool_Play/new-message.html')
+
+
+class TestIntegrationWithSelenium(StaticLiveServerTestCase):
+
+    def setUp(self):
+        # geckodriver_autoinstaller.install(True)
+        # path = os.getcwd() + '/geckodriver-linux64'
+        # firefox_binary = FirefoxBinary(path)
+        # path = os.path.dirname(os.path.realpath('./geckodriver-linux64'))
+        self.browser = webdriver.Firefox(executable_path='./geckodriver-linux64')
+
+        self.admin_user = User.objects.create_user('admin', 'admin@test.com')
+        self.admin_user.set_password('qwerty246')
+        self.admin_user.is_staff = True
+        self.admin_user.is_superuser = True
+        self.admin_user.save()
+        self.admin_profile = UserProfile(user=self.admin_user, is_admin=True)
+        self.admin_profile.save()
+        self.teacher = User.objects.create_user(username='teacher1')
+        self.teacher.set_password('qwerty246')
+        self.teacher.save()
+        self.teacher_profile = UserProfile(user=self.teacher, type='teacher')
+        self.teacher_profile.save()
+        self.kg = Kindergarten(name='mypreschool', teacher=self.teacher_profile)
+        self.kg.save()
+        self.user = User.objects.create_user(username='user1')
+        self.user.set_password('qwerty246')
+        self.user.save()
+        self.profile = UserProfile(user=self.user, is_admin=True)
+        self.profile.save()
+
+    def tearDown(self):
+        self.browser.close()
+
+    @override_settings(DEBUG=True)
+    def test_login_then_add_and_delete_new_child(self):
+        self.browser.get(f'{self.live_server_url}/preschoolplay/login')
+        username_input = self.browser.find_element_by_name("user_name")
+        username_input.send_keys('user1')
+        password_input = self.browser.find_element_by_name("password")
+        password_input.send_keys('qwerty246')
+        self.browser.find_element_by_xpath('//button[@type="submit"]').click()
+        self.browser.find_element_by_xpath('//a[text()="Add Child"]').click()
+        child_name = self.browser.find_element_by_name("name_child")
+        child_name.send_keys('kid1')
+        self.browser.find_element_by_xpath('//button[@type="submit"]').click()
+        self.browser.find_element_by_xpath('//a[text()="Delete Child"]').click()
+        self.browser.find_element_by_xpath('//select/option[text()="Name: kid1. Parent: user1"]').click()
+        self.browser.find_element_by_xpath('//input[@type="submit"]').click()
+
+    def test_sending_and_receiving_messages_between_two_users(self):
+        self.browser.get(f'{self.live_server_url}/preschoolplay/login')
+        username_input = self.browser.find_element_by_name("user_name")
+        username_input.send_keys('user1')
+        password_input = self.browser.find_element_by_name("password")
+        password_input.send_keys('qwerty246')
+        self.browser.find_element_by_xpath('//button[@type="submit"]').click()
+        self.browser.get(f'{self.live_server_url}/preschoolplay')
+        self.browser.find_element_by_xpath('//a[text()="Inbox"]').click()
+        self.browser.find_element_by_xpath('//a[text()="Send new message"]').click()
+        self.browser.find_element_by_xpath('//select[@name="receiver"]/option[text()="admin"]').click()
+        subject_input = self.browser.find_element_by_name("subject")
+        subject_input.send_keys('this new app')
+        subject_input = self.browser.find_element_by_name("body")
+        subject_input.send_keys('random text')
+        self.browser.find_element_by_xpath('//button[@type="submit"]').click()
+        self.browser.get(f'{self.live_server_url}/preschoolplay')
+        self.browser.find_element_by_xpath('//a[text()="Logout"]').click()
+        self.browser.get(f'{self.live_server_url}/preschoolplay/login')
+        username_input = self.browser.find_element_by_name("user_name")
+        username_input.send_keys('admin')
+        password_input = self.browser.find_element_by_name("password")
+        password_input.send_keys('qwerty246')
+        self.browser.find_element_by_xpath('//button[@type="submit"]').click()
+        self.browser.find_element_by_xpath('//a[text()="Inbox(1)"]').click()
+        self.browser.find_element_by_xpath('//a[text()=" Open"]').click()
+        message_subject = self.browser.find_element_by_xpath('//h3')
+        self.assertEquals('this new app' in message_subject.text, True)
+
+class TestViewFAQView(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser')
+        self.user.set_password('Qwerty246')
+        self.user.save()
+        self.profile = UserProfile(user=self.user, is_admin=False)
+        self.profile.save()
+        self.client = Client()
+        self.client.login(username='testuser', password='Qwerty246')
+
+    def test_FAQ_shows_up_on_page(self):
+        self.faq = FAQ(question = 'question1', answer='answer2')
+        self.faq.save()
+        response = self.client.get(reverse('Preschool_Play:view-FAQ'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "question1")

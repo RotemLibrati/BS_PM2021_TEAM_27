@@ -9,10 +9,12 @@ from django.db.models.functions import ExtractDay, ExtractMonth, ExtractYear
 from django.http import HttpResponse, HttpResponseRedirect
 from django.db.models.signals import post_save
 from django import forms
+
+
 from .models import *
 import json
-from .forms import DeleteMediaForm, LoginForm, MessageForm, AddMediaForm, KindergartenListForm, \
-    CreateUserForm, ProfileForm, ChildForm, DeleteUserForm, DeletePrimaryUserForm, FindStudentForm, NoteForm
+from .forms import DeleteMediaForm, LoginForm, MessageForm, AddMediaForm, KindergartenListForm,\
+    CreateUserForm, ProfileForm, ChildForm, DeleteUserForm, DeletePrimaryUserForm, VideoForm
 from django.shortcuts import render, get_object_or_404
 
 
@@ -36,33 +38,40 @@ def index(request):
 
 @login_required
 def score_graphs(request, **kwargs):
-    context = {'user': request.user, 'profile': UserProfile.objects.get(user=request.user)}
+    context = {'user': request.user}
+    if request.user.is_authenticated:
+        context['profile'] = UserProfile.objects.get(user=request.user)
     if context['profile'].is_admin:
-        if 'name' in kwargs:
-            children = list(Child.objects.filter(name=kwargs['name']))
-            if children.__len__() > 0:
-                context['scoreData'] = list(
-                    Score.objects.filter(child=children[0]).values(d=ExtractDay('date'), m=ExtractMonth('date'),
-                                                                   y=ExtractYear('date')).annotate(
-                        Sum('amount')))
+        if kwargs:
+            if kwargs['name']:
+                children = list(Child.objects.filter(name=kwargs['name']))
+                if children.__len__() > 0:
+                    context['scoreData'] = list(
+                        Score.objects.filter(child=children[0]).values(d=ExtractDay('date'), m=ExtractMonth('date'),
+                                                                       y=ExtractYear('date')).annotate(
+                            Sum('amount')))
         else:
             context['scoreData'] = list(
                 Score.objects.values(d=ExtractDay('date'), m=ExtractMonth('date'), y=ExtractYear('date')).annotate(
                     Sum('amount')))
         return render(request, 'Preschool_Play/score-graphs.html', context)
     else:
-        if 'name' in kwargs:
-            children = list(Child.objects.filter(parent=request.user.profile, name=kwargs['name']))
-            if children.__len__() <= 0:
-                children = list(Child.objects.filter(teacher=request.user.profile, name=kwargs['name']))
-            if children.__len__() > 0:
-                context['scoreData'] = list(
-                    Score.objects.filter(child=children[0]).values(d=ExtractDay('date'), m=ExtractMonth('date'),
-                                                                   y=ExtractYear('date')).annotate(
-                        Sum('amount')))
-                context['child'] = children[0]
-                return render(request, 'Preschool_Play/score-graphs.html', context)
+        if kwargs:
+            if kwargs['name']:
+                children = list(Child.objects.filter(parent=request.user, name=kwargs['name']))
+                if children.__len__() > 0:
+                    context['scoreData'] = list(
+                        Score.objects.filter(child=children[0]).values(d=ExtractDay('date'), m=ExtractMonth('date'),
+                                                                       y=ExtractYear('date')).annotate(
+                            Sum('amount')))
+                    return render(request, 'Preschool_Play/score-graphs.html', context)
     return render(request, 'Preschool_Play/error.html', {'message': 'Unauthorized user'})
+
+
+@login_required
+def game(request, child_name):
+    context = {'user': request.user, 'child_name':child_name}
+    return render(request, 'Preschool_Play/connect-dots.html', context)
 
 
 @login_required
@@ -75,7 +84,7 @@ def send_game_info(request):
     try:
         connected_user = request.user
         child = Child.objects.get(name=child_name)
-        if child.parent == connected_user:
+        if child.parent == connected_user.profile:
             sc = Score(child=child, amount=_amount, comment=_comment)
             sc.save()
             return HttpResponse("Score saved")
@@ -225,39 +234,6 @@ def view_message(request, message_id):
                                                            })
 
 
-@login_required
-def find_student_of_teacher(request):
-    user_profile = UserProfile.objects.get(user=request.user)
-    if user_profile.type == 'parent' and not user_profile.is_admin:
-        return render(request, 'Preschool_Play/failure.html', {'error': 'Unauthorized access'})
-    teacher_username = None
-    if request.method == 'POST':
-        form = FindStudentForm(request.POST)
-        if form.is_valid():
-            teacher_username = form.cleaned_data['username']
-    teacher_users = User.objects.filter(profile__type='teacher')
-    if teacher_username is None:
-        form = FindStudentForm()
-        return render(request, 'Preschool_Play/find-student-of-teacher.html', {'teacher_users': teacher_users, 'form': form})
-    try:
-        chosen_teacher_user = User.objects.get(username=teacher_username)
-        chosen_teacher_profile = UserProfile.objects.get(user=chosen_teacher_user)
-    except (TypeError, User.DoesNotExist, UserProfile.DoesNotExist):
-        error = f"User with username \"{teacher_username}\" was not found."
-        return render(request, 'Preschool_Play/failure.html', {'error': error})
-    students = Child.objects.filter(teacher=chosen_teacher_profile)
-    context = {'teacher_users': teacher_users, 'chosen_teacher_user': chosen_teacher_user, 'students': students}
-    return render(request, 'Preschool_Play/find-student-of-teacher.html', context)
-
-
-@login_required
-def my_students(request):
-    if request.user.profile.type != 'teacher':
-        return render(request, 'Preschool_Play/failure.html', {'error': 'Unauthorized user.'})
-    students = list(Child.objects.filter(teacher=request.user.profile))
-    return render(request, 'Preschool_Play/my-students.html', {'students': students})
-
-
 def delete_message(request, message_id):
     if request.user is None or not request.user.is_authenticated:
         return HttpResponse("Not logged in")
@@ -286,10 +262,10 @@ def new_message(request, **kwargs):
     parents_users = None
     if user_profile.type == 'teacher':
         teachers_users = User.objects.all()
-        parents_users = User.objects.filter(profile__type='parent', profile__child__teacher=request.user.profile,
+        parents_users = User.objects.filter(profile__type='parent', profile__child__teacher=request.user,
                                             profile__is_admin=False)
     if user_profile.type == 'parent':
-        teachers_users = User.objects.filter(student__parent=request.user.profile)
+        teachers_users = User.objects.filter(student__parent=request.user)
         parents_users = User.objects.filter(profile__type='parent', child__teacher__in=list(teachers_users),
                                             profile__is_admin=False)
     if user_profile.is_admin:
@@ -318,7 +294,7 @@ def new_message(request, **kwargs):
         if kwargs:
             if kwargs['reply']:
                 form = MessageForm({'receiver': kwargs['reply']})
-        all_users = list(set().union(teachers_users, parents_users, admin_users))
+        all_users = list(teachers_users) + list(parents_users) + list(admin_users)
         form.fields['receiver'] = forms.CharField(
             widget=forms.Select(choices=[(u.username, u.username) for u in all_users]))
         form.fields['receiver'].initial = all_users[0].username
@@ -328,20 +304,30 @@ def new_message(request, **kwargs):
 
 
 def parent(request):
-    children = Child.objects.filter(parent=request.user.profile)
-    context = {'children': children, 'user': request.user}
+    user_parent = request.user
+    user_profile = UserProfile.objects.get(user=user_parent)
+    children = Child.objects.filter(parent=user_profile)
+    context = {'children': children}
     return render(request, 'Preschool_Play/parent.html', context)
 
 
-def child_area(request):
-    return render(request, 'Preschool_Play/child-area.html')
+def child_area(request, name):
+    user_parent = request.user
+    user_profile = UserProfile.objects.get(user=user_parent)
+    child = Child.objects.get(parent=user_profile, name=name)
+    if child.auth == False:
+        return render(request, 'Preschool_Play/error.html', {'message': 'You have to wait for your teacher to approve you'})
+    teacher = child.teacher
+    videos = Video.objects.filter(create=teacher)
+    context = {'child': child, 'videos': videos}
+    return render(request, 'Preschool_Play/child-area.html', context)
 
 
 def scoretable(request):
     user = request.user
     user_profile = UserProfile.objects.get(user=user)
     if user_profile.type == 'teacher':
-        user_list = Score.objects.filter(child__teacher=user.profile)
+        user_list = Score.objects.filter(child__teacher=user)
         context = {'user_list': user_list}
     return render(request, 'Preschool_Play/scoretable_teacher.html', context)
 
@@ -433,9 +419,13 @@ def new_profile(request, username):
 
 
 @login_required
-def add_child(request):
+def add_child(request, **kwargs):
     user = request.user
     user_profile = UserProfile.objects.get(user=user)
+    teachers_users = None
+    kindergarten = None
+    teachers_users = UserProfile.objects.filter(type='teacher')
+    kindergarten = Kindergarten.objects.all()
     if user_profile.type != 'parent':
         return render(request, 'Preschool_Play/error.html', {'message': 'You don\'t parent'})
     else:
@@ -444,6 +434,14 @@ def add_child(request):
             if form.is_valid():
                 name = form.cleaned_data['name_child']
                 teacher = form.cleaned_data['teacher']
+                child_names = Child.objects.all()
+                child_list = list(child_names)
+                print(child_list)
+                for n in child_list:
+                    print(n)
+                    if name == n.name:
+                        return render(request, 'Preschool_Play/error.html',
+                                      {'message': 'You try to add name exist'})
                 kindergarten = form.cleaned_data['kindergarten']
                 chosen_teacher = UserProfile.objects.filter(type='teacher')
                 for t in chosen_teacher:
@@ -457,10 +455,23 @@ def add_child(request):
                         new_child.save()
                         alert = Notification(receiver=User.objects.get(username='admin'), message=f'{user} has registered his child to the system')
                         alert.save()
+                        alert = Notification(receiver=User.objects.get(username=finally_chosen_teacher.user),
+                                             message=f'{user} has registered his child to the system')
+                        alert.save()
                         return HttpResponseRedirect(reverse('Preschool_Play:index'))
         else:
             form = ChildForm()
-            return render(request, 'Preschool_Play/create-child.html', {'form': form})
+            all_users = list(teachers_users)
+            all_kindergarten = list(kindergarten)
+            form.fields['teacher'] = forms.CharField(
+                widget=forms.Select(choices=[(u.user, u.user) for u in all_users]))
+            form.fields['teacher'].initial = all_users[0].user
+            form.fields['kindergarten'] = forms.CharField(
+                widget=forms.Select(choices=[(n.name, n.name) for n in kindergarten]))
+            form.fields['kindergarten'].initial = kindergarten[0].name
+        return render(request, 'Preschool_Play/create-child.html', {
+            'form': form, 'teachers': teachers_users
+        })
 
 
 def delete_user(request):
@@ -512,58 +523,69 @@ def delete_primary_user(request):
     return render(request, 'Preschool_Play/delete-primary-user.html', context)
 
 
-@login_required
-def view_note(request, note_id):
-    profile = UserProfile.objects.get(user=request.user)
-    if profile.type != 'teacher':
+def show_video(request):
+    # videos = Video.objects.all()
+    # context = {
+    #     'videos': videos,
+    # }
+    return render(request, 'Preschool_Play/videos.html')
+
+
+def upload_video(request):
+    user = request.user
+    user_profile = UserProfile.objects.get(user=user)
+    if user_profile.type != 'teacher':
         return render(request, 'Preschool_Play/error.html',
-                      {'message': 'Unauthorized user. Only teacher type allowed.'})
-    try:
-        teacher_note = Note.objects.get(id=note_id)
-        if teacher_note.teacher != request.user:
-            return render(request, 'Preschool_Play/error.html',
-                  {'message': 'Only the creator of the note may see it.'})
-    except (TypeError, Note.DoesNotExist):
+                      {'message': 'You are cant upload media because you are not a teacher !'})
+    if request.method == 'POST':
+        form = VideoForm(request.POST or None, request.FILES or None)
+
+        if form.is_valid():
+            form.save()
+            last = Video.objects.last()
+            last.create = user_profile
+            last.save()
+            return HttpResponseRedirect(reverse('Preschool_Play:index'))
+    else:
+        form = VideoForm(request.POST or None, request.FILES or None)
+        context = {'form': form}
+    return render(request, 'Preschool_Play/upload.html', context)
+
+
+def approve_student(request):
+    user=request.user
+    user_profile = UserProfile.objects.get(user=user)
+    if user_profile.type != 'teacher':
         return render(request, 'Preschool_Play/error.html',
-                      {'message': 'Unable to find requested note.'})
-    return render(request, 'Preschool_Play/view-note.html',
-                  {'note': teacher_note, 'user': request.user, 'profile': profile})
+                      {'message': 'You are cant upload this page because you are not a teacher !'})
+    else:
+        student = Child.objects.filter(teacher=user_profile)
+        student_wait = []
+        for s in student:
+            if s.auth == False:
+                student_wait.append(s)
+        context = {'student': student_wait}
+        return render(request, 'Preschool_Play/approve-student.html', context)
 
-def new_note(request):
-    if request.user is None or not request.user.is_authenticated:
-        return HttpResponse("Not logged in")
-    user_profile = UserProfile.objects.get(user=request.user)
-    if user_profile.type == 'teacher':
-        if request.method == 'POST':
-            form = NoteForm(request.POST)
-            if form.is_valid():
-                try:
-                    child = Child.objects.get(name=form.cleaned_data['child'])
-                except (TypeError, User.DoesNotExist):
-                    error = "Could not find child."
-                    render(request, 'Preschool_Play/failure.html', {'error': error})
-                note = Note(teacher=request.user, child=child,
-                            subject=form.cleaned_data['subject'], body=form.cleaned_data['body'])
-                note.save()
-                return HttpResponseRedirect(reverse('Preschool_Play:notes'))
-        else:
-            childs = Child.objects.filter(teacher=request.user.profile)
-            form = NoteForm()
-            form.fields['child'] = forms.CharField(
-                widget=forms.Select(choices=[(u.name, u.name) for u in childs]))
-            return render(request, 'Preschool_Play/new-note.html',
-                          {'user': request.user, 'form': form})
-    return render(request,'Preschool_Play/error.html',{'error':'error: you are not a teacher'})
 
-@login_required
-def notes(request):
-    context = {'notes': Note.objects.all()}
-    return render(request, 'Preschool_Play/notes.html', context)
+def wait_for_approve(request, name):
+    user_parent = request.user
+    user_profile = UserProfile.objects.get(user=user_parent)
+    child = Child.objects.get(teacher=user_profile, name=name)
+    context = {'child': child}
+    return render(request, 'Preschool_Play/wait-for-approve.html', context)
 
-@login_required
-def FAQ(request):
-    context = {}
-    context['FAQ'] = FAQ.objects.all()
-    return render(request, 'Preschool_Play/FAQ.html', context)
+
+def final_approve(request, name):
+    user_parent = request.user
+    user_profile = UserProfile.objects.get(user=user_parent)
+    child = Child.objects.get(teacher=user_profile, name=name)
+    child.auth = True
+    child.save()
+    return HttpResponseRedirect(reverse('Preschool_Play:index'))
+
+
+
+
 
 

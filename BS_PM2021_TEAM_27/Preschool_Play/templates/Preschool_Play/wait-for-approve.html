@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Wait for approve</title>
+</head>
+<body>
+   <h1> Are you sure that you want to approve this student ? </h1>
+    <a href="{% url 'Preschool_Play:final-approve' child.name %}"class="button alt">Submit</a>
+    <a href="{% url 'Preschool_Play:index' %}"class="button alt">Cancel</a><br>
+</body>
+</html>

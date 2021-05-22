@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from django.forms import ModelForm
 
-from .models import UserProfile, Child
+from .models import UserProfile, Child, Video
 from django.contrib.auth.models import User
 
 from .models import Media, Kindergarten
@@ -68,13 +68,9 @@ class ProfileForm(forms.ModelForm):
 
 
 class ChildForm(forms.Form):
-    set = UserProfile.objects.filter(type='teacher')
-    set2 = Kindergarten.objects.all()
-    TEACHER = list(map(lambda x: (str(x.user), str(x.user)), set))
-    KINDERGARTEN = list(map(lambda x: (str(x.name), str(x.name)), set2))
     name_child= forms.CharField(max_length=30)
-    teacher = forms.CharField(widget=forms.Select(choices=TEACHER))
-    kindergarten = forms.CharField(widget=forms.Select(choices=KINDERGARTEN))
+    teacher = forms.CharField()
+    kindergarten = forms.CharField()
 
 
 class DeleteUserForm(forms.Form):
@@ -86,14 +82,15 @@ class DeleteUserForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput)
 
 
-class FindStudentForm(forms.Form):
-    username = forms.CharField(max_length=250)
+class ScoreDataForm(forms.Form):
+    child_parent_pair = forms.CharField()
 
 
 class DeletePrimaryUserForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput)
 
-class NoteForm(forms.Form):
-    child = forms.CharField(max_length=50)
-    subject = forms.CharField(max_length=50, initial='message subject')
-    body = forms.CharField(max_length=5000, widget=forms.Textarea)
+class VideoForm(forms.ModelForm):
+    class Meta:
+        model= Video
+        fields= ["title", "video"]
+

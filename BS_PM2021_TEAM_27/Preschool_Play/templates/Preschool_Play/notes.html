@@ -6,7 +6,8 @@
 </head>
 <body>
     Order by:<br>
-
+    <a href="{% url 'Preschool_Play:notes' 'date' %}">Date</a>
+    <a href="{% url 'Preschool_Play:notes' 'subject' %}">Subject</a>
     <ol>
         {% for note in notes %}
         <li>
