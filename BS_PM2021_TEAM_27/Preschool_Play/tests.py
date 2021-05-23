@@ -7,7 +7,6 @@ from django.test.utils import override_settings
 from django.urls import reverse, resolve
 from selenium import webdriver
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
-import geckodriver_autoinstaller
 from . import views
 from .models import *
 
@@ -572,7 +571,7 @@ class TestIntegrationWithSelenium(StaticLiveServerTestCase):
         # path = os.getcwd() + '/geckodriver-linux64'
         # firefox_binary = FirefoxBinary(path)
         # path = os.path.dirname(os.path.realpath('./geckodriver-linux64'))
-        self.browser = webdriver.Firefox(executable_path='./geckodriver-linux64')
+        self.browser = webdriver.Firefox(executable_path='./win-geckodriver.exe')
 
         self.admin_user = User.objects.create_user('admin', 'admin@test.com')
         self.admin_user.set_password('qwerty246')

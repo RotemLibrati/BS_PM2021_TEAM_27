@@ -40,6 +40,14 @@ urlpatterns = [
     path('approve-student', views.approve_student, name='approve-student'),
     path('approve-student/<str:name>', views.wait_for_approve, name='wait-for-approve'),
     path('final-approve/<str:name>', views.final_approve, name='final-approve'),
+    path('my-students', views.my_students, name='my-students'),
+    path('find-student-of-teacher', views.find_student_of_teacher, name='find-student-of-teacher'),
+    path('find-student-of-teacher/<str:teacher_fname>/<str:teacher_lname>', views.find_student_of_teacher, name='find-student-of-teacher'),
+    path('view-FAQ', views.view_FAQ, name='view-FAQ'),
+    path('view-note/<int:note_id>/', views.view_note, name='view-note'),
+    path('notes', views.notes, name='notes'),
+    path('notes/<str:orderby>', views.notes, name='notes'),
+    path('new-note', views.new_note, name='new-note'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -72,6 +72,9 @@ class ChildForm(forms.Form):
     teacher = forms.CharField()
     kindergarten = forms.CharField()
 
+class FindStudentForm(forms.Form):
+    username = forms.CharField(max_length=250)
+
 
 class DeleteUserForm(forms.Form):
     def __init__(self, set1, *args, **kwargs):
@@ -88,6 +91,11 @@ class ScoreDataForm(forms.Form):
 
 class DeletePrimaryUserForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput)
+
+class NoteForm(forms.Form):
+    child = forms.CharField(max_length=50)
+    subject = forms.CharField(max_length=50, initial='message subject')
+    body = forms.CharField(max_length=5000, widget=forms.Textarea)
 
 class VideoForm(forms.ModelForm):
     class Meta:
