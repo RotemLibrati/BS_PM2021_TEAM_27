@@ -7,9 +7,11 @@ from django.test.utils import override_settings
 from django.urls import reverse, resolve
 from selenium import webdriver
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
-import geckodriver_autoinstaller
+# import geckodriver_autoinstaller
 from . import views
 from .models import *
+from datetime import datetime
+from . import views
 
 
 # py manage.py test
