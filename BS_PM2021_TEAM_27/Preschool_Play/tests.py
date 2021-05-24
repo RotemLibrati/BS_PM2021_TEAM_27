@@ -10,6 +10,8 @@ from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 import geckodriver_autoinstaller
 from . import views
 from .models import *
+from datetime import datetime
+from . import views
 
 
 # py manage.py test

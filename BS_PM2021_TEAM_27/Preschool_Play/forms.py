@@ -80,12 +80,23 @@ class DeleteUserForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput)
 
 
+class FindStudentForm(forms.Form):
+    username = forms.CharField(max_length=250)
+
+
 class ScoreDataForm(forms.Form):
     child_parent_pair = forms.CharField()
 
 
 class DeletePrimaryUserForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput)
+
+
+class NoteForm(forms.Form):
+    child = forms.CharField(max_length=50)
+    subject = forms.CharField(max_length=50, initial='message subject')
+    body = forms.CharField(max_length=5000, widget=forms.Textarea)
+
 
 class VideoForm(forms.ModelForm):
     class Meta:
