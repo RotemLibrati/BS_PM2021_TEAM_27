@@ -113,7 +113,8 @@ def score_graphs(request):
 
 @login_required
 def game(request, child_name):
-    context = {'user': request.user, 'child_name':child_name}
+    song = Video.objects.filter(type="audio")
+    context = {'user': request.user, 'child_name':child_name, 'song': song}
     return render(request, 'Preschool_Play/connect-dots.html', context)
 
 
@@ -685,6 +686,27 @@ def upload_video(request):
     return render(request, 'Preschool_Play/upload.html', context)
 
 
+def upload_audio(request):
+    user = request.user
+    user_profile = UserProfile.objects.get(user=user)
+    if not user_profile.is_admin:
+        return render(request, 'Preschool_Play/error.html',
+                      {'message': 'You are cant upload audio because you are not a admin !'})
+    if request.method == 'POST':
+        form = VideoForm(request.POST or None, request.FILES or None)
+        if form.is_valid():
+            form.save()
+            last = Video.objects.last()
+            last.create = user_profile
+            last.type = 'audio'
+            last.save()
+            return HttpResponseRedirect(reverse('Preschool_Play:index'))
+    else:
+        form = VideoForm(request.POST or None, request.FILES or None)
+        context = {'form': form}
+    return render(request, 'Preschool_Play/upload-audio.html', context)
+
+
 def approve_student(request):
     user=request.user
     user_profile = UserProfile.objects.get(user=user)
@@ -740,6 +762,9 @@ def create_kindergarten(request):
         return render(request, 'Preschool_Play/create-kindergarten.html', context)
 
 
-
+def songs(request):
+    s = Video.objects.filter(type='audio')
+    context = {'song': s}
+    return render(request, 'Preschool_Play/songs.html' , context)
 
 

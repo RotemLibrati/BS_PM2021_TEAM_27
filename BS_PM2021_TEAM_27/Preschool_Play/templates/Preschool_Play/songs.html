@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<sytle>
+
+</sytle>
+    {% for s in song %}
+    <audio class="song" audio controls="controls" autoplay="autoplay" loop hidden="true" >
+        <source src="{{ s.video.url }}" type="audio/mpeg" >
+    </audio>
+    {% endfor %}
+</body>
+</html>
