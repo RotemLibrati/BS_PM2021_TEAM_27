@@ -15,7 +15,7 @@ from .models import *
 import json
 from .forms import DeleteMediaForm, LoginForm, MessageForm, AddMediaForm, KindergartenListForm,\
     CreateUserForm, ProfileForm, ChildForm, DeleteUserForm, DeletePrimaryUserForm, VideoForm, ScoreDataForm, \
-    FindStudentForm, NoteForm
+    FindStudentForm, NoteForm, CreateKindergartenForm
 
 from django.shortcuts import render, get_object_or_404
 
@@ -717,6 +717,27 @@ def final_approve(request, name):
     child.save()
     return HttpResponseRedirect(reverse('Preschool_Play:index'))
 
+
+def create_kindergarten(request):
+    user=request.user
+    user_profile = UserProfile.objects.get(user=user)
+    if user_profile.type != 'teacher':
+        return render(request, 'Preschool_Play/error.html',
+                      {'message': 'You are cant create kindergarten because you are not a teacher !'})
+    if request.method == 'POST':
+        form = CreateKindergartenForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data['name']
+            k = Kindergarten(name=name, teacher=user_profile)
+            k.save()
+            alert = Notification(receiver=User.objects.get(username='admin'),
+                                 message=f'{user} create a new kindergarten')
+            alert.save()
+            return HttpResponseRedirect(reverse('Preschool_Play:index'))
+    else:
+        form = CreateKindergartenForm()
+        context = {'form': form}
+        return render(request, 'Preschool_Play/create-kindergarten.html', context)
 
 
 

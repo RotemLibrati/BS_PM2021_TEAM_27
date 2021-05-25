@@ -46,6 +46,7 @@ urlpatterns = [
     path('approve-student', views.approve_student, name='approve-student'),
     path('approve-student/<str:name>', views.wait_for_approve, name='wait-for-approve'),
     path('final-approve/<str:name>', views.final_approve, name='final-approve'),
+    path('create-kindergarten', views.create_kindergarten, name='create-kindergarten'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
