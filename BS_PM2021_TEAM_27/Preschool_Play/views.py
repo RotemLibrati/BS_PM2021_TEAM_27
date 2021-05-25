@@ -762,9 +762,4 @@ def create_kindergarten(request):
         return render(request, 'Preschool_Play/create-kindergarten.html', context)
 
 
-def songs(request):
-    s = Video.objects.filter(type='audio')
-    context = {'song': s}
-    return render(request, 'Preschool_Play/songs.html' , context)
-
 
