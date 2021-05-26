@@ -80,13 +80,21 @@ class ProfileForm(forms.ModelForm):
 
 
 class ChildForm(forms.Form):
-    set = UserProfile.objects.filter(type='teacher')
-    set2 = Kindergarten.objects.all()
-    TEACHER = list(map(lambda x: (str(x.user), str(x.user)), set))
-    KINDERGARTEN = list(map(lambda x: (str(x.name), str(x.name)), set2))
-    name_child= forms.CharField(max_length=30)
-    teacher = forms.CharField(widget=forms.Select(choices=TEACHER))
-    kindergarten = forms.CharField(widget=forms.Select(choices=KINDERGARTEN))
+    name_child = forms.CharField(max_length=30)
+    teacher = forms.CharField()
+    kindergarten = forms.CharField()
+
+    def __init__(self, *args, **kwargs):
+        super(ChildForm, self).__init__(*args, **kwargs)
+
+        set = UserProfile.objects.filter(type='teacher')
+        set2 = Kindergarten.objects.all()
+        TEACHER = list(map(lambda x: (str(x.user), str(x.user)), set))
+        KINDERGARTEN = list(map(lambda x: (str(x.name), str(x.name)), set2))
+        self.fields['teacher'] = forms.CharField(
+            widget=forms.Select(choices=TEACHER))
+        self.fields['kindergarten'] = forms.CharField(
+            widget=forms.Select(choices=KINDERGARTEN))
 
 
 class DeleteUserForm(forms.Form):
@@ -94,7 +102,7 @@ class DeleteUserForm(forms.Form):
         super(DeleteUserForm, self).__init__(*args, **kwargs)
         self.fields['child'].queryset = set1
 
-    child = forms.ModelChoiceField(queryset=Child.objects.all())
+    # child = forms.ModelChoiceField(queryset=Child.objects.all())
     password = forms.CharField(widget=forms.PasswordInput)
 
 
@@ -120,4 +128,3 @@ class VideoForm(forms.ModelForm):
     class Meta:
         model = Video
         fields = ["title", "video"]
-
