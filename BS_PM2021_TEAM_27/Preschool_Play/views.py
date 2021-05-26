@@ -351,7 +351,7 @@ def new_message(request, **kwargs):
         parents_users = User.objects.filter(profile__type='parent', profile__child__teacher=request.user.profile,
                                             profile__is_admin=False)
     if user_profile.type == 'parent':
-        teachers_users = User.objects.filter(student__parent=request.user.profile)
+        teachers_users = User.objects.filter(profile__student__parent=request.user.profile)
         parents_users = User.objects.filter(profile__type='parent', child__teacher__in=list(teachers_users),
                                             profile__is_admin=False)
     if user_profile.is_admin:
