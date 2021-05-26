@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
     <meta charset="UTF-8">
     <title>Preschool Play</title>
 </head>
@@ -17,6 +18,7 @@
     {% if profile.is_admin %}
             <li><a href="{% url 'Preschool_Play:add-media' %}" >Add Media</a><br>
 			<li><a href="{% url 'Preschool_Play:delete-media' %}">Delete Media</a><br>
+    		<li><a href="{% url 'Preschool_Play:upload-audio' %}">Upload Audio</a><br>
 
     {% endif %}
 
@@ -29,6 +31,7 @@
     {% if profile.type == 'teacher' %}
         <li><a href="{% url 'Preschool_Play:upload' %}">Upload Video</a><br>
         <li><a href="{% url 'Preschool_Play:approve-student' %}">Approve Student</a><br>
+        <li><a href="{% url 'Preschool_Play:create-kindergarten' %}">Create Kindergarten</a><br>
     {% endif %}
     <li><a href="{% url 'Preschool_Play:score-graphs' %}">Score Graphs</a><br>
     <li><a href="{% url 'Preschool_Play:message-board' %}">Message Board</a><br>

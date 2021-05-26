@@ -42,11 +42,12 @@ urlpatterns = [
     path('notes', views.notes, name='notes'),
     path('new-note', views.new_note, name='new-note'),
     path('upload', views.upload_video, name='upload'),
-    path('videos', views.show_video, name='videos'),
     path('child-area/<str:name>', views.child_area, name='child-area'),
     path('approve-student', views.approve_student, name='approve-student'),
     path('approve-student/<str:name>', views.wait_for_approve, name='wait-for-approve'),
     path('final-approve/<str:name>', views.final_approve, name='final-approve'),
+    path('create-kindergarten', views.create_kindergarten, name='create-kindergarten'),
+    path('upload-audio', views.upload_audio, name='upload-audio'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

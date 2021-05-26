@@ -12,5 +12,12 @@
     <script>const childName="{{child_name}}"</script>
     <script src="{% static 'preschoolplay/js/connect-dots.js' %}"></script>
     <a href="{% url 'Preschool_Play:index' %}">Exit</a>
+    {% for s in song %}
+    <h4>Song Name: {{ s.title }}</h4>
+    <h4>Song: </h4>
+    <audio class="song" audio controls="controls" autoplay="autoplay" loop >
+        <source src="{{ s.video.url }}" type="audio/mpeg" >
+    </audio>
+    {% endfor %}
 </body>
 </html>
