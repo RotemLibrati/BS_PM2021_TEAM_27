@@ -16,3 +16,4 @@ class FAQAdmin(admin.ModelAdmin):
 
 admin.site.register(FAQ,FAQAdmin)
 admin.site.register(Video)
+
