@@ -12,9 +12,9 @@ admin.site.register(Note)
 
 
 class FAQAdmin(admin.ModelAdmin):
-    list_display = ('question','answer')
+    list_display = ('question', 'answer')
 
 
-admin.site.register(FAQ,FAQAdmin)
+admin.site.register(FAQ, FAQAdmin)
 admin.site.register(Video)
 
