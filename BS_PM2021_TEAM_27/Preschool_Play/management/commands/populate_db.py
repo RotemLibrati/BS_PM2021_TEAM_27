@@ -20,8 +20,8 @@ class Command(BaseCommand):
                        teacher=teacher1.profile, auth=True, kindergarten=kindergarten)
         child2.save()
         for _ in range(random.randint(3, 6)):
-            d = datetime.today() - timedelta(days=random.randint(0, 30))
-            d2 = datetime.today() - timedelta(days=random.randint(0, 30))
+            d = datetime.today() - timedelta(days=random.randint(1, 30))
+            d2 = datetime.today() - timedelta(days=random.randint(1, 30))
             Score(child=child1, amount=random.randint(1, 30), date=d).save()
             Score(child=child2, amount=random.randint(1, 30), date=d2).save()
 
