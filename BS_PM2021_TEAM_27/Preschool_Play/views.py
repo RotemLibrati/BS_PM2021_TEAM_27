@@ -114,9 +114,9 @@ def score_graphs(request):
 
 
 @login_required
-def game(request, child_name):
+def game(request, child_name, difficulty=1):
     song = Video.objects.filter(type="audio")
-    context = {'user': request.user, 'child_name': child_name, 'song': song}
+    context = {'user': request.user, 'child_name': child_name, 'song': song, 'difficulty': difficulty}
     return render(request, 'Preschool_Play/connect-dots.html', context)
 
 

@@ -23,7 +23,7 @@ const options = {
     canvasWidth: 600,
     canvasHeight: 500,
     generalSizeMultiplier: 1,
-    difficultyLevel: 1,
+    difficultyLevel: givenDifficulty,
     difficultyAdder: 0,
     initDifficuly: function initDifficuly() {
         if (this.difficultyLevel == 2) {
@@ -43,7 +43,7 @@ const options = {
             difficultyLevel: this.difficultyLevel,
             mistakeCounter: this.mistakeCounter,
             child: childName,
-            amount: 5,
+            amount: 5*options.difficultyLevel,
             comment: "comment placeholder",
         };
         let csrftoken = getCookie("csrftoken");

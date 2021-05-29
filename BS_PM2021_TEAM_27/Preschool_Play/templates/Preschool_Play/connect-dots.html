@@ -9,7 +9,7 @@
     <title>Connect The Dots</title>
 </head>
 <body>
-    <script>const childName="{{child_name}}"</script>
+    <script>const childName="{{child_name}}"; const givenDifficulty={{difficulty}}</script>
     <script src="{% static 'preschoolplay/js/connect-dots.js' %}"></script>
     <a href="{% url 'Preschool_Play:index' %}">Exit</a>
     {% for s in song %}
