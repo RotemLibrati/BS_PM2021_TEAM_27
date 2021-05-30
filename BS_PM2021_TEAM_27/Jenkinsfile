@@ -27,8 +27,7 @@ pipeline {
         stage('Send Report') {
           steps {
               sh """
-                  echo TEST_RESULTS=${(cat test_results.txt)}
-                  mail bcc: '', body: ${TEST_RESULTS}, cc: '', from: '', replyTo: '', subject: 'Jenkins update', to: 'eilonco@ac.sce.ac.il'
+                  mail bcc: '', body: readFile("./test_results.txt"), cc: '', from: '', replyTo: '', subject: 'Jenkins update', to: 'eilonco@ac.sce.ac.il'
               """
           }
         }
