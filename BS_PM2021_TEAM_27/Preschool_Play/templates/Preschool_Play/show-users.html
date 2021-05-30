@@ -1,10 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+{% extends 'Preschool_Play/SubPage.html' %}
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
 <body>
+{% block title %}
+    <h1>Show Users</h1>
+{% endblock %}
+{% block data %}
+
     {% for user in up %}
     {{ user.user }} <br>
     {% endfor %}
@@ -14,6 +20,6 @@
         <input name="lname" type="text">
         <input value="submit" type="submit">
     </form>
-
+{% endblock %}
 </body>
 </html>

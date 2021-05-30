@@ -1,15 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
+{% extends 'Preschool_Play/SubPage.html' %}
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>New Profile</title>
 </head>
 <body>
+{% block title %}
+<h1>New Profile</h1>
+{% endblock %}
+{% block data %}
+
         <form action="{% url 'Preschool_Play:new-profile' user.username %}" method="POST">
   {% csrf_token %}
   {{ form.as_p }}
   <button type="submit">Finish registration</button>
-
+{% endblock %}
 </form>
 </body>
 </html>

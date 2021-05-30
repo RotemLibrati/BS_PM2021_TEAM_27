@@ -1,14 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
+{% extends 'Preschool_Play/SubPage.html' %}
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
 <body>
+{% block title %}
+<h1>Create child</h1>
+{% endblock %}
+{% block data %}
     <form method="POST">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">Submit</button>
     </form>
+{% endblock %}
 </body>
 </html>

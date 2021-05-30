@@ -91,14 +91,16 @@ const options = {
         stroke(5);
         textSize(100);
         text(
-            "!ניצחון",
-            this.canvasWidth / 2 - textWidth("!ניצחון") / 2,
+            this.positiveFeedback[this.PFIndex],
+            this.canvasWidth / 2 - textWidth(this.positiveFeedback[this.PFIndex]) / 2,
             this.canvasHeight / 3
         );
         pop();
     },
     mistakeEncouragements: ["כמעט", "ניסיון טוב", "קרוב", "לא בדיוק"],
     MEIndex: 0,
+    positiveFeedback: ["המשך כך", "מעולה", "מצוין", "כל הכבוד"],
+    PFIndex: 0,
     shuffleWrongAnswers: function shuffleWrongAnswers() {
         function shuffleArr(array) {
             var currentIndex = array.length,
@@ -222,6 +224,267 @@ const house = Object.create(options);
 options.shapes.push(house);
 const car = Object.create(options);
 options.shapes.push(car);
+const door = Object.create(options);
+options.shapes.push(door);
+door.initShape = function initShape(){
+    this.specificSizeMultiplier = 1;
+    this.dots = [
+        {//left top
+            x: this.canvasWidth / 3,
+            y: (this.canvasHeight )/ 5 ,
+            isClicked: false,
+            lastTimePressed: new Date() + 1,
+        },
+        {
+            //left center
+            x: this.canvasWidth /3,
+            y: (this.canvasHeight *2 )/ 4 ,
+            isClicked: false,
+            lastTimePressed: new Date() + 1,
+        },
+        {//left down
+            x: this.canvasWidth  /3,
+            y: (this.canvasHeight *4)/5 ,
+            isClicked: false,
+            lastTimePressed: new Date() + 1,
+        },
+        {//right down
+            x: this.canvasWidth *2 /3,
+            y: (this.canvasHeight *4)/5 ,
+            isClicked: false,
+            lastTimePressed: new Date() + 1,
+        },
+        {//right center
+            x: this.canvasWidth *2 /3,
+            y: (this.canvasHeight *2 )/ 4 ,
+            isClicked: false,
+            lastTimePressed: new Date() + 1,
+        },
+        {
+            // top right
+            x: this.canvasWidth *2 /3,
+            y: (this.canvasHeight )/ 5 ,
+            isClicked: false,
+            lastTimePressed: new Date() + 1,
+        },
+    ];
+    this.randStartPoint = Math.floor(Math.random() * this.dots.length);
+    this.clickIndex = 0;
+    this.dotRadius = 40;
+    this.isSolved = false;
+    this.isComplete = false;
+    this.rightAnswer = "דלת";
+    this.rightAnswerIndex = 0;
+    this.wrongAnswers = ["ספה", "מחשב", "כיסא", "שולחן"];
+    this.shuffleWrongAnswers = function shuffleWrongAnswers() {
+        function shuffleArr(array) {
+            var currentIndex = array.length,
+                temporaryValue,
+                randomIndex;
+            while (0 !== currentIndex) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex -= 1;
+                temporaryValue = array[currentIndex];
+                array[currentIndex] = array[randomIndex];
+                array[randomIndex] = temporaryValue;
+            }
+            return array;
+        }
+        this.wrongAnswers = shuffleArr(this.wrongAnswers);
+    };
+    this.drawDots = function drawDots(j = 0) {
+        if (this.isSolved) {
+            return;
+        }
+        j = Math.floor(j % this.dots.length);
+        this.startIndex = j;
+        push();
+        for (let i = 0; i < this.dots.length; i++) {
+            if (this.dots[j].isClicked) {
+                push();
+                let fromDot =
+                    this.dots[(j + this.dots.length - 1) % this.dots.length];
+                fill(0);
+                stroke(0);
+                strokeWeight(9);
+                line(fromDot.x, fromDot.y, this.dots[j].x, this.dots[j].y);
+                pop();
+            }
+            j = (j + 1) % this.dots.length;
+        }
+        j = Math.floor(j % this.dots.length);
+        for (let i = 0; i < this.dots.length; i++) {
+            if (this.dots[j].isClicked) {
+                fill(50, 255, 50);
+            } else {
+                const timeNow = new Date();
+                if (timeNow - this.dots[j].lastTimePressed < 3000) {
+                    push();
+                    stroke(230, 50, 50);
+                    textSize(50);
+                    text(
+                        this.mistakeEncouragements[this.MEIndex],
+                        this.canvasWidth / 2 -
+                            textWidth(
+                                this.mistakeEncouragements[this.MEIndex]
+                            ) /
+                                2,
+                        (this.canvasHeight * 7) / 8
+                    );
+                    pop();
+                }
+                if (timeNow - this.dots[j].lastTimePressed < 1500) {
+                    fill(230, 50, 50);
+                } else {
+                    fill(230);
+                }
+            }
+            ellipse(
+                this.dots[j].x,
+                this.dots[j].y,
+                this.dotRadius,
+                this.dotRadius
+            );
+            fill(0);
+            textSize(15);
+            text(
+                i + this.difficultyAdder,
+                this.dots[j].x - 5,
+                this.dots[j].y + 5
+            );
+            j = (j + 1) % this.dots.length;
+        }
+        pop();
+        this.isSolved = true;
+        for (let i = 0; i < this.dots.length; i++) {
+            if (!this.dots[i].isClicked) {
+                this.isSolved = false;
+            }
+        }
+    };
+    this.drawShape = function drawShape() {
+        if (!this.isSolved) {
+            return;
+        }
+        const multiplier =
+            this.generalSizeMultiplier * this.specificSizeMultiplier;
+        const canvasWidthCenter = this.canvasWidth / 2;
+        const cnavasHeightCenter = this.canvasHeight / 2;
+        const shapeHeightmodifier = -80;
+        push();
+        fill(150, 75, 0);
+        rectMode(CENTER);
+        rect(
+             canvasWidthCenter,
+            (cnavasHeightCenter ) ,
+            (this.canvasWidth ) / 3,
+            (this.canvasHeight *4)/6
+        );
+        push();
+        rectMode(CENTER);
+        rect(
+            (canvasWidthCenter*100)/101,
+            (cnavasHeightCenter *7)/10 ,
+            (this.canvasWidth/4),
+            (this.canvasHeight*2)/8
+        );
+        push();
+        fill(0);
+        rectMode(CENTER);
+        circle(
+            (this.canvasWidth * 4) / 10,
+            (this.canvasHeight * 5) / 7 + shapeHeightmodifier,
+            20
+        );
+        pop();
+        pop();
+        pop();
+    };
+
+    this.drawQuestion = function drawQuestion() {
+        if (!this.isSolved) {
+            return;
+        }
+        push();
+        rectMode(CENTER);
+        fill(50, 50, 255);
+        textSize(20);
+        text(
+            "?מה רואים בתמונה",
+            this.canvasWidth / 2 - textWidth("?מה רואים בתמונה") / 2,
+            this.canvasHeight * 0.9
+        );
+        if (this.isComplete && this.rightAnswerIndex == 0) {
+            fill(0, 255, 0);
+        } else {
+            fill(50, 50, 255);
+        }
+        rect(
+            this.canvasWidth / 3,
+            this.canvasHeight * 0.95,
+            this.canvasWidth / 9,
+            this.canvasHeight / 12
+        );
+        if (this.isComplete && this.rightAnswerIndex == 1) {
+            fill(0, 255, 0);
+        } else {
+            fill(50, 50, 255);
+        }
+        rect(
+            this.canvasWidth / 2,
+            this.canvasHeight * 0.95,
+            this.canvasWidth / 9,
+            this.canvasHeight / 12
+        );
+        if (this.isComplete && this.rightAnswerIndex == 2) {
+            fill(0, 255, 0);
+        } else {
+            fill(50, 50, 255);
+        }
+        rect(
+            (this.canvasWidth * 2) / 3,
+            this.canvasHeight * 0.95,
+            this.canvasWidth / 9,
+            this.canvasHeight / 12
+        );
+        fill(0);
+        let i = 0;
+        let txt = "";
+        if (i == this.rightAnswerIndex) {
+            txt = this.rightAnswer;
+        } else {
+            txt = this.wrongAnswers[i];
+        }
+        i++;
+        text(
+            txt,
+            this.canvasWidth / 3 - textWidth(txt) / 2,
+            this.canvasHeight * 0.95
+        );
+        if (i == this.rightAnswerIndex) {
+            txt = this.rightAnswer;
+        } else {
+            txt = this.wrongAnswers[i];
+        }
+        i++;
+        text(
+            txt,
+            this.canvasWidth / 2 - textWidth(txt) / 2,
+            this.canvasHeight * 0.95
+        );
+        if (i == this.rightAnswerIndex) {
+            txt = this.rightAnswer;
+        } else {
+            txt = this.wrongAnswers[i];
+        }
+        text(
+            txt,
+            (this.canvasWidth * 2) / 3 - textWidth(txt) / 2,
+            this.canvasHeight * 0.95
+        );
+        pop();
+    };
+}
 car.initShape = function initShape() {
     this.specificSizeMultiplier = 1;
     this.dots = [

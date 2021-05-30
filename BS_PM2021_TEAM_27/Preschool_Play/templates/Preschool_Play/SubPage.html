@@ -1,0 +1,100 @@
+<!DOCTYPE HTML>
+{% load static %}
+<html>
+	<head>
+
+		<title>Preschool Play</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="stylesheet" href="{% static 'preschoolplay/sitestyle/assets/css/main.css' %}" />
+	</head>
+	<body class="subpage">
+
+		<!-- Header -->
+			<header id="header">
+				<div class="logo"><a href="{% url 'Preschool_Play:index' %}">Preschool Play <span>by Group_27</span></a></div>
+				<a href="#menu">Main Menu</a>
+			</header>
+
+			<!-- Nav -->
+			<nav id="menu">
+				<ul class="links">
+       {% block content %}
+    {% if user.is_authenticated %}
+    {% if profile.is_admin %}
+            <li><a href="{% url 'Preschool_Play:add-media' %}" >Add Media</a><br>
+			<li><a href="{% url 'Preschool_Play:delete-media' %}">Delete Media</a><br>
+    		<li><a href="{% url 'Preschool_Play:upload-audio' %}">Upload Audio</a><br>
+
+    {% endif %}
+
+    {% if profile.type == 'parent' %}
+        <li><a href="{% url 'Preschool_Play:parent' %}">My Children</a><br>
+        <li><a href="{% url 'Preschool_Play:create-child' %}">Add Child</a><br>
+         <li><a href="{% url 'Preschool_Play:delete-user' %}">Delete Child</a><br>
+        <li><a href="{% url 'Preschool_Play:delete-primary-user' %}">Delete Primary User</a><br>
+    {% endif %}
+    {% if profile.type == 'teacher' %}
+        <li><a href="{% url 'Preschool_Play:upload' %}">Upload Video</a><br>
+        <li><a href="{% url 'Preschool_Play:approve-student' %}">Approve Student</a><br>
+        <li><a href="{% url 'Preschool_Play:create-kindergarten' %}">Create Kindergarten</a><br>
+    {% endif %}
+    <li><a href="{% url 'Preschool_Play:score-graphs' %}">Score Graphs</a><br>
+    <li><a href="{% url 'Preschool_Play:message-board' %}">Message Board</a><br>
+    <li><a href="{% url 'Preschool_Play:inbox' %}">Inbox{% if unread %}({{unread}}){% endif %}</a><br>
+    <li><a href="{% url 'Preschool_Play:logout' %}">Logout</a><br>
+
+    {% endif %}
+{% endblock %}
+{% block links %}
+
+    {% endblock %}
+				</ul>
+			</nav>
+
+				<!-- One -->
+			<section id="One" class="wrapper style3">
+				<div class="inner">
+					<header class="align-center">
+						<p>Preschool Play</p>
+						{% block title %}{% endblock %}
+					</header>
+				</div>
+			</section>
+
+				<!-- Two -->
+			<section id="two" class="wrapper style2">
+				<div class="inner">
+					<div class="box">
+						<div class="content">
+								{% block data %}{% endblock %}
+						</div>
+					</div>
+				</div>
+			</section>
+
+
+
+			<!-- Footer -->
+			<footer id="footer">
+				<div class="container">
+					<ul class="icons">
+						<li><a href="#" class="icon fa-twitter"><span class="label">Twitter</span></a></li>
+						<li><a href="#" class="icon fa-facebook"><span class="label">Facebook</span></a></li>
+						<li><a href="#" class="icon fa-instagram"><span class="label">Instagram</span></a></li>
+						<li><a href="#" class="icon fa-envelope-o"><span class="label">Email</span></a></li>
+					</ul>
+				</div>
+				<div class="copyright">
+					&copy; Untitled. All rights reserved to Group_27.
+				</div>
+			</footer>
+
+		<!-- Scripts -->
+			<script src="{% static 'preschoolplay/sitestyle/assets/js/jquery.min.js' %}"></script>
+			<script src="{% static 'preschoolplay/sitestyle/assets/js/jquery.scrollex.min.js' %}"></script>
+			<script src="{% static 'preschoolplay/sitestyle/assets/js/skel.min.js' %}"></script>
+			<script src="{% static 'preschoolplay/sitestyle/assets/js/util.js' %}"></script>
+			<script src="{% static 'preschoolplay/sitestyle/assets/js/main.js' %}"></script>
+	</body>
+</html>

@@ -1,6 +1,13 @@
+{% extends 'Preschool_Play/SubPage.html' %}
+{% block title %}
+<h1>New Note</h1>
+{% endblock %}
+{% block data %}
+
 <form action="{% url 'Preschool_Play:new-note' %}" method="POST">
     {% csrf_token %}
     <h2>New Note</h2>
     {{form.as_p}}
     <button type="submit">Submit</button>
 </form>
+{% endblock %}
