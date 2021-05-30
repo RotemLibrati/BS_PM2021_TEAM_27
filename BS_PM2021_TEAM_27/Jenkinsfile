@@ -21,7 +21,7 @@ pipeline {
               sh """
                   cd BS_PM2021_TEAM_27
                   python manage.py test Preschool_Play.tests.TestInboxView.test_with_no_messages >> test_results.txt
-                  mail bcc: '', body: readFile("./test_results.txt"), cc: '', from: '', replyTo: '', subject: 'Jenkins update1', to: 'eilonco@ac.sce.ac.il'
+                  mail bcc: '', body: 'bod1233', cc: '', from: '', replyTo: '', subject: 'Jenkins update1', to: 'eilonco@ac.sce.ac.il'
               """
           }
         }
