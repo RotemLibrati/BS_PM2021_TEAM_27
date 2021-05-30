@@ -11,19 +11,19 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         parent1 = self.create_parent1()
         teacher1 = self.create_teacher1()
-        child1 = Child(name='Dani', parent=parent1.profile,
-                       teacher=teacher1.profile)
-        child1.save()
-        child2 = Child(name='Ron', parent=parent1.profile,
-                       teacher=teacher1.profile)
-        child2.save()
-        for _ in range(random.randint(3, 6)):
-            d = datetime.today() - timedelta(days=random.randint(0, 30))
-            d2 = datetime.today() - timedelta(days=random.randint(0, 30))
-            Score(child=child1, amount=random.randint(1, 30), date=d).save()
-            Score(child=child2, amount=random.randint(1, 30), date=d2).save()
         kindergarten = Kindergarten(name='Flower', teacher=teacher1.profile)
         kindergarten.save()
+        child1 = Child(name='Dani', parent=parent1.profile,
+                       teacher=teacher1.profile, auth=True, kindergarten=kindergarten)
+        child1.save()
+        child2 = Child(name='Ron', parent=parent1.profile,
+                       teacher=teacher1.profile, auth=True, kindergarten=kindergarten)
+        child2.save()
+        for _ in range(random.randint(3, 6)):
+            d = datetime.today() - timedelta(days=random.randint(1, 30))
+            d2 = datetime.today() - timedelta(days=random.randint(1, 30))
+            Score(child=child1, amount=random.randint(1, 30), date=d).save()
+            Score(child=child2, amount=random.randint(1, 30), date=d2).save()
 
     @staticmethod
     def create_parent1():

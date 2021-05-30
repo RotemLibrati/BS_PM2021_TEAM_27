@@ -7,7 +7,7 @@
 <body>
     <ul>
     {% for s in students %}
-        <li>{{s}}. <a href="{% url 'Preschool_Play:scoregraphs' s.name %}">score graph</a></li>
+        <li>{{s}}. <a href="{% url 'Preschool_Play:score-graphs' s.name %}">score graph</a></li>
     {% empty %}
         <p>No students found.</p>
     {% endfor %}

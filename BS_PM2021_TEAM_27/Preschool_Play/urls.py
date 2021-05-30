@@ -21,6 +21,7 @@ urlpatterns = [
     path('inbox/new-message/', views.new_message, name='new-message'),
     path('inbox/new-message/<str:reply>', views.new_message, name='new-message'),
     path('game/<str:child_name>', views.game, name='game'),
+    path('game/<str:child_name>/<int:difficulty>', views.game, name='game'),
     path('send-game-info', views.send_game_info, name='send-game-info'),
     path('parent', views.parent, name='parent'),
     path('suspension-teacher', views.suspension_for_teacher, name='suspension_teacher'),
@@ -39,15 +40,16 @@ urlpatterns = [
     path('delete-primary-user', views.delete_primary_user, name='delete-primary-user'),
     path('view-FAQ', views.view_FAQ, name='view-FAQ'),
     path('view-note/<int:note_id>/', views.view_note, name='view-note'),
+    path('kindergarten/<str:kindergarten_name>', views.kindergarten_details, name='kindergarten'),
     path('notes', views.notes, name='notes'),
     path('new-note', views.new_note, name='new-note'),
     path('upload', views.upload_video, name='upload'),
-    path('videos', views.show_video, name='videos'),
     path('child-area/<str:name>', views.child_area, name='child-area'),
     path('approve-student', views.approve_student, name='approve-student'),
     path('approve-student/<str:name>', views.wait_for_approve, name='wait-for-approve'),
     path('final-approve/<str:name>', views.final_approve, name='final-approve'),
-    path('kindergarten/<str:kindergarten_name>', views.kindergarten_details, name='kindergarten'),
+    path('create-kindergarten', views.create_kindergarten, name='create-kindergarten'),
+    path('upload-audio', views.upload_audio, name='upload-audio'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

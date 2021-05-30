@@ -128,3 +128,8 @@ class VideoForm(forms.ModelForm):
     class Meta:
         model = Video
         fields = ["title", "video"]
+
+
+class CreateKindergartenForm(forms.Form):
+    name = forms.CharField(max_length=50)
+

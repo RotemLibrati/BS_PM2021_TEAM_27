@@ -12,9 +12,7 @@ from django import forms
 
 from .models import *
 import json
-from .forms import DeleteMediaForm, LoginForm, MessageForm, AddMediaForm, KindergartenListForm, \
-    CreateUserForm, ProfileForm, ChildForm, DeleteUserForm, DeletePrimaryUserForm, VideoForm, ScoreDataForm, \
-    FindStudentForm, NoteForm
+from .forms import *
 from django.shortcuts import render, get_object_or_404
 
 
@@ -116,8 +114,9 @@ def score_graphs(request):
 
 
 @login_required
-def game(request, child_name):
-    context = {'user': request.user, 'child_name': child_name}
+def game(request, child_name, difficulty=1):
+    song = Video.objects.filter(type="audio")
+    context = {'user': request.user, 'child_name': child_name, 'song': song, 'difficulty': difficulty}
     return render(request, 'Preschool_Play/connect-dots.html', context)
 
 
@@ -155,13 +154,15 @@ def show_suspend_user(request):
 
 def filter_suspension(request):
     user_profile = UserProfile.objects.all()
-    suspend_user = []  # list of suspended users
-    for user in user_profile:
-        if user.suspension_time >= timezone.now():
-            suspend_user.append(user)
-    suspend_user.sort(
-        key=lambda r: r.suspension_time)  # filter by time left and keeping track of the time user has been suspended.
-    context = {'suspend_user': suspend_user}
+    # suspend_user = []  # list of suspended users
+    suspend_user = list(User.objects.filter(profile__suspension_time__gte=timezone.now()))
+    suspended_children = list(Child.objects.filter(suspension_time__gte=timezone.now()))
+    # for user in user_profile:
+    #     if user.suspension_time >= timezone.now():
+    #         suspend_user.append(user)
+    # suspend_user.sort(
+    #     key=lambda r: r.suspension_time)  # filter by time left and keeping track of the time user has been suspended.
+    context = {'suspend_user': suspend_user, 'suspended_children': suspended_children}
     return render(request, 'Preschool_Play/filter-suspension.html', context)
 
 
@@ -185,7 +186,9 @@ def add_media(request):
     return render(request, 'Preschool_Play/add-media.html', context)
 
 
-def delete_media(request):
+def delete_media(request, **kwargs):
+    all_media = None
+    media = Media.objects.all()
     if request.method == 'POST':
         form = DeleteMediaForm(request.POST)
         if form.is_valid():
@@ -194,7 +197,11 @@ def delete_media(request):
             return HttpResponseRedirect(reverse('Preschool_Play:index'))
     else:
         form = DeleteMediaForm()
-    context = {'form': form}
+        all_media = list(media)
+        form.fields['name'] = forms.CharField(
+            widget=forms.Select(choices=[(u.name, u.name) for u in all_media]))
+        form.fields['name'].initial = all_media[0].name
+    context = {'form': form, 'media': media}
     return render(request, 'Preschool_Play/delete-media.html', context)
 
 
@@ -346,7 +353,7 @@ def new_message(request, **kwargs):
         parents_users = User.objects.filter(profile__type='parent', profile__child__teacher=request.user.profile,
                                             profile__is_admin=False)
     if user_profile.type == 'parent':
-        teachers_users = User.objects.filter(student__parent=request.user.profile)
+        teachers_users = User.objects.filter(profile__student__parent=request.user.profile)
         parents_users = User.objects.filter(profile__type='parent', child__teacher__in=list(teachers_users),
                                             profile__is_admin=False)
     if user_profile.is_admin:
@@ -400,7 +407,7 @@ def child_area(request, name):
         return render(request, 'Preschool_Play/error.html',
                       {'message': 'You have to wait for your teacher to approve you'})
     teacher = child.teacher
-    videos = Video.objects.filter(create=teacher)
+    videos = Video.objects.filter(create=teacher, type='video')
     context = {'child': child, 'videos': videos}
     return render(request, 'Preschool_Play/child-area.html', context)
 
@@ -521,7 +528,6 @@ def add_child(request, **kwargs):
                 child_list = list(child_names)
                 print(child_list)
                 for n in child_list:
-                    print(n)
                     if name == n.name:
                         return render(request, 'Preschool_Play/error.html',
                                       {'message': 'You try to add name exist'})
@@ -549,12 +555,16 @@ def add_child(request, **kwargs):
             form = ChildForm()
             all_users = list(teachers_users)
             all_kindergarten = list(kindergarten)
-            form.fields['teacher'] = forms.CharField(
-                widget=forms.Select(choices=[(u.user, u.user) for u in all_users]))
-            form.fields['teacher'].initial = all_users[0].user
-            form.fields['kindergarten'] = forms.CharField(
-                widget=forms.Select(choices=[(n.name, n.name) for n in kindergarten]))
-            form.fields['kindergarten'].initial = kindergarten[0].name
+            try:
+                form.fields['teacher'] = forms.CharField(
+                    widget=forms.Select(choices=[(u.user, u.user) for u in all_users]))
+                form.fields['teacher'].initial = all_users[0].user
+                form.fields['kindergarten'] = forms.CharField(
+                    widget=forms.Select(choices=[(n.name, n.name) for n in kindergarten]))
+                form.fields['kindergarten'].initial = kindergarten[0].name
+            except:
+                error = "Teacher is not exist."
+                render(request, 'Preschool_Play/error.html', {'error': error})
         return render(request, 'Preschool_Play/create-child.html', {
             'form': form, 'teachers': teachers_users
         })
@@ -690,12 +700,34 @@ def upload_video(request):
             form.save()
             last = Video.objects.last()
             last.create = user_profile
+            last.type = 'video'
             last.save()
             return HttpResponseRedirect(reverse('Preschool_Play:index'))
     else:
         form = VideoForm(request.POST or None, request.FILES or None)
         context = {'form': form}
     return render(request, 'Preschool_Play/upload.html', context)
+
+
+def upload_audio(request):
+    user = request.user
+    user_profile = UserProfile.objects.get(user=user)
+    if not user_profile.is_admin:
+        return render(request, 'Preschool_Play/error.html',
+                      {'message': 'You are cant upload audio because you are not a admin !'})
+    if request.method == 'POST':
+        form = VideoForm(request.POST or None, request.FILES or None)
+        if form.is_valid():
+            form.save()
+            last = Video.objects.last()
+            last.create = user_profile
+            last.type = 'audio'
+            last.save()
+            return HttpResponseRedirect(reverse('Preschool_Play:index'))
+    else:
+        form = VideoForm(request.POST or None, request.FILES or None)
+        context = {'form': form}
+    return render(request, 'Preschool_Play/upload-audio.html', context)
 
 
 def approve_student(request):
@@ -730,10 +762,32 @@ def final_approve(request, name):
     child.save()
     return HttpResponseRedirect(reverse('Preschool_Play:index'))
 
-
 def kindergarten_details(request, kindergarten_name):
     child_kindergarten = Kindergarten.objects.get(name=kindergarten_name)
     children = Child.objects.filter(kindergarten=child_kindergarten)
     context = {'children': children, 'child_kindergarten': child_kindergarten}
     return render(request, 'Preschool_Play/kindergarten.html', context)
+
+def create_kindergarten(request):
+    user=request.user
+    user_profile = UserProfile.objects.get(user=user)
+    if user_profile.type != 'teacher':
+        return render(request, 'Preschool_Play/error.html',
+                      {'message': 'You are cant create kindergarten because you are not a teacher !'})
+    if request.method == 'POST':
+        form = CreateKindergartenForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data['name']
+            k = Kindergarten(name=name, teacher=user_profile)
+            k.save()
+            alert = Notification(receiver=User.objects.get(username='admin'),
+                                 message=f'{user} create a new kindergarten')
+            alert.save()
+            return HttpResponseRedirect(reverse('Preschool_Play:index'))
+    else:
+        form = CreateKindergartenForm()
+        context = {'form': form}
+        return render(request, 'Preschool_Play/create-kindergarten.html', context)
+
+
 

@@ -17,5 +17,8 @@
 <b>{{video.title}}</b>
 </video>
     {% endfor %}
+<a href="{% url 'Preschool_Play:game' child.name 1 %}">Play with difficulty 1</a><br>
+<a href="{% url 'Preschool_Play:game' child.name 2 %}">Play with difficulty 2</a><br>
+<a href="{% url 'Preschool_Play:game' child.name 3 %}">Play with difficulty 3</a>
 </body>
 </html>
