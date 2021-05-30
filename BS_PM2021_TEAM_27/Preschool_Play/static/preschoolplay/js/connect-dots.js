@@ -137,6 +137,21 @@ const options = {
                 fill(50, 255, 50);
             } else {
                 const timeNow = new Date();
+                if (timeNow - this.dots[j].lastTimePressed < 3000) {
+                    push();
+                    stroke(230, 50, 50);
+                    textSize(50);
+                    text(
+                        this.mistakeEncouragements[this.MEIndex],
+                        this.canvasWidth / 2 -
+                            textWidth(
+                                this.mistakeEncouragements[this.MEIndex]
+                            ) /
+                                2,
+                        (this.canvasHeight * 7) / 8
+                    );
+                    pop();
+                }
                 if (timeNow - this.dots[j].lastTimePressed < 1500) {
                     fill(230, 50, 50);
                 } else {
