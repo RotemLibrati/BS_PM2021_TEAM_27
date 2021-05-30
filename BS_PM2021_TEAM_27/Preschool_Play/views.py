@@ -563,6 +563,7 @@ def add_child(request, **kwargs):
             except:
                 error = "Teacher is not exist."
                 render(request, 'Preschool_Play/error.html', {'error': error})
+
         return render(request, 'Preschool_Play/create-child.html', {
             'form': form, 'teachers': teachers_users
         })
