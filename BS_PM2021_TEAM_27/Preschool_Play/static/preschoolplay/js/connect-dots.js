@@ -93,72 +93,9 @@ const options = {
         );
         pop();
     },
-};
-const house = Object.create(options);
-options.shapes.push(house);
-const car = Object.create(options);
-options.shapes.push(car);
-car.initShape = function initShape() {
-    this.specificSizeMultiplier = 1;
-    this.dots = [
-        {
-            x: this.canvasWidth / 12,
-            y: (this.canvasHeight * 3) / 4,
-            isClicked: false,
-            lastTimePressed: new Date() + 1,
-        },
-        {
-            x: this.canvasWidth / 12,
-            y: this.canvasHeight / 2,
-            isClicked: false,
-            lastTimePressed: new Date() + 1,
-        },
-        {
-            x: this.canvasWidth / 5,
-            y: this.canvasHeight / 2,
-            isClicked: false,
-            lastTimePressed: new Date() + 1,
-        },
-        {
-            x: (this.canvasWidth * 4) / 12,
-            y: this.canvasHeight / 4,
-            isClicked: false,
-            lastTimePressed: new Date() + 1,
-        },
-        {
-            x: (this.canvasWidth * 7) / 12,
-            y: this.canvasHeight / 4,
-            isClicked: false,
-            lastTimePressed: new Date() + 1,
-        },
-        {
-            x: (this.canvasWidth * 2) / 3,
-            y: this.canvasHeight / 2,
-            isClicked: false,
-            lastTimePressed: new Date() + 1,
-        },
-        {
-            x: (this.canvasWidth * 5) / 6,
-            y: this.canvasHeight / 2,
-            isClicked: false,
-            lastTimePressed: new Date() + 1,
-        },
-        {
-            x: (this.canvasWidth * 5) / 6,
-            y: (this.canvasHeight * 3) / 4,
-            isClicked: false,
-            lastTimePressed: new Date() + 1,
-        },
-    ];
-    this.randStartPoint = Math.floor(Math.random() * this.dots.length);
-    this.clickIndex = 0;
-    this.dotRadius = 40;
-    this.isSolved = false;
-    this.isComplete = false;
-    this.rightAnswer = "מכונית";
-    this.rightAnswerIndex = 0;
-    this.wrongAnswers = ["הר", "חיה", "בית", "מיטה"];
-    this.shuffleWrongAnswers = function shuffleWrongAnswers() {
+    mistakeEncouragements: ["כמעט", "ניסיון טוב", "קרוב", "לא בדיוק"],
+    MEIndex: 0,
+    shuffleWrongAnswers: function shuffleWrongAnswers() {
         function shuffleArr(array) {
             var currentIndex = array.length,
                 temporaryValue,
