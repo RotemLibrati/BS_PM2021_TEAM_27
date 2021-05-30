@@ -768,6 +768,13 @@ def create_kindergarten(request):
     if user_profile.type != 'teacher':
         return render(request, 'Preschool_Play/error.html',
                       {'message': 'You are cant create kindergarten because you are not a teacher !'})
+    k = Kindergarten.objects.filter(teacher=user_profile)
+    count = 0
+    for n in k:
+        count = count+1
+    if count >0:
+        return render(request, 'Preschool_Play/error.html',
+                      {'message': 'You are cant create kindergarten because you already teacher in your kindergarten !'})
     if request.method == 'POST':
         form = CreateKindergartenForm(request.POST)
         if form.is_valid():
