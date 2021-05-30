@@ -16,17 +16,17 @@ pipeline {
               """
           }
         }
-        stage('Run Unit Tests') {
-          steps {
-              try {
+        try{
+            stage('Run Unit Tests') {
+              steps {
                   sh """
                       cd BS_PM2021_TEAM_27
                       python manage.py test >> test_results.txt
                   """
-              } catch(e){
-                  echo e.toString() >> test_results.txt
               }
-          }
+            }
+        }catch(e){
+            e.toString() >> test_results.txt
         }
         stage('Send Report') {
           steps {
