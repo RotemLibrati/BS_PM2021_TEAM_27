@@ -154,13 +154,15 @@ def show_suspend_user(request):
 
 def filter_suspension(request):
     user_profile = UserProfile.objects.all()
-    suspend_user = []  # list of suspended users
-    for user in user_profile:
-        if user.suspension_time >= timezone.now():
-            suspend_user.append(user)
-    suspend_user.sort(
-        key=lambda r: r.suspension_time)  # filter by time left and keeping track of the time user has been suspended.
-    context = {'suspend_user': suspend_user}
+    # suspend_user = []  # list of suspended users
+    suspend_user = list(User.objects.filter(profile__suspension_time__gte=timezone.now()))
+    suspended_children = list(Child.objects.filter(suspension_time__gte=timezone.now()))
+    # for user in user_profile:
+    #     if user.suspension_time >= timezone.now():
+    #         suspend_user.append(user)
+    # suspend_user.sort(
+    #     key=lambda r: r.suspension_time)  # filter by time left and keeping track of the time user has been suspended.
+    context = {'suspend_user': suspend_user, 'suspended_children': suspended_children}
     return render(request, 'Preschool_Play/filter-suspension.html', context)
 
 

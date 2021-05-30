@@ -7,7 +7,11 @@
 <body>
     <h1>Suspend users:</h1>
     {% for user in suspend_user %}
-        {{ user.user }} {{ user.suspension_time }} <br>
+        {{ user }} {{ user.suspension_time }} <br>
+    {% endfor %}
+    <h1>Suspend children:</h1>
+    {% for c in suspended_children %}
+        {{ c }} {{ c.suspension_time }} <br>
     {% endfor %}
 </body>
 </html>
