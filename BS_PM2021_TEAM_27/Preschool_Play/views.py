@@ -194,11 +194,16 @@ def delete_media(request, **kwargs):
             media_delete = Media.objects.filter(name=name).delete()
             return HttpResponseRedirect(reverse('Preschool_Play:index'))
     else:
-        form = DeleteMediaForm()
-        all_media = list(media)
-        form.fields['name'] = forms.CharField(
-            widget=forms.Select(choices=[(u.name, u.name) for u in all_media]))
-        form.fields['name'].initial = all_media[0].name
+        try:
+            form = DeleteMediaForm()
+            all_media = list(media)
+            form.fields['name'] = forms.CharField(
+                widget=forms.Select(choices=[(u.name, u.name) for u in all_media]))
+            form.fields['name'].initial = all_media[0].name
+        except(IndexError, Media.DoesNotExist):
+            error = "Media is not exist."
+            render(request, 'Preschool_Play/error.html', {'message': error})
+
     context = {'form': form, 'media': media}
     return render(request, 'Preschool_Play/delete-media.html', context)
 
