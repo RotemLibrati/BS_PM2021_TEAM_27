@@ -23,7 +23,8 @@ const options = {
     canvasWidth: 600,
     canvasHeight: 500,
     generalSizeMultiplier: 1,
-    difficultyLevel: givenDifficulty,
+    difficultyLevel:
+        typeof givenDifficulty !== "undefined" ? givenDifficulty : 1,
     difficultyAdder: 0,
     initDifficuly: function initDifficuly() {
         if (this.difficultyLevel == 2) {
@@ -43,7 +44,7 @@ const options = {
             difficultyLevel: this.difficultyLevel,
             mistakeCounter: this.mistakeCounter,
             child: childName,
-            amount: 5*options.difficultyLevel,
+            amount: 5 * options.difficultyLevel,
             comment: "comment placeholder",
         };
         let csrftoken = getCookie("csrftoken");
@@ -74,6 +75,9 @@ const options = {
                     this.clickIndex++;
                 } else {
                     this.mistakeCounter++;
+                    this.MEIndex = Math.floor(
+                        Math.random() * this.mistakeEncouragements.length
+                    );
                 }
             }
         }
@@ -110,8 +114,8 @@ const options = {
             return array;
         }
         this.wrongAnswers = shuffleArr(this.wrongAnswers);
-    };
-    this.drawDots = function drawDots(j = 0) {
+    },
+    drawDots: function drawDots(j = 0) {
         if (this.isSolved) {
             return;
         }
@@ -180,7 +184,72 @@ const options = {
                 this.isSolved = false;
             }
         }
-    };
+    },
+};
+const house = Object.create(options);
+options.shapes.push(house);
+const car = Object.create(options);
+options.shapes.push(car);
+car.initShape = function initShape() {
+    this.specificSizeMultiplier = 1;
+    this.dots = [
+        {
+            x: this.canvasWidth / 12,
+            y: (this.canvasHeight * 3) / 4,
+            isClicked: false,
+            lastTimePressed: new Date() + 1,
+        },
+        {
+            x: this.canvasWidth / 12,
+            y: this.canvasHeight / 2,
+            isClicked: false,
+            lastTimePressed: new Date() + 1,
+        },
+        {
+            x: this.canvasWidth / 5,
+            y: this.canvasHeight / 2,
+            isClicked: false,
+            lastTimePressed: new Date() + 1,
+        },
+        {
+            x: (this.canvasWidth * 4) / 12,
+            y: this.canvasHeight / 4,
+            isClicked: false,
+            lastTimePressed: new Date() + 1,
+        },
+        {
+            x: (this.canvasWidth * 7) / 12,
+            y: this.canvasHeight / 4,
+            isClicked: false,
+            lastTimePressed: new Date() + 1,
+        },
+        {
+            x: (this.canvasWidth * 2) / 3,
+            y: this.canvasHeight / 2,
+            isClicked: false,
+            lastTimePressed: new Date() + 1,
+        },
+        {
+            x: (this.canvasWidth * 5) / 6,
+            y: this.canvasHeight / 2,
+            isClicked: false,
+            lastTimePressed: new Date() + 1,
+        },
+        {
+            x: (this.canvasWidth * 5) / 6,
+            y: (this.canvasHeight * 3) / 4,
+            isClicked: false,
+            lastTimePressed: new Date() + 1,
+        },
+    ];
+    this.randStartPoint = Math.floor(Math.random() * this.dots.length);
+    this.clickIndex = 0;
+    this.dotRadius = 40;
+    this.isSolved = false;
+    this.isComplete = false;
+    this.rightAnswer = "מכונית";
+    this.rightAnswerIndex = 0;
+    this.wrongAnswers = ["הר", "חיה", "בית", "מיטה"];
     this.drawShape = function drawShape() {
         if (!this.isSolved) {
             return;
@@ -392,77 +461,6 @@ house.initShape = function initShape() {
     this.rightAnswer = "בית";
     this.rightAnswerIndex = 0;
     this.wrongAnswers = ["הר", "חיה", "מכונית", "מיטה"];
-    this.shuffleWrongAnswers = function shuffleWrongAnswers() {
-        function shuffleArr(array) {
-            var currentIndex = array.length,
-                temporaryValue,
-                randomIndex;
-            while (0 !== currentIndex) {
-                randomIndex = Math.floor(Math.random() * currentIndex);
-                currentIndex -= 1;
-                temporaryValue = array[currentIndex];
-                array[currentIndex] = array[randomIndex];
-                array[randomIndex] = temporaryValue;
-            }
-            return array;
-        }
-        this.wrongAnswers = shuffleArr(this.wrongAnswers);
-    };
-    this.drawDots = function drawDots(j = 0) {
-        if (this.isSolved) {
-            return;
-        }
-        j = Math.floor(j % this.dots.length);
-        this.startIndex = j;
-        push();
-        for (let i = 0; i < this.dots.length; i++) {
-            if (this.dots[j].isClicked) {
-                push();
-                let fromDot =
-                    this.dots[(j + this.dots.length - 1) % this.dots.length];
-                fill(0);
-                stroke(0);
-                strokeWeight(9);
-                line(fromDot.x, fromDot.y, this.dots[j].x, this.dots[j].y);
-                pop();
-            }
-            j = (j + 1) % this.dots.length;
-        }
-        j = Math.floor(j % this.dots.length);
-        for (let i = 0; i < this.dots.length; i++) {
-            if (this.dots[j].isClicked) {
-                fill(50, 255, 50);
-            } else {
-                const timeNow = new Date();
-                if (timeNow - this.dots[j].lastTimePressed < 1500) {
-                    fill(230, 50, 50);
-                } else {
-                    fill(230);
-                }
-            }
-            ellipse(
-                this.dots[j].x,
-                this.dots[j].y,
-                this.dotRadius,
-                this.dotRadius
-            );
-            fill(0);
-            textSize(15);
-            text(
-                i + this.difficultyAdder,
-                this.dots[j].x - 5,
-                this.dots[j].y + 5
-            );
-            j = (j + 1) % this.dots.length;
-        }
-        pop();
-        this.isSolved = true;
-        for (let i = 0; i < this.dots.length; i++) {
-            if (!this.dots[i].isClicked) {
-                this.isSolved = false;
-            }
-        }
-    };
     this.drawShape = function drawShape() {
         if (!this.isSolved) {
             return;
