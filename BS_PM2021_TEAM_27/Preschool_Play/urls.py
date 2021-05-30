@@ -37,7 +37,7 @@ urlpatterns = [
     path('create-child', views.add_child, name='create-child'),
     path('delete-user', views.delete_user, name='delete-user'),
     path('delete-primary-user', views.delete_primary_user, name='delete-primary-user'),
-    path('FAQ', views.FAQ, name='FAQ'),
+    path('view-FAQ', views.view_FAQ, name='view-FAQ'),
     path('view-note/<int:note_id>/', views.view_note, name='view-note'),
     path('notes', views.notes, name='notes'),
     path('new-note', views.new_note, name='new-note'),
@@ -47,6 +47,7 @@ urlpatterns = [
     path('approve-student', views.approve_student, name='approve-student'),
     path('approve-student/<str:name>', views.wait_for_approve, name='wait-for-approve'),
     path('final-approve/<str:name>', views.final_approve, name='final-approve'),
+    path('kindergarten/<str:kindergarten_name>', views.kindergarten_details, name='kindergarten'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

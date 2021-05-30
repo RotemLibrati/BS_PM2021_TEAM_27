@@ -663,10 +663,10 @@ def notes(request):
 
 
 @login_required
-def FAQ(request):
+def  view_FAQ(request):
     context = {}
     context['FAQ'] = FAQ.objects.all()
-    return render(request, 'Preschool_Play/FAQ.html', context)
+    return render(request, 'Preschool_Play/view-FAQ.html', context)
 
 
 def show_video(request):
@@ -729,3 +729,11 @@ def final_approve(request, name):
     child.auth = True
     child.save()
     return HttpResponseRedirect(reverse('Preschool_Play:index'))
+
+
+def kindergarten_details(request, kindergarten_name):
+    child_kindergarten = Kindergarten.objects.get(name=kindergarten_name)
+    children = Child.objects.filter(kindergarten=child_kindergarten)
+    context = {'children': children, 'child_kindergarten': child_kindergarten}
+    return render(request, 'Preschool_Play/kindergarten.html', context)
+

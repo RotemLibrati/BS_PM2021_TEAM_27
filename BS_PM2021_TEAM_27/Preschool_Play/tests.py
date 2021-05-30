@@ -673,3 +673,36 @@ class TestViewFAQView(TestCase):
         response = self.client.get(reverse('Preschool_Play:view-FAQ'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "question1")
+
+
+class TestKindergartenDetailsView(TestCase):
+    def setUp(self):
+        self.userP = User.objects.create_user(username='parent1')
+        self.userP.set_password('Qwerty246')
+        self.userP.save()
+        self.profile = UserProfile(user=self.userP, is_admin=False, type='parent')
+        self.profile.save()
+        self.client = Client()
+        self.client.login(username='parent1', password='Qwerty246')
+        self.teacher = User.objects.create_user(username='teacher1')
+        self.teacher.set_password('qwerty246')
+        self.teacher.save()
+        self.teacher_profile = UserProfile(user=self.teacher, type='teacher')
+        self.teacher_profile.save()
+        self.kg = Kindergarten(name='mypreschool', teacher=self.teacher_profile)
+        self.kg.save()
+        self.child = Child(name='ben', parent=self.profile, teacher=self.teacher_profile, kindergarten=self.kg)
+        self.child.save()
+
+
+    def test_child_name_is_in_kindergarten_page(self):
+        response = self.client.post(reverse('Preschool_Play:kindergarten', args=[self.kg.name]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "ben")
+
+
+    def test_kindergarten_name_is_in_kindergarten_page(self):
+        response = self.client.post(reverse('Preschool_Play:kindergarten', args=[self.kg.name]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "mypreschool")
+
