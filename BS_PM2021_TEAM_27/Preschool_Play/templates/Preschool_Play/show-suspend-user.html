@@ -17,6 +17,12 @@
         <br>
     </tr>
     {% endfor %}
+{% for u in c_users %}
+    <tr>
+        <td>{{ u.name }}</td>
+        <br>
+    </tr>
+    {% endfor %}
 
 
 <h1><u><b>Suspend users:</b></u></h1>
@@ -24,6 +30,13 @@
     {% for u in suspend_user %}
     <tr>
         <td>{{ u.user }}</td>
+        <td>{{ u.suspension_time }}</td>
+        <br>
+    </tr>
+    {% endfor %}
+{% for u in c_suspend %}
+    <tr>
+        <td>{{ u.name }}</td>
         <td>{{ u.suspension_time }}</td>
         <br>
     </tr>

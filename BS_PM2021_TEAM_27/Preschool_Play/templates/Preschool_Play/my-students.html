@@ -1,16 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
+{% extends 'Preschool_Play/SubPage.html' %}
+
 <head>
     <meta charset="UTF-8">
     <title>My Students</title>
 </head>
 <body>
+{% block title %}
+<h1>Score Graphs</h1>
+{% endblock %}
+{% block data %}
+
     <ul>
     {% for s in students %}
-        <li>{{s}}. <a href="{% url 'Preschool_Play:score-graphs' s.name %}">score graph</a></li>
+        <li>{{s}}. <a href="{% url 'Preschool_Play:score-graphs' %}">score graph</a></li>
     {% empty %}
         <p>No students found.</p>
     {% endfor %}
     </ul>
+{% endblock %}
 </body>
 </html>

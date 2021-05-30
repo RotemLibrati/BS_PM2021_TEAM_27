@@ -143,12 +143,20 @@ def show_suspend_user(request):
     user_profile = UserProfile.objects.all()
     users = []  # List of unsuspended users
     suspend_user = []  # lost of suspended users
+    child_users = []
+    child_suspend = []
     for user in user_profile:
         if user.suspension_time >= timezone.now():
             suspend_user.append(user)
         else:
             users.append(user)
-    context = {'users': users, 'suspend_user': suspend_user}
+    children = Child.objects.all()
+    for child in children:
+        if child.suspension_time >= timezone.now():
+            child_suspend.append(child)
+        else:
+            child_users.append(child)
+    context = {'users': users, 'suspend_user': suspend_user, 'c_users': child_users, 'c_suspend': child_suspend}
     return render(request, 'Preschool_Play/show-suspend-user.html', context)
 
 
@@ -320,7 +328,7 @@ def find_student_of_teacher(request):
 @login_required
 def my_students(request):
     if request.user.profile.type != 'teacher':
-        return render(request, 'Preschool_Play/error.html', {'error': 'Unauthorized user.'})
+        return render(request, 'Preschool_Play/error.html', {'message': 'You are not a teacher.'})
     students = list(Child.objects.filter(teacher=request.user.profile))
     return render(request, 'Preschool_Play/my-students.html', {'students': students})
 
