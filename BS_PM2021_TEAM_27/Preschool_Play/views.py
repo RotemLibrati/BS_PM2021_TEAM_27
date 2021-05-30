@@ -320,7 +320,7 @@ def find_student_of_teacher(request):
 @login_required
 def my_students(request):
     if request.user.profile.type != 'teacher':
-        return render(request, 'Preschool_Play/failure.html', {'error': 'Unauthorized user.'})
+        return render(request, 'Preschool_Play/error.html', {'error': 'Unauthorized user.'})
     students = list(Child.objects.filter(teacher=request.user.profile))
     return render(request, 'Preschool_Play/my-students.html', {'students': students})
 
@@ -421,7 +421,7 @@ def scoretable(request):
     if user_profile.type == 'teacher':
         user_list = Score.objects.filter(child__teacher=user.profile)
         context = {'user_list': user_list}
-    return render(request, 'Preschool_Play/scoretable_teacher.html', context)
+    return render(request, 'Preschool_Play/scoretable-teacher.html', context)
 
 
 def suspension_for_teacher(request):
@@ -430,7 +430,7 @@ def suspension_for_teacher(request):
     if user_profile.type != 'teacher':
         return HttpResponse("You are not teacher !!")
 
-    child = Child.objects.filter(teacher=user)
+    child = Child.objects.filter(teacher=user_profile)
     suspended_child = []
     for c in child:
         if c.suspension_time >= timezone.now():
