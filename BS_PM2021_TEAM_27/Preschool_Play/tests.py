@@ -7,12 +7,13 @@ from django.test.utils import override_settings
 from django.urls import reverse, resolve
 from selenium import webdriver
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
-import geckodriver_autoinstaller
+# import geckodriver_autoinstaller
+from .forms import ScoreDataForm
 from . import views
 from .models import *
 from datetime import datetime
 from . import views
-
+from django import forms
 
 # py manage.py test
 # Create your tests here.
@@ -200,7 +201,7 @@ class TestScoreGraphsView(TestCase):
         self.profile.save()
         self.client = Client()
         self.client.login(username='testuser', password='Qwerty246')
-        response = self.client.get(reverse('Preschool_Play:scoregraphs'))
+        response = self.client.get(reverse('Preschool_Play:score-graphs'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Daily sum")
         self.assertTemplateUsed(response, 'Preschool_Play/score-graphs.html')
@@ -210,7 +211,7 @@ class TestScoreGraphsView(TestCase):
         self.profile.save()
         self.client = Client()
         self.client.login(username='testuser', password='Qwerty246')
-        response = self.client.get(reverse('Preschool_Play:scoregraphs'))
+        response = self.client.get(reverse('Preschool_Play:score-graphs'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Unauthorized user")
         self.assertTemplateUsed(response, 'Preschool_Play/error.html')
@@ -222,7 +223,11 @@ class TestScoreGraphsView(TestCase):
         self.child.save()
         self.client = Client()
         self.client.login(username='testuser', password='Qwerty246')
-        response = self.client.get(reverse('Preschool_Play:scoregraphs', kwargs={'name': 'son'}))
+        response = self.client.get(reverse('Preschool_Play:score-graphs'))
+        form = response.context['form']
+        data = form.initial
+        data['child_parent_pair'] = 'son:testuser'
+        response = self.client.post(reverse('Preschool_Play:score-graphs'), data)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Daily sum")
         self.assertTemplateUsed(response, 'Preschool_Play/score-graphs.html')
@@ -242,7 +247,11 @@ class TestScoreGraphsView(TestCase):
         self.score.save()
         self.client = Client()
         self.client.login(username='teacher_user', password='Qwerty246')
-        response = self.client.get(reverse('Preschool_Play:scoregraphs', kwargs={'name': 'ben'}))
+        response = self.client.get(reverse('Preschool_Play:score-graphs'))
+        form = response.context['form']
+        data = form.initial
+        data['child_parent_pair'] = 'ben:testuser'
+        response = self.client.post(reverse('Preschool_Play:score-graphs'), data)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "ben")
         self.assertTemplateUsed(response, 'Preschool_Play/score-graphs.html')
@@ -513,11 +522,11 @@ class TestViewNoteView(TestCase):
         self.child.save()
         self.note = Note(teacher=self.teacher_user, child=self.child, subject='subjectTEST', body='bodyTEST')
         self.note.save()
-        self.note = Note.objects.get(teacher=self.teacher_user, child=self.child, subject='subjectTEST', body='bodyTEST')
+        self.note = Note.objects.get(teacher=self.teacher_user, child=self.child, subject='subjectTEST',
+                                     body='bodyTEST')
         self.noteId = self.note.id
         self.client = Client()
         self.client.login(username='teacher1', password='Qwerty246')
-
 
     def test_content_of_note_shows_up(self):
         response = self.client.get(reverse('Preschool_Play:view-note', args=[self.noteId]))
@@ -553,12 +562,15 @@ class TestNewNoteView(TestCase):
         # note = {'teacher': self.teacher_user, 'child': self.child, 'subject': 'subjectTEST', 'body': 'bodyTEST'}
         url = reverse('Preschool_Play:new-note')
         print(url)
-        response = self.client.post('./preschoolplay/new-note', {'teacher': self.teacher_user, 'child': self.child, 'subject': 'subjectTEST', 'body': 'bodyTEST'})
+        response = self.client.post('./preschoolplay/new-note',
+                                    {'teacher': self.teacher_user, 'child': self.child, 'subject': 'subjectTEST',
+                                     'body': 'bodyTEST'})
         print(response)
         # response = self.client.post(reverse('Preschool_Play:new-note'), data=note)
         # self.assertRedirects(response, reverse('Preschool_Play:notes'))
         m = Note.objects.get(teacher=self.teacher_user)
         self.assertIsNotNone(m)
+
 
 # def test_teacher_of_child_shows_up_in_new_message_page(self):
 #     response = self.client.get(reverse('Preschool_Play:new-message'))
@@ -644,6 +656,7 @@ class TestIntegrationWithSelenium(StaticLiveServerTestCase):
         message_subject = self.browser.find_element_by_xpath('//h3')
         self.assertEquals('this new app' in message_subject.text, True)
 
+
 class TestViewFAQView(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username='testuser')
@@ -655,7 +668,7 @@ class TestViewFAQView(TestCase):
         self.client.login(username='testuser', password='Qwerty246')
 
     def test_FAQ_shows_up_on_page(self):
-        self.faq = FAQ(question = 'question1', answer='answer2')
+        self.faq = FAQ(question='question1', answer='answer2')
         self.faq.save()
         response = self.client.get(reverse('Preschool_Play:view-FAQ'))
         self.assertEqual(response.status_code, 200)

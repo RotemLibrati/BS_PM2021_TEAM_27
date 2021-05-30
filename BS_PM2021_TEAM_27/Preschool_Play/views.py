@@ -10,13 +10,9 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.db.models.signals import post_save
 from django import forms
 
-
 from .models import *
 import json
-from .forms import DeleteMediaForm, LoginForm, MessageForm, AddMediaForm, KindergartenListForm,\
-    CreateUserForm, ProfileForm, ChildForm, DeleteUserForm, DeletePrimaryUserForm, VideoForm, ScoreDataForm, \
-    FindStudentForm, NoteForm, CreateKindergartenForm
-
+from .forms import *
 from django.shortcuts import render, get_object_or_404
 
 
@@ -51,7 +47,8 @@ def score_graphs(request):
                 children = list(Child.objects.all().order_by('parent__user__username', 'name'))
                 user_is_admin = True
             elif request.user.profile.type == 'teacher':
-                children = list(Child.objects.filter(teacher=request.user.profile).order_by('parent__user__username', 'name'))
+                children = list(
+                    Child.objects.filter(teacher=request.user.profile).order_by('parent__user__username', 'name'))
             else:
                 children = list(Child.objects.filter(parent=request.user.profile).order_by('name'))
             if pair[0] == 'All' and user_is_admin:
@@ -65,17 +62,19 @@ def score_graphs(request):
                 context['child_name'] = chosen_child.name
                 if user_is_admin or request.user == parent_user_of_chosen_child or request.user.profile == chosen_child.teacher:
                     context['scoreData'] = list(
-                        Score.objects.filter(child=chosen_child).values(d=ExtractDay('date'), m=ExtractMonth('date'), y=ExtractYear('date')).annotate(
+                        Score.objects.filter(child=chosen_child).values(d=ExtractDay('date'), m=ExtractMonth('date'),
+                                                                        y=ExtractYear('date')).annotate(
                             Sum('amount')))
                 else:
                     return render(request, 'Preschool_Play/error.html', {'message': 'Unauthorized user'})
             form = ScoreDataForm()
-            pairs_choices = [(f'{c.name}:{c.parent.user.username}', f'P: {c.parent.user.username}. C: {c.name}.') for c in
+            pairs_choices = [(f'{c.name}:{c.parent.user.username}', f'P: {c.parent.user.username}. C: {c.name}.') for c
+                             in
                              children]
             if user_is_admin:
                 pairs_choices.insert(0, ('All:All', 'All'))
             form.fields['child_parent_pair'] = forms.CharField(widget=forms.Select(choices=pairs_choices))
-            form.fields['child_parent_pair'].initial = pairs_choices[0][0]
+            form.fields['child_parent_pair'].initial = pairs_choices[0][1]
             context['form'] = form
             return render(request, 'Preschool_Play/score-graphs.html', context)
     else:
@@ -84,7 +83,8 @@ def score_graphs(request):
             children = list(Child.objects.all().order_by('parent__user__username', 'name'))
             user_is_admin = True
         elif request.user.profile.type == 'teacher':
-            children = list(Child.objects.filter(teacher=request.user.profile).order_by('parent__user__username', 'name'))
+            children = list(
+                Child.objects.filter(teacher=request.user.profile).order_by('parent__user__username', 'name'))
         else:
             children = list(Child.objects.filter(parent=request.user.profile).order_by('name'))
         if user_is_admin:
@@ -92,12 +92,15 @@ def score_graphs(request):
                 Score.objects.values(d=ExtractDay('date'), m=ExtractMonth('date'), y=ExtractYear('date')).annotate(
                     Sum('amount')))
         else:
+            if children.__len__() < 1:
+                return render(request, 'Preschool_Play/error.html', {'message': 'Unauthorized user'})
             context['scoreData'] = list(
                 Score.objects.filter(child=children[0]).values(d=ExtractDay('date'), m=ExtractMonth('date'),
                                                                y=ExtractYear('date')).annotate(
                     Sum('amount')))
         form = ScoreDataForm()
-        pairs_choices = [(f'{c.name}:{c.parent.user.username}', f'P: {c.parent.user.username}. C: {c.name}.') for c in children]
+        pairs_choices = [(f'{c.name}:{c.parent.user.username}', f'P: {c.parent.user.username}. C: {c.name}.') for c in
+                         children]
         if user_is_admin:
             pairs_choices.insert(0, ('All:All', 'All'))
             context['child_name'] = 'All'
@@ -110,11 +113,10 @@ def score_graphs(request):
     return render(request, 'Preschool_Play/error.html', {'message': 'Unauthorized user'})
 
 
-
 @login_required
-def game(request, child_name):
+def game(request, child_name, difficulty=1):
     song = Video.objects.filter(type="audio")
-    context = {'user': request.user, 'child_name':child_name, 'song': song}
+    context = {'user': request.user, 'child_name': child_name, 'song': song, 'difficulty': difficulty}
     return render(request, 'Preschool_Play/connect-dots.html', context)
 
 
@@ -297,7 +299,8 @@ def find_student_of_teacher(request):
     teacher_users = User.objects.filter(profile__type='teacher')
     if teacher_username is None:
         form = FindStudentForm()
-        return render(request, 'Preschool_Play/find-student-of-teacher.html', {'teacher_users': teacher_users, 'form': form})
+        return render(request, 'Preschool_Play/find-student-of-teacher.html',
+                      {'teacher_users': teacher_users, 'form': form})
     try:
         chosen_teacher_user = User.objects.get(username=teacher_username)
         chosen_teacher_profile = UserProfile.objects.get(user=chosen_teacher_user)
@@ -345,10 +348,10 @@ def new_message(request, **kwargs):
     parents_users = None
     if user_profile.type == 'teacher':
         teachers_users = User.objects.all()
-        parents_users = User.objects.filter(profile__type='parent', profile__child__teacher=request.user,
+        parents_users = User.objects.filter(profile__type='parent', profile__child__teacher=request.user.profile,
                                             profile__is_admin=False)
     if user_profile.type == 'parent':
-        teachers_users = User.objects.filter(student__parent=request.user)
+        teachers_users = User.objects.filter(profile__student__parent=request.user.profile)
         parents_users = User.objects.filter(profile__type='parent', child__teacher__in=list(teachers_users),
                                             profile__is_admin=False)
     if user_profile.is_admin:
@@ -399,7 +402,8 @@ def child_area(request, name):
     user_profile = UserProfile.objects.get(user=user_parent)
     child = Child.objects.get(parent=user_profile, name=name)
     if child.auth == False:
-        return render(request, 'Preschool_Play/error.html', {'message': 'You have to wait for your teacher to approve you'})
+        return render(request, 'Preschool_Play/error.html',
+                      {'message': 'You have to wait for your teacher to approve you'})
     teacher = child.teacher
     videos = Video.objects.filter(create=teacher, type='video')
     context = {'child': child, 'videos': videos}
@@ -410,7 +414,7 @@ def scoretable(request):
     user = request.user
     user_profile = UserProfile.objects.get(user=user)
     if user_profile.type == 'teacher':
-        user_list = Score.objects.filter(child__teacher=user)
+        user_list = Score.objects.filter(child__teacher=user.profile)
         context = {'user_list': user_list}
     return render(request, 'Preschool_Play/scoretable_teacher.html', context)
 
@@ -491,7 +495,8 @@ def new_profile(request, username):
         if form.is_valid():
             post_save.connect(attach_user, sender=UserProfile)
             form.save()
-            alert = Notification(receiver=User.objects.get(username='admin'), message=f'New user sign up to your system {user}')
+            alert = Notification(receiver=User.objects.get(username='admin'),
+                                 message=f'New user sign up to your system {user}')
             alert.save()
             return HttpResponseRedirect(reverse('Preschool_Play:index'))
     else:
@@ -532,10 +537,13 @@ def add_child(request, **kwargs):
                         temp = UserProfile.objects.get(user=t.user)
                         chosen_kindergarten = Kindergarten.objects.get(teacher=temp)
                         if chosen_kindergarten.name != kindergarten:
-                            return render(request, 'Preschool_Play/error.html', {'message': 'The teacher and the kindergarten are not suitable'})
-                        new_child = Child(name=name, parent=user_profile, teacher=finally_chosen_teacher, kindergarten=chosen_kindergarten)
+                            return render(request, 'Preschool_Play/error.html',
+                                          {'message': 'The teacher and the kindergarten are not suitable'})
+                        new_child = Child(name=name, parent=user_profile, teacher=finally_chosen_teacher,
+                                          kindergarten=chosen_kindergarten)
                         new_child.save()
-                        alert = Notification(receiver=User.objects.get(username='admin'), message=f'{user} has registered his child to the system')
+                        alert = Notification(receiver=User.objects.get(username='admin'),
+                                             message=f'{user} has registered his child to the system')
                         alert.save()
                         alert = Notification(receiver=User.objects.get(username=finally_chosen_teacher.user),
                                              message=f'{user} has registered his child to the system')
@@ -575,7 +583,8 @@ def delete_user(request):
                 if user.check_password(password):
                     name.delete()
                 else:
-                    alert = Notification(receiver=user, message='The password is incorrect, you are passed to the home page')
+                    alert = Notification(receiver=user,
+                                         message='The password is incorrect, you are passed to the home page')
                     alert.save()
                     return HttpResponseRedirect(reverse('Preschool_Play:index'))
         return HttpResponseRedirect(reverse('Preschool_Play:index'))
@@ -599,7 +608,8 @@ def delete_primary_user(request):
                     user_profile.delete()
                     request.user.delete()
                 else:
-                    alert = Notification(receiver=user, message='The password is incorrect, you are passed to the home page')
+                    alert = Notification(receiver=user,
+                                         message='The password is incorrect, you are passed to the home page')
                     alert.save()
                     return HttpResponseRedirect(reverse('Preschool_Play:index'))
         return HttpResponseRedirect(reverse('Preschool_Play:index'))
@@ -619,12 +629,13 @@ def view_note(request, note_id):
         teacher_note = Note.objects.get(id=note_id)
         if teacher_note.teacher != request.user:
             return render(request, 'Preschool_Play/error.html',
-                  {'message': 'Only the creator of the note may see it.'})
+                          {'message': 'Only the creator of the note may see it.'})
     except (TypeError, Note.DoesNotExist):
         return render(request, 'Preschool_Play/error.html',
                       {'message': 'Unable to find requested note.'})
     return render(request, 'Preschool_Play/view-note.html',
                   {'note': teacher_note, 'user': request.user, 'profile': profile})
+
 
 def new_note(request):
     if request.user is None or not request.user.is_authenticated:
@@ -650,18 +661,28 @@ def new_note(request):
                 widget=forms.Select(choices=[(u.name, u.name) for u in childs]))
             return render(request, 'Preschool_Play/new-note.html',
                           {'user': request.user, 'form': form})
-    return render(request,'Preschool_Play/error.html',{'error':'error: you are not a teacher'})
+    return render(request, 'Preschool_Play/error.html', {'error': 'error: you are not a teacher'})
+
 
 @login_required
 def notes(request):
     context = {'notes': Note.objects.all()}
     return render(request, 'Preschool_Play/notes.html', context)
 
+
 @login_required
 def FAQ(request):
     context = {}
     context['FAQ'] = FAQ.objects.all()
     return render(request, 'Preschool_Play/FAQ.html', context)
+
+
+def show_video(request):
+    # videos = Video.objects.all()
+    # context = {
+    #     'videos': videos,
+    # }
+    return render(request, 'Preschool_Play/videos.html')
 
 
 def upload_video(request):
@@ -708,7 +729,7 @@ def upload_audio(request):
 
 
 def approve_student(request):
-    user=request.user
+    user = request.user
     user_profile = UserProfile.objects.get(user=user)
     if user_profile.type != 'teacher':
         return render(request, 'Preschool_Play/error.html',
