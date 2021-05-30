@@ -1,12 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
+
+{% extends 'Preschool_Play/SubPage.html' %}
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
 <body>
+{% block title %}
+    <h1>Approve Users</h1>
+{% endblock %}
+{% block data %}
 <h1>Hello</h1>
-    {{ profile.user }}
+   <h2> You approve {{ profile.user }}</h2>
+<a href="{% url 'Preschool_Play:index' %}"class="button alt">Menu</a><br>
+{% endblock %}
 
 </body>
 </html>

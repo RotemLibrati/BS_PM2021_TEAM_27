@@ -12,12 +12,19 @@
 {% block data %}
 
     {% for user in up %}
-    {{ user.user }} <br>
+    {{ user.user }} {% if user.auth  %} -
+        Auth      <br>
+    {% else %} -
+        Dont Auth      <br>
+    {% endif %}
     {% endfor %}
+
+<br><br><br>
+<h1>Enter first name and last name of user:</h1>
     <form action="{% url 'Preschool_Play:search-user' %}" method="post">
         {% csrf_token %}
-        <input name="fname" value="" type="text" >
-        <input name="lname" type="text">
+        <input name="fname" value="First Name" type="text" >
+        <input name="lname" type="text" value="Last Name">
         <input value="submit" type="submit">
     </form>
 {% endblock %}

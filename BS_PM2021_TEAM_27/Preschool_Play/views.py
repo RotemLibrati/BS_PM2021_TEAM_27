@@ -233,8 +233,10 @@ def search_user(request):
         for x in unconfirmed_users:
             if x.user.first_name == fname and x.user.last_name == lname:
                 context['profile'] = x
+                x.auth = True
+                x.save()
                 return render(request, 'Preschool_Play/search-user.html', context)
-    return render(request, 'Preschool_Play/error.html', {'message': 'unauthorized'})
+    return render(request, 'Preschool_Play/error.html', {'message': 'Name doesnt exist'})
 
 
 def login_view(request):  # login view
@@ -764,6 +766,7 @@ def wait_for_approve(request, name):
     child = Child.objects.get(teacher=user_profile, name=name)
     context = {'child': child}
     return render(request, 'Preschool_Play/wait-for-approve.html', context)
+
 
 
 def final_approve(request, name):
