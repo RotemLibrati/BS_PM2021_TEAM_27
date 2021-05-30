@@ -185,6 +185,38 @@ const options = {
             }
         }
     },
+    clickAnswer: function clickAnswer() {
+        if (this.isSolved) {
+            if (
+                this.rightAnswerIndex == 0 &&
+                this.canvasWidth / 3 - this.canvasWidth / 18 <= mouseX &&
+                mouseX <= this.canvasWidth / 3 + this.canvasWidth / 18 &&
+                this.canvasHeight * 0.95 - this.canvasHeight / 24 <= mouseY &&
+                mouseY <= this.canvasHeight * 0.95 + this.canvasHeight / 24
+            ) {
+                this.isComplete = true;
+                this.sendData();
+            } else if (
+                this.rightAnswerIndex == 1 &&
+                this.canvasWidth / 2 - this.canvasWidth / 18 <= mouseX &&
+                mouseX <= this.canvasWidth / 2 + this.canvasWidth / 18 &&
+                this.canvasHeight * 0.95 - this.canvasHeight / 24 <= mouseY &&
+                mouseY <= this.canvasHeight * 0.95 + this.canvasHeight / 24
+            ) {
+                this.isComplete = true;
+                this.sendData();
+            } else if (
+                this.rightAnswerIndex == 2 &&
+                (this.canvasWidth * 2) / 3 - this.canvasWidth / 18 <= mouseX &&
+                mouseX <= (this.canvasWidth * 2) / 3 + this.canvasWidth / 18 &&
+                this.canvasHeight * 0.95 - this.canvasHeight / 24 <= mouseY &&
+                mouseY <= this.canvasHeight * 0.95 + this.canvasHeight / 24
+            ) {
+                this.isComplete = true;
+                this.sendData();
+            }
+        }
+    },
 };
 const house = Object.create(options);
 options.shapes.push(house);
@@ -388,36 +420,6 @@ car.initShape = function initShape() {
         );
         pop();
     };
-    this.clickAnswer = function clickAnswer() {
-        if (
-            this.rightAnswerIndex == 0 &&
-            this.canvasWidth / 3 - this.canvasWidth / 18 <= mouseX &&
-            mouseX <= this.canvasWidth / 3 + this.canvasWidth / 18 &&
-            this.canvasHeight * 0.95 - this.canvasHeight / 24 <= mouseY &&
-            mouseY <= this.canvasHeight * 0.95 + this.canvasHeight / 24
-        ) {
-            this.isComplete = true;
-            this.sendData();
-        } else if (
-            this.rightAnswerIndex == 1 &&
-            this.canvasWidth / 2 - this.canvasWidth / 18 <= mouseX &&
-            mouseX <= this.canvasWidth / 2 + this.canvasWidth / 18 &&
-            this.canvasHeight * 0.95 - this.canvasHeight / 24 <= mouseY &&
-            mouseY <= this.canvasHeight * 0.95 + this.canvasHeight / 24
-        ) {
-            this.isComplete = true;
-            this.sendData();
-        } else if (
-            this.rightAnswerIndex == 2 &&
-            (this.canvasWidth * 2) / 3 - this.canvasWidth / 18 <= mouseX &&
-            mouseX <= (this.canvasWidth * 2) / 3 + this.canvasWidth / 18 &&
-            this.canvasHeight * 0.95 - this.canvasHeight / 24 <= mouseY &&
-            mouseY <= this.canvasHeight * 0.95 + this.canvasHeight / 24
-        ) {
-            this.isComplete = true;
-            this.sendData();
-        }
-    };
 };
 house.initShape = function initShape() {
     this.specificSizeMultiplier = 1;
@@ -589,36 +591,6 @@ house.initShape = function initShape() {
             this.canvasHeight * 0.95
         );
         pop();
-    };
-    this.clickAnswer = function clickAnswer() {
-        if (
-            this.rightAnswerIndex == 0 &&
-            this.canvasWidth / 3 - this.canvasWidth / 18 <= mouseX &&
-            mouseX <= this.canvasWidth / 3 + this.canvasWidth / 18 &&
-            this.canvasHeight * 0.95 - this.canvasHeight / 24 <= mouseY &&
-            mouseY <= this.canvasHeight * 0.95 + this.canvasHeight / 24
-        ) {
-            this.isComplete = true;
-            this.sendData();
-        } else if (
-            this.rightAnswerIndex == 1 &&
-            this.canvasWidth / 2 - this.canvasWidth / 18 <= mouseX &&
-            mouseX <= this.canvasWidth / 2 + this.canvasWidth / 18 &&
-            this.canvasHeight * 0.95 - this.canvasHeight / 24 <= mouseY &&
-            mouseY <= this.canvasHeight * 0.95 + this.canvasHeight / 24
-        ) {
-            this.isComplete = true;
-            this.sendData();
-        } else if (
-            this.rightAnswerIndex == 2 &&
-            (this.canvasWidth * 2) / 3 - this.canvasWidth / 18 <= mouseX &&
-            mouseX <= (this.canvasWidth * 2) / 3 + this.canvasWidth / 18 &&
-            this.canvasHeight * 0.95 - this.canvasHeight / 24 <= mouseY &&
-            mouseY <= this.canvasHeight * 0.95 + this.canvasHeight / 24
-        ) {
-            this.isComplete = true;
-            this.sendData();
-        }
     };
 };
 
