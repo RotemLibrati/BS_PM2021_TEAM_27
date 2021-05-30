@@ -20,7 +20,15 @@ pipeline {
           steps {
               sh """
                   cd BS_PM2021_TEAM_27
-                  python manage.py test
+                  python manage.py test >> test_results.txt
+              """
+          }
+        }
+        stage('Send Report') {
+          steps {
+              sh """
+                  echo TEST_RESULTS=$(cat test_results.txt)
+                  mail bcc: '', body: $TEST_RESULTS, cc: '', from: '', replyTo: '', subject: 'Jenkins update', to: 'eilonco@ac.sce.ac.il'
               """
           }
         }
