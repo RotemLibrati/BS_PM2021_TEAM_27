@@ -864,6 +864,7 @@ function setup() {
     options.chosenShape.initShape();
     options.chosenShape.shuffleWrongAnswers();
     options.chosenShape.rightAnswerIndex = Math.floor(Math.random() * 3);
+    options.PFIndex = Math.floor(Math.random()*options.positiveFeedback.length);
 }
 function draw() {
     background(220);
