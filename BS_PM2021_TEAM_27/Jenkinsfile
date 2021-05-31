@@ -19,8 +19,8 @@ pipeline {
             steps {
                 dir("BS_PM2021_TEAM_27"){
                     script{
-                        """
-                        sout1 = ${sh(returnStdout: true, script: "python manage.py test")}
+                        sout1 = """
+                        ${sh(returnStdout: true, script: "python manage.py test")}
                         """
                     }
                 }
