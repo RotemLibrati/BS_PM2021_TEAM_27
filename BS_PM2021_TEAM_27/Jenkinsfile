@@ -23,7 +23,7 @@ pipeline {
                 dir("BS_PM2021_TEAM_27"){
                     script{
                         try{
-                            OUTPUT1 = """${sh(returnStdout: true, script: "python manage.py test Preschool_Play.tests.TestInboxView")}"""
+                            """${sh(returnStdout: true, script: "python manage.py test Preschool_Play.tests.TestInboxView")}""" > out1.txt
                         }finally{
                             echo OUTPUT1 > out1.txt
                             echo '0000000000000000000000000000'
@@ -61,6 +61,7 @@ pipeline {
         always{
             echo '99999999999999999999999999'
             echo OUTPUT1
+            cat out1.txt
         }
     }
 }
