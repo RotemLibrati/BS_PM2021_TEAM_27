@@ -19,8 +19,9 @@ pipeline {
             steps {
                 script{
                     try{
-                        sout = sh(returnStdout: true, script: "python BS_PM2021_TEAM_27/manage.py test ./Preschool_Play.tests").trim()
+                        sout = """${sh(returnStdout: true, script: "python BS_PM2021_TEAM_27/manage.py test ./Preschool_Play.tests")}"""
                         echo '+++++++++'
+                        echo sout > out.txt
                         cat out.txt
                     }
                     catch(e){
