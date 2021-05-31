@@ -13,9 +13,13 @@ pipeline {
                   cd BS_PM2021_TEAM_27
                   python manage.py makemigrations
                   python manage.py migrate
-                  mail body: 'bod234', subject: 'sub1', to: 'eilonco@ac.sce.ac.il'
               """
           }
+        }
+        post{
+            always{
+                echo 'test++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+            }
         }
         stage('Run Unit Tests') {
           steps {
@@ -24,6 +28,11 @@ pipeline {
                   python manage.py test Preschool_Play.tests.TestInboxView.test_with_no_messages >> test_results.txt
               """
           }
+        }
+        post{
+            always{
+                echo 'test================================================================'
+            }
         }
     }
 
