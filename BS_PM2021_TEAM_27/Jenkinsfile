@@ -29,6 +29,7 @@ pipeline {
                         }finally{
                             sh """
                                 echo ${OUTPUT1} > out1.txt
+                                echo ${outp} > out1.txt
                                 echo '0000000000000000000000000000'
                                 cat out1.txt
                             """
