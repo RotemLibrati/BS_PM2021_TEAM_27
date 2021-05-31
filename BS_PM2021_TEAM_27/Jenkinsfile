@@ -18,15 +18,9 @@ pipeline {
         stage('Run Unit Tests') {
             steps {
                 script{
-                    try{
-                        sout = """${sh(returnStdout: true, script: "python BS_PM2021_TEAM_27/manage.py test ./Preschool_Play.tests")}"""
-                        echo '+++++++++'
-                        echo sout > out.txt
-                        cat out.txt
-                    }
-                    catch(e){
-                        echo sout
-                    }
+                    """
+                    sout1 = ${sh(returnStdout: true, script: "python BS_PM2021_TEAM_27/manage.py test ./Preschool_Play.tests")}
+                    """
                 }
                 /*script{
                     try{
@@ -52,6 +46,11 @@ pipeline {
                     }
                 }*/
             }
+        }
+    }
+    post{
+        always{
+            echo '99999999999999999999999999'
         }
     }
 }
