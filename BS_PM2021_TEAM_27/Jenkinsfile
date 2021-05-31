@@ -61,7 +61,7 @@ pipeline {
         always{
             echo '99999999999999999999999999'
             echo OUTPUT1
-            cat out1.txt
+            sh "out1.txt"
         }
     }
 }
