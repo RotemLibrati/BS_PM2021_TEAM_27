@@ -21,16 +21,20 @@ pipeline {
                     try{
                         sh """
                         cd BS_PM2021_TEAM_27
-                        echo python manage.py test > test_results.txt
+                        python manage.py test > stdout.txt 2> stderr.txt
                         echo '000000000000000000000000000'
-                        cat test_results.txt
+                        cat stdout.txt
+                        echo '000000000000000000000000000'
+                        cat stderr.txt
                         echo '000000000000000000000000000'
                         """
                     }
                     catch(e){
                         sh """
                             echo '++++++++++++++++++++++++++++++++++'
-                            cat test_results.txt
+                            cat stdout.txt
+                            echo '++++++++++++++++++++++++++++++++++'
+                            cat stderr.txt
                             echo '++++++++++++++++++++++++++++++++++'
                         """
                     }
