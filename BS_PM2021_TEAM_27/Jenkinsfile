@@ -23,7 +23,9 @@ pipeline {
                 dir("BS_PM2021_TEAM_27"){
                     script{
                         try{
-                            OUTPUT1 = """${sh(returnStdout: true, script: "python manage.py test Preschool_Play.tests.TestInboxView 2>&1")}"""
+                            OUTPUT1 = sh(returnStdout: true, script: "python manage.py test Preschool_Play.tests.TestInboxView > out1.txt")
+                            def outp = readFile('out1.txt').trim()
+                            echo "${outp}"
                         }finally{
                             sh """
                                 echo ${OUTPUT1} > out1.txt
