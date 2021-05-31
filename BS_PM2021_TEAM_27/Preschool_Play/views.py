@@ -812,4 +812,3 @@ def create_kindergarten(request):
         return render(request, 'Preschool_Play/create-kindergarten.html', context)
 
 
-
