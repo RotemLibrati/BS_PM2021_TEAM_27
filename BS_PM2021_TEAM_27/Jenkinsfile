@@ -26,32 +26,12 @@ pipeline {
                             sh(returnStdout: true, script: "python manage.py test Preschool_Play.tests.TestInboxView 2>&1 | xargs echo > out1.txt")
                         }finally{
                             OUTPUT1 = sh(returnStdout: true, script: "cat out1.txt")
+                            sh """
+                                python manage.py email_report -s "Tests Report" -b ${OUTPUT1}
+                            """
                         }
                     }
                 }
-                /*script{
-                    try{
-                        sh """
-                        cd BS_PM2021_TEAM_27
-                        python manage.py test 2>&1 stdout.txt
-                        echo '000000000000000000000000000'
-                        cat stdout.txt
-                        echo '000000000000000000000000000'
-                        cat stderr.txt
-                        echo '000000000000000000000000000'
-                        """
-                    }
-                    catch(e){
-                        sh """
-                            echo ${e}
-                            echo '++++++++++++++++++++++++++++++++++'
-                            cat stdout.txt
-                            echo '++++++++++++++++++++++++++++++++++'
-                            cat stderr.txt
-                            echo '++++++++++++++++++++++++++++++++++'
-                        """
-                    }
-                }*/
             }
         }
     }
