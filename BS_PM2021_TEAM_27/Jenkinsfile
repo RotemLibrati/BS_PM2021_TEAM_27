@@ -26,7 +26,7 @@ pipeline {
                             OUTPUT1 = """${sh(returnStdout: true, script: "python manage.py test Preschool_Play.tests.TestInboxView")}"""
                         }finally{
                             sh """
-                                echo OUTPUT1 > out1.txt
+                                echo ${OUTPUT1} > out1.txt
                                 echo '0000000000000000000000000000'
                                 cat out1.txt
                             """
