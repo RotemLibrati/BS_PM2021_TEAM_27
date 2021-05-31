@@ -17,7 +17,10 @@ pipeline {
         }
         stage('Run Unit Tests') {
             steps {
-                script{
+                cd BS_PM2021_TEAM_27
+                python manage.py test > out.txt
+                cat out.txt
+                /*script{
                     try{
                         sh """
                         cd BS_PM2021_TEAM_27
@@ -39,7 +42,7 @@ pipeline {
                             echo '++++++++++++++++++++++++++++++++++'
                         """
                     }
-                }
+                }*/
             }
         }
     }
