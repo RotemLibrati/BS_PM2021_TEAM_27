@@ -19,7 +19,8 @@ pipeline {
             steps {
                 script{
                     """
-                    sout1 = ${sh(returnStdout: true, script: "python BS_PM2021_TEAM_27/manage.py test ./Preschool_Play.tests")}
+                    sh cd BS_PM2021_TEAM_27
+                    sout1 = ${sh(returnStdout: true, script: "python manage.py test")}
                     """
                 }
                 /*script{
