@@ -24,7 +24,6 @@ pipeline {
                             ${sh(returnStdout: true, script: "python manage.py test")}
                             """
                         }catch(e){
-                        }finally{
                             echo sout1 > out1.txt
                             echo '====================='
                             cat out1.txt
