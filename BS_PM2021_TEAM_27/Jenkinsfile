@@ -38,7 +38,7 @@ pipeline {
             echo OUTPUT1
             dir("BS_PM2021_TEAM_27"){
                 sh """
-                     python manage.py email_report -s "Tests Report" -b "hi there"
+                     python manage.py email_report -s "Tests Report" -b "${OUTPUT1}"
                 """
             }
             sh "cat out1.txt"
