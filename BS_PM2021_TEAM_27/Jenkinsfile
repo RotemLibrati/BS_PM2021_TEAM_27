@@ -24,7 +24,7 @@ pipeline {
                 dir("BS_PM2021_TEAM_27"){
                     script{
                         try{
-                            output1 = ${sh(returnStdout: true, script: "python manage.py test")}
+                            """${output1} = ${sh(returnStdout: true, script: "python manage.py test")}"""
                         }catch(e){
                             echo output1 > out1.txt
                             echo '0000000000000000000000000000'
