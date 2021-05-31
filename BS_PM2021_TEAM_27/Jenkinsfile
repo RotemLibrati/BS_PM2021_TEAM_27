@@ -17,11 +17,14 @@ pipeline {
         }
         stage('Run Unit Tests') {
             steps {
-                script{
+                sh(returnStdout: true, script: "python manage.py test").trim() > out.txt
+                echo '+++++++++'
+                cat out.txt
+                /*script{
                     try{
                         sh """
                         cd BS_PM2021_TEAM_27
-                        python manage.py test 2> stdout.txt
+                        python manage.py test 2>&1 stdout.txt
                         echo '000000000000000000000000000'
                         cat stdout.txt
                         echo '000000000000000000000000000'
@@ -39,7 +42,7 @@ pipeline {
                             echo '++++++++++++++++++++++++++++++++++'
                         """
                     }
-                }
+                }*/
             }
         }
     }
