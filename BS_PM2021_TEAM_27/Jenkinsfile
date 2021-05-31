@@ -1,3 +1,4 @@
+def output1
 pipeline {
     agent {
         docker { image 'eilonc285/repos-team27:team27' }
@@ -20,11 +21,11 @@ pipeline {
                 dir("BS_PM2021_TEAM_27"){
                     script{
                         try{
-                            sout1 = """
+                            output1 = """
                             ${sh(returnStdout: true, script: "python manage.py test")}
                             """
                         }catch(e){
-                            echo sout1 > out1.txt
+                            echo output1 > out1.txt
                             echo '====================='
                             cat out1.txt
                         }
@@ -59,7 +60,7 @@ pipeline {
     post{
         always{
             echo '99999999999999999999999999'
-            echo sout1
+            echo output1
         }
     }
 }
