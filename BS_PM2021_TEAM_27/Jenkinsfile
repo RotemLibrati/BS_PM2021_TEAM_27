@@ -21,8 +21,8 @@ pipeline {
               sh """
                   cd BS_PM2021_TEAM_27
                   python manage.py test Preschool_Play.tests.TestInboxView.test_with_no_messages >> test_results.txt
-                  mail (body: 'bod234', subject: 'sub1', to: 'eilonco@ac.sce.ac.il')
               """
+              sh "mail (body: 'bod234', subject: 'sub1', to: 'eilonco@ac.sce.ac.il')"
           }
         }
     }
