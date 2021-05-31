@@ -18,9 +18,8 @@ pipeline {
         stage('Run Unit Tests') {
             steps {
                 script{
-                    sh """cd BS_PM2021_TEAM_27"""
                     """
-                    sout1 = ${sh(returnStdout: true, script: "python manage.py test")}
+                    sout1 = ${sh(returnStdout: true, script: "cd BS_PM2021_TEAM_27","python manage.py test")}
                     """
                 }
                 /*script{
