@@ -21,7 +21,9 @@ pipeline {
                     try{
                         sh """
                         cd BS_PM2021_TEAM_27
-                        python manage.py test Preschool_Play.tests.TestInboxView.test_with_no_messages >> test_results.txt
+                        python manage.py test >> test_results.txt
+                        echo '000000000000000000000000000'
+                        head -10 test_results.txt
                         """
                     }
                     catch(e){
