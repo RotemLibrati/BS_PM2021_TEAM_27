@@ -769,7 +769,6 @@ def wait_for_approve(request, name):
     context = {'child': child}
     return render(request, 'Preschool_Play/wait-for-approve.html', context)
 
-
 def final_approve(request, name):
     user_parent = request.user
     user_profile = UserProfile.objects.get(user=user_parent)
