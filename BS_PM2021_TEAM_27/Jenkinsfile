@@ -19,9 +19,16 @@ pipeline {
             steps {
                 dir("BS_PM2021_TEAM_27"){
                     script{
-                        sout1 = """
-                        ${sh(returnStdout: true, script: "python manage.py test")}
-                        """
+                        try{
+                            sout1 = """
+                            ${sh(returnStdout: true, script: "python manage.py test")}
+                            """
+                        }catch(e){
+                        }finally{
+                            echo sout1 > out1.txt
+                            echo '====================='
+                            cat out1.txt
+                        }
                     }
                 }
                 /*script{
