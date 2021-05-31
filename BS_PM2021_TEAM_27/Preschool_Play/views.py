@@ -162,13 +162,15 @@ def show_suspend_user(request):
 
 def filter_suspension(request):
     user_profile = UserProfile.objects.all()
-    suspend_user = []  # list of suspended users
-    for user in user_profile:
-        if user.suspension_time >= timezone.now():
-            suspend_user.append(user)
-    suspend_user.sort(
-        key=lambda r: r.suspension_time)  # filter by time left and keeping track of the time user has been suspended.
-    context = {'suspend_user': suspend_user}
+    # suspend_user = []  # list of suspended users
+    suspend_user = list(User.objects.filter(profile__suspension_time__gte=timezone.now()))
+    suspended_children = list(Child.objects.filter(suspension_time__gte=timezone.now()))
+    # for user in user_profile:
+    #     if user.suspension_time >= timezone.now():
+    #         suspend_user.append(user)
+    # suspend_user.sort(
+    #     key=lambda r: r.suspension_time)  # filter by time left and keeping track of the time user has been suspended.
+    context = {'suspend_user': suspend_user, 'suspended_children': suspended_children}
     return render(request, 'Preschool_Play/filter-suspension.html', context)
 
 
@@ -687,10 +689,10 @@ def notes(request):
 
 
 @login_required
-def FAQ(request):
+def  view_FAQ(request):
     context = {}
     context['FAQ'] = FAQ.objects.all()
-    return render(request, 'Preschool_Play/FAQ.html', context)
+    return render(request, 'Preschool_Play/view-FAQ.html', context)
 
 
 def show_video(request):
@@ -777,6 +779,11 @@ def final_approve(request, name):
     child.save()
     return HttpResponseRedirect(reverse('Preschool_Play:index'))
 
+def kindergarten_details(request, kindergarten_name):
+    child_kindergarten = Kindergarten.objects.get(name=kindergarten_name)
+    children = Child.objects.filter(kindergarten=child_kindergarten)
+    context = {'children': children, 'child_kindergarten': child_kindergarten}
+    return render(request, 'Preschool_Play/kindergarten.html', context)
 
 def create_kindergarten(request):
     user=request.user

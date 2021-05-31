@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Kindergarten</title>
+</head>
+<body>
+  <h1>"{{child_kindergarten.name}}" Kindergarten</h1>
+  <h2>Teacher: {{child_kindergarten.teacher.user}}</h2>
+  <h3>Children:</h3>
+  {% for ch in children %}
+  <h4><pre>         -{{ch.name}}</pre></h4>
+
+{% endfor %}
+</body>
+</html>

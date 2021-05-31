@@ -16,6 +16,7 @@
     <h4>Parent: {{child.parent}}</h4>
     <h4>Teacher: {{child.teacher}}</h4>
     <h4>Kindergarten: {{child.kindergarten}}</h4>
+    <a href="{% url 'Preschool_Play:kindergarten' child.kindergarten %}" >My Kindergarten</a><br>
 {% for video in videos %}
 <video width="300" height="300" controls >
 <source src="{{video.video.url}}" type="video/mp4">
