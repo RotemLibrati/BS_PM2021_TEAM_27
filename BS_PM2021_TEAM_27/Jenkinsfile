@@ -17,10 +17,7 @@ pipeline {
         }
         stage('Run Unit Tests') {
             steps {
-                cd BS_PM2021_TEAM_27
-                python manage.py test > out.txt
-                cat out.txt
-                /*script{
+                script{
                     try{
                         sh """
                         cd BS_PM2021_TEAM_27
@@ -33,8 +30,8 @@ pipeline {
                         """
                     }
                     catch(e){
-                        echo e.toString()
                         sh """
+                            echo ${e}
                             echo '++++++++++++++++++++++++++++++++++'
                             cat stdout.txt
                             echo '++++++++++++++++++++++++++++++++++'
@@ -42,7 +39,7 @@ pipeline {
                             echo '++++++++++++++++++++++++++++++++++'
                         """
                     }
-                }*/
+                }
             }
         }
     }
