@@ -53,6 +53,7 @@ pipeline {
     post{
         always{
             echo '99999999999999999999999999'
+            echo sout1
         }
     }
 }
