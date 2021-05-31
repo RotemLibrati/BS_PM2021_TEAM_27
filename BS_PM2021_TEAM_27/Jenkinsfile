@@ -23,13 +23,13 @@ pipeline {
                         cd BS_PM2021_TEAM_27
                         echo python manage.py test >> test_results.txt
                         echo '000000000000000000000000000'
-                        head -10 test_results.txt
+                        head 10 test_results.txt
                         """
                     }
                     catch(e){
                         sh """
                             echo '++++++++++++++++++++++++++++++++++'
-                            head -10 test_results.txt
+                            head 10 test_results.txt
                         """
                     }
                 }
