@@ -21,7 +21,7 @@ pipeline {
                     try{
                         sh """
                         cd BS_PM2021_TEAM_27
-                        python manage.py test | echo > test_results.txt
+                        echo python manage.py test > test_results.txt
                         echo '000000000000000000000000000'
                         cat test_results.txt
                         echo '000000000000000000000000000'
