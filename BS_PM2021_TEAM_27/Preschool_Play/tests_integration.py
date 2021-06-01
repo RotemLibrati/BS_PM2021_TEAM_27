@@ -2,6 +2,7 @@ import time
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test.utils import override_settings
 from selenium import webdriver
+from selenium.webdriver import FirefoxOptions
 from .models import *
 import os
 
@@ -10,9 +11,11 @@ class TestIntegrationWithSelenium(StaticLiveServerTestCase):
 
     def setUp(self):
         driver = './win-geckodriver.exe'
+        opts = FirefoxOptions()
         if os.name != 'nt':
             driver = './geckodriver-linux64'
-        self.browser = webdriver.Firefox(executable_path=driver)
+            opts.add_argument("--headless")
+        self.browser = webdriver.Firefox(executable_path=driver, firefox_options=opts)
 
         self.admin_user = User.objects.create_user('admin', 'admin@test.com')
         self.admin_user.set_password('qwerty246')
