@@ -5,7 +5,6 @@ from selenium import webdriver
 from selenium.webdriver import FirefoxOptions
 from .models import *
 import os
-# from pyvirtualdisplay import Display
 
 
 class TestIntegrationWithSelenium(StaticLiveServerTestCase):
@@ -16,9 +15,8 @@ class TestIntegrationWithSelenium(StaticLiveServerTestCase):
         if os.name != 'nt':
             driver = './geckodriver-linux64'
             opts.add_argument("--headless")
-            # display = Display(visible=0, size=(800, 600))
-            # display.start()
-        self.browser = webdriver.Firefox(executable_path=driver, firefox_options=opts)
+            opts.setLegacy(True)
+        self.browser = webdriver.Firefox(executable_path=driver, options=opts)
 
         self.admin_user = User.objects.create_user('admin', 'admin@test.com')
         self.admin_user.set_password('qwerty246')
