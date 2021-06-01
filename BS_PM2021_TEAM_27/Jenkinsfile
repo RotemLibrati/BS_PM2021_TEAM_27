@@ -40,7 +40,8 @@ pipeline {
             echo 'Sending test report email...'
             dir("BS_PM2021_TEAM_27"){
                 sh """
-                     python manage.py email_report -s "Tests Report" -b "${OUTPUT1} 00000000000000000000000000 ${OUTPUT2}"
+                     python manage.py email_report -s "Tests Report" -b "${OUTPUT1}"
+                     python manage.py email_report -s "Log" -b '${OUTPUT2}'
                 """
             }
             echo 'Email sent.'
