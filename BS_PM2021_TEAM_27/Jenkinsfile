@@ -3,7 +3,7 @@ pipeline {
         OUTPUT1 = "foo"
     }
     agent {
-        docker { image 'eilonc285/repos-team27:team27' }
+        docker { image 'eilonc285/repos-team27:main' }
     }
     triggers {
         githubPush()
