@@ -11,7 +11,7 @@ class TestIntegrationWithSelenium(StaticLiveServerTestCase):
     def setUp(self):
         driver = './win-geckodriver.exe'
         if os.name != 'nt':
-            driver = 'geckodriver-linux64'
+            driver = './geckodriver-linux64'
         self.browser = webdriver.Firefox(executable_path=driver)
 
         self.admin_user = User.objects.create_user('admin', 'admin@test.com')
