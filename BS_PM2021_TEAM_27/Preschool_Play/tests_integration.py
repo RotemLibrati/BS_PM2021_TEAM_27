@@ -5,18 +5,15 @@ from selenium import webdriver
 from selenium.webdriver import FirefoxOptions
 from .models import *
 import os
-import struct
 
 
 class TestIntegrationWithSelenium(StaticLiveServerTestCase):
 
     def setUp(self):
-        print('000000000000000000000000000000000')
-        print(struct.calcsize("P") * 8)
         driver = './win-geckodriver.exe'
         opts = FirefoxOptions()
         if os.name != 'nt':
-            driver = './geckodriver-linux64'
+            driver = './geckodriver-n'
             opts.add_argument("--headless")
         self.browser = webdriver.Firefox(executable_path=driver, options=opts)
 
