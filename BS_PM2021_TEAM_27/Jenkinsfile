@@ -15,7 +15,6 @@ pipeline {
                 sh """
                     cd BS_PM2021_TEAM_27
                     chmod 555 geckodriver-linux64
-                    apt install -y xvfb
                     python manage.py makemigrations
                     python manage.py migrate
                 """
