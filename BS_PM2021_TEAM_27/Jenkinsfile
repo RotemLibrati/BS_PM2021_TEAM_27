@@ -14,6 +14,8 @@ pipeline {
                 sh """
                     cd BS_PM2021_TEAM_27
                     chmod 555 geckodriver-linux64
+                    apt update
+                    apt install firefox
                     python manage.py makemigrations
                     python manage.py migrate
                 """
