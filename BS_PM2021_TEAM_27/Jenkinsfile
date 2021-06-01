@@ -1,6 +1,7 @@
 pipeline {
     environment {
         OUTPUT1 = "foo"
+        OUTPUT12 = 'bar'
     }
     agent {
         docker { image 'eilonc285/repos-team27:main' }
@@ -27,8 +28,7 @@ pipeline {
                             sh(returnStdout: true, script: "python manage.py test Preschool_Play.tests_integration.TestIntegrationWithSelenium.test_login_then_add_and_delete_new_child 2>&1 | xargs echo > out1.txt")
                         }finally{
                             OUTPUT1 = sh(returnStdout: true, script: "cat out1.txt")
-                            OUTPUT1 += sh(returnStdout: true, script: "echo 00000000000000000000")
-                            OUTPUT1 += sh(returnStdout: true, script: "cat geckodriver.log")
+                            OUTPUT2 = sh(returnStdout: true, script: "cat geckodriver.log")
                         }
                     }
                 }
@@ -40,7 +40,7 @@ pipeline {
             echo 'Sending test report email...'
             dir("BS_PM2021_TEAM_27"){
                 sh """
-                     python manage.py email_report -s "Tests Report" -b "${OUTPUT1}"
+                     python manage.py email_report -s "Tests Report" -b "${OUTPUT1} 00000000000000000000000000 ${OUTPUT2}"
                 """
             }
             echo 'Email sent.'
