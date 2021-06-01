@@ -24,7 +24,7 @@ urlpatterns = [
     path('game/<str:child_name>/<int:difficulty>', views.game, name='game'),
     path('send-game-info', views.send_game_info, name='send-game-info'),
     path('parent', views.parent, name='parent'),
-    path('suspension-teacher', views.suspension_for_teacher, name='suspension_teacher'),
+    path('suspension-teacher', views.suspension_for_teacher, name='suspension-teacher'),
     path('message-board/', views.message_board, name='message-board'),
     path('message-board/<int:delete_message>', views.message_board, name='message-board'),
     path('scoretable-teacher', views.scoretable, name='scoretable-teacher'),
@@ -50,6 +50,7 @@ urlpatterns = [
     path('final-approve/<str:name>', views.final_approve, name='final-approve'),
     path('create-kindergarten', views.create_kindergarten, name='create-kindergarten'),
     path('upload-audio', views.upload_audio, name='upload-audio'),
+    path('notes/<str:orderby>', views.notes, name='notes'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

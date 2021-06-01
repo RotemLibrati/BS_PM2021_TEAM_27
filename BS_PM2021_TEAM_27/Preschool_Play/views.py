@@ -683,9 +683,21 @@ def new_note(request):
 
 
 @login_required
-def notes(request):
-    context = {'notes': Note.objects.all()}
-    return render(request, 'Preschool_Play/notes.html', context)
+def notes(request, **kwargs):
+    profile = UserProfile.objects.get(user=request.user)
+    if profile.type != 'teacher':
+        return render(request, 'Preschool_Play/error.html',
+                      {'message': 'Unauthorized user. Only teacher type allowed.'})
+    order = '-date'
+    if kwargs:
+        if 'delete_id' in kwargs:
+            note_to_delete = Note.objects.get(teacher=request.user, id=kwargs['delete_id'])
+            note_to_delete.delete()
+        if 'orderby' in kwargs:
+            order = kwargs['orderby']
+    teacher_notes = Note.objects.filter(teacher=request.user).order_by(order)
+    return render(request, 'Preschool_Play/notes.html',
+                  {'notes': list(teacher_notes), 'user': request.user, 'profile': profile})
 
 
 @login_required
