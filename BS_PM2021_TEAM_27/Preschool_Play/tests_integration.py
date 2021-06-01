@@ -13,9 +13,9 @@ class TestIntegrationWithSelenium(StaticLiveServerTestCase):
         driver = './win-geckodriver.exe'
         opts = FirefoxOptions()
         if os.name != 'nt':
-            driver = './geckodriver-n'
+            driver = './geckodriver-linux64'
             opts.add_argument("--headless")
-        self.browser = webdriver.Firefox(executable_path=driver, options=opts)
+        self.browser = webdriver.Firefox(options=opts)
 
         self.admin_user = User.objects.create_user('admin', 'admin@test.com')
         self.admin_user.set_password('qwerty246')
