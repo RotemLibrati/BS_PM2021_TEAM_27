@@ -16,68 +16,69 @@ from datetime import datetime
 from . import views
 from django import forms
 
+
 # py manage.py test
 # Create your tests here.
 
 
-#class TestInboxView(TestCase):
-    # def test_without_login(self):
-    #     c = Client()
-    #     response = c.get(reverse('Preschool_Play:inbox'))
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertContains(response, "Not logged in")
-    #
-    # def test_with_no_messages(self):
-    #     c = Client()
-    #     user = User.objects.create_user(username='tester')
-    #     user.set_password('qwerty246')
-    #     user.save()
-    #     user_profile = UserProfile.objects.create(user=user)
-    #     user_profile.save()
-    #     c.force_login(user)
-    #     response = c.get(reverse('Preschool_Play:inbox'))
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertTemplateUsed(response, 'Preschool_Play/inbox.html')
-    #     self.assertEquals(len(response.context['messages_received']), 0)
-    #     self.assertEquals(len(response.context['messages_sent']), 0)
-    #
-    # def test_with_message_received(self):
-    #     c = Client()
-    #     user = User.objects.create_user(username='tester1', password='qwerty246')
-    #     user.save()
-    #     user_profile = UserProfile.objects.create(user=user)
-    #     user_profile.save()
-    #     user2 = User.objects.create_user(username='tester2', password='qwerty246')
-    #     user2.save()
-    #     user_profile2 = UserProfile.objects.create(user=user2)
-    #     user_profile2.save()
-    #     message = Message(sender=user2, receiver=user, body='hello')
-    #     message.save()
-    #     c.force_login(user)
-    #     response = c.get(reverse('Preschool_Play:inbox'))
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertTemplateUsed(response, 'Preschool_Play/inbox.html')
-    #     self.assertEquals(len(response.context['messages_received']), 1)
-    #     self.assertEquals(len(response.context['messages_sent']), 0)
-    #
-    # def test_with_message_sent(self):
-    #     c = Client()
-    #     user = User.objects.create_user(username='tester1', password='qwerty246')
-    #     user.save()
-    #     user_profile = UserProfile.objects.create(user=user)
-    #     user_profile.save()
-    #     user2 = User.objects.create_user(username='tester2', password='qwerty246')
-    #     user2.save()
-    #     user_profile2 = UserProfile.objects.create(user=user2)
-    #     user_profile2.save()
-    #     message = Message(sender=user2, receiver=user, body='hello')
-    #     message.save()
-    #     c.force_login(user2)
-    #     response = c.get(reverse('Preschool_Play:inbox'))
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertTemplateUsed(response, 'Preschool_Play/inbox.html')
-    #     self.assertEquals(len(response.context['messages_received']), 0)
-    #     self.assertEquals(len(response.context['messages_sent']), 1)
+# class TestInboxView(TestCase):
+# def test_without_login(self):
+#     c = Client()
+#     response = c.get(reverse('Preschool_Play:inbox'))
+#     self.assertEqual(response.status_code, 200)
+#     self.assertContains(response, "Not logged in")
+#
+# def test_with_no_messages(self):
+#     c = Client()
+#     user = User.objects.create_user(username='tester')
+#     user.set_password('qwerty246')
+#     user.save()
+#     user_profile = UserProfile.objects.create(user=user)
+#     user_profile.save()
+#     c.force_login(user)
+#     response = c.get(reverse('Preschool_Play:inbox'))
+#     self.assertEqual(response.status_code, 200)
+#     self.assertTemplateUsed(response, 'Preschool_Play/inbox.html')
+#     self.assertEquals(len(response.context['messages_received']), 0)
+#     self.assertEquals(len(response.context['messages_sent']), 0)
+#
+# def test_with_message_received(self):
+#     c = Client()
+#     user = User.objects.create_user(username='tester1', password='qwerty246')
+#     user.save()
+#     user_profile = UserProfile.objects.create(user=user)
+#     user_profile.save()
+#     user2 = User.objects.create_user(username='tester2', password='qwerty246')
+#     user2.save()
+#     user_profile2 = UserProfile.objects.create(user=user2)
+#     user_profile2.save()
+#     message = Message(sender=user2, receiver=user, body='hello')
+#     message.save()
+#     c.force_login(user)
+#     response = c.get(reverse('Preschool_Play:inbox'))
+#     self.assertEqual(response.status_code, 200)
+#     self.assertTemplateUsed(response, 'Preschool_Play/inbox.html')
+#     self.assertEquals(len(response.context['messages_received']), 1)
+#     self.assertEquals(len(response.context['messages_sent']), 0)
+#
+# def test_with_message_sent(self):
+#     c = Client()
+#     user = User.objects.create_user(username='tester1', password='qwerty246')
+#     user.save()
+#     user_profile = UserProfile.objects.create(user=user)
+#     user_profile.save()
+#     user2 = User.objects.create_user(username='tester2', password='qwerty246')
+#     user2.save()
+#     user_profile2 = UserProfile.objects.create(user=user2)
+#     user_profile2.save()
+#     message = Message(sender=user2, receiver=user, body='hello')
+#     message.save()
+#     c.force_login(user2)
+#     response = c.get(reverse('Preschool_Play:inbox'))
+#     self.assertEqual(response.status_code, 200)
+#     self.assertTemplateUsed(response, 'Preschool_Play/inbox.html')
+#     self.assertEquals(len(response.context['messages_received']), 0)
+#     self.assertEquals(len(response.context['messages_sent']), 1)
 
 
 class TestViewMessage(TestCase):
@@ -613,7 +614,8 @@ class TestIntegrationWithSelenium(StaticLiveServerTestCase):
         self.user.save()
         self.profile = UserProfile(user=self.user, type='parent')
         self.profile.save()
-        self.kid = Child(name='kid2',parent=self.profile, teacher=self.teacher_profile, kindergarten=self.kg, auth=True, suspension_time=datetime.now()+timedelta(hours=1))
+        self.kid = Child(name='kid2', parent=self.profile, teacher=self.teacher_profile, kindergarten=self.kg,
+                         auth=True, suspension_time=datetime.now() + timedelta(hours=1))
         self.kid.save()
 
     def tearDown(self):
@@ -700,40 +702,50 @@ class TestIntegrationWithSelenium(StaticLiveServerTestCase):
         self.browser.find_element_by_xpath("//div[contains(., 'kid2')]")
         time.sleep(1)
 
+    def test_sending_and_receiving_messages_between_two_users(self):
+        def wait_page_load():
+            time.sleep(0.5)
 
-
-
-
-    # def test_sending_and_receiving_messages_between_two_users(self):
-    #     breakpoint()
-    #     self.browser.get(f'{self.live_server_url}/preschoolplay/login')
-    #     username_input = self.browser.find_element_by_name("user_name")
-    #     username_input.send_keys('user1')
-    #     password_input = self.browser.find_element_by_name("password")
-    #     password_input.send_keys('qwerty246')
-    #     self.browser.find_element_by_xpath('//button[@type="submit"]').click()
-    #     self.browser.get(f'{self.live_server_url}/preschoolplay')
-    #     self.browser.find_element_by_xpath('//a[text()="Main Menu"]').click()
-    #     self.browser.find_element_by_xpath('//a[text()="Inbox"]').click()
-    #     self.browser.find_element_by_xpath('//a[text()="Send new message"]').click()
-    #     self.browser.find_element_by_xpath('//select[@name="receiver"]/option[text()="admin"]').click()
-    #     subject_input = self.browser.find_element_by_name("subject")
-    #     subject_input.send_keys('this new app')
-    #     subject_input = self.browser.find_element_by_name("body")
-    #     subject_input.send_keys('random text')
-    #     self.browser.find_element_by_xpath('//button[@type="submit"]').click()
-    #     self.browser.get(f'{self.live_server_url}/preschoolplay')
-    #     self.browser.find_element_by_xpath('//a[text()="Logout"]').click()
-    #     self.browser.get(f'{self.live_server_url}/preschoolplay/login')
-    #     username_input = self.browser.find_element_by_name("user_name")
-    #     username_input.send_keys('admin')
-    #     password_input = self.browser.find_element_by_name("password")
-    #     password_input.send_keys('qwerty246')
-    #     self.browser.find_element_by_xpath('//button[@type="submit"]').click()
-    #     self.browser.find_element_by_xpath('//a[text()="Inbox(1)"]').click()
-    #     self.browser.find_element_by_xpath('//a[text()=" Open"]').click()
-    #     message_subject = self.browser.find_element_by_xpath('//h3')
-    #     self.assertEquals('this new app' in message_subject.text, True)
+        self.browser.get(f'{self.live_server_url}/preschoolplay/login')
+        username_input = self.browser.find_element_by_name("user_name")
+        username_input.send_keys('user1')
+        password_input = self.browser.find_element_by_name("password")
+        password_input.send_keys('qwerty246')
+        self.browser.find_element_by_xpath('//button[@type="submit"]').click()
+        wait_page_load()
+        self.browser.get(f'{self.live_server_url}/preschoolplay')
+        self.browser.find_element_by_xpath('//a[text()="Main Menu"]').click()
+        wait_page_load()
+        self.browser.find_element_by_xpath('//a[text()="Inbox"]').click()
+        wait_page_load()
+        self.browser.find_element_by_xpath('//a[text()="Send new message"]').click()
+        wait_page_load()
+        self.browser.find_element_by_xpath('//select[@name="receiver"]/option[text()="admin"]').click()
+        wait_page_load()
+        subject_input = self.browser.find_element_by_name("subject")
+        subject_input.send_keys('this new app')
+        subject_input = self.browser.find_element_by_name("body")
+        subject_input.send_keys('random text')
+        self.browser.find_element_by_xpath('//button[@type="submit"]').click()
+        self.browser.get(f'{self.live_server_url}/preschoolplay')
+        self.browser.find_element_by_xpath('//a[text()="Main Menu"]').click()
+        wait_page_load()
+        self.browser.find_element_by_xpath('//a[text()="Logout"]').click()
+        wait_page_load()
+        self.browser.get(f'{self.live_server_url}/preschoolplay/login')
+        username_input = self.browser.find_element_by_name("user_name")
+        username_input.send_keys('admin')
+        password_input = self.browser.find_element_by_name("password")
+        password_input.send_keys('qwerty246')
+        self.browser.find_element_by_xpath('//button[@type="submit"]').click()
+        wait_page_load()
+        self.browser.find_element_by_xpath('//a[text()="Main Menu"]').click()
+        wait_page_load()
+        self.browser.find_element_by_xpath('//a[text()="Inbox(1)"]').click()
+        wait_page_load()
+        self.browser.find_element_by_xpath('//a[text()=" Open"]').click()
+        message_subject = self.browser.find_element_by_xpath('//h3')
+        self.assertEquals('this new app' in message_subject.text, True)
 
 
 class TestViewFAQView(TestCase):
@@ -773,16 +785,12 @@ class TestKindergartenDetailsView(TestCase):
         self.child = Child(name='ben', parent=self.profile, teacher=self.teacher_profile, kindergarten=self.kg)
         self.child.save()
 
-
     def test_child_name_is_in_kindergarten_page(self):
         response = self.client.post(reverse('Preschool_Play:kindergarten', args=[self.kg.name]))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "ben")
 
-
     def test_kindergarten_name_is_in_kindergarten_page(self):
         response = self.client.post(reverse('Preschool_Play:kindergarten', args=[self.kg.name]))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "mypreschool")
-
-
