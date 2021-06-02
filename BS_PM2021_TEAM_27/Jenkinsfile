@@ -18,6 +18,7 @@ pipeline {
                     chmod 555 geckodriver-linux64
                     python3 manage.py makemigrations
                     python3 manage.py migrate
+                    rm geckodriver.log
                 """
             }
         }
@@ -29,14 +30,14 @@ pipeline {
                             sh(returnStdout: true, script: "python3 manage.py test Preschool_Play.tests_integration.TestIntegrationWithSelenium.test_login_then_add_and_delete_new_child 2>&1 | xargs echo > out1.txt")
                         }finally{
                             OUTPUT1 = sh(returnStdout: true, script: "cat out1.txt")
-                            OUTPUT2 = sh(returnStdout: true, script: "tail -4 geckodriver.log")
+                            OUTPUT2 = sh(returnStdout: true, script: "cat geckodriver.log")
                         }
                     }
                 }
             }
         }
     }
-    /*post{
+    post{
         always{
             echo 'Sending test report email...'
             dir("BS_PM2021_TEAM_27"){
@@ -47,5 +48,5 @@ pipeline {
             }
             echo 'Email sent.'
         }
-    }*/
+    }
 }
