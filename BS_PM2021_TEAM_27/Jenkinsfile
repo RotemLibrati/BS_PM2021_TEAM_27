@@ -4,8 +4,8 @@ pipeline {
         OUTPUT2 = 'bar'
     }
     agent {
-        //dockerfile true
-        docker { image 'eilonc285/repos-team27:main2' }
+        dockerfile true
+        //docker { image 'eilonc285/repos-team27:main2' }
     }
     triggers {
         githubPush()
