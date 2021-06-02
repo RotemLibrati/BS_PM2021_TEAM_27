@@ -10,6 +10,15 @@ pipeline {
         githubPush()
     }
     stages {
+        stage('venv') {
+            dir('venv/Scripts'){
+                steps {
+                    sh """
+                        activate
+                        """
+                    }
+            }
+        }
         stage('Build') {
             steps {
                 sh """
