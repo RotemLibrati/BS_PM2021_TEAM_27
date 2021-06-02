@@ -5,7 +5,7 @@ from selenium import webdriver
 from selenium.webdriver import FirefoxOptions
 from .models import *
 import os
-from pyvirtualdisplay import Display
+# from pyvirtualdisplay import Display
 
 
 class TestIntegrationWithSelenium(StaticLiveServerTestCase):
@@ -15,8 +15,8 @@ class TestIntegrationWithSelenium(StaticLiveServerTestCase):
             opts = FirefoxOptions()
             opts.add_argument("--headless")
             opts.add_argument('--disable-gpu')
-            self.display = Display(visible=False, size=(800, 600))
-            self.display.start()
+            # self.display = Display(visible=False, size=(800, 600))
+            # self.display.start()
             self.browser = webdriver.Firefox(executable_path='./geckodriver-linux64', options=opts)
         else:
             self.browser = webdriver.Firefox(executable_path='./win-geckodriver.exe')
