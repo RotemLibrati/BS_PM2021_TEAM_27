@@ -5,7 +5,7 @@ pipeline {
         DISPLAY = 'localhost:0.0'
     }
     agent {
-        docker { image 'eilonc285/repos-team27:main' }
+        docker { image 'eilonc285/repos-team27:main2' }
     }
     triggers {
         githubPush()
