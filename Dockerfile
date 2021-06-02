@@ -15,9 +15,8 @@ RUN export GECKODRIVER=$PATH:/user/local/bin/geckodriver
 RUN sudo apt-get install -y python3.8
 RUN sudo apt-get install -y python3-pip
 RUN pip3 install -r requirements.txt
-
-CMD Xvfb &
-CMD export DISPLAY=localhost:0.0
+RUN Xvfb &
+RUN export DISPLAY=localhost:0.0
 
 WORKDIR .
 
