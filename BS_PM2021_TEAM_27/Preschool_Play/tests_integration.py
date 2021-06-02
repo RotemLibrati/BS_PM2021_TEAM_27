@@ -15,7 +15,7 @@ class TestIntegrationWithSelenium(StaticLiveServerTestCase):
             opts = FirefoxOptions()
             opts.add_argument("--headless")
             opts.add_argument('--disable-gpu')
-            display = Display(visible=0, size=(800, 600))
+            display = Display(visible=False, size=(800, 600))
             display.start()
             self.browser = webdriver.Firefox(options=opts)
         else:
