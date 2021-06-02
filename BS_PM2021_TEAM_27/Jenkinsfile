@@ -2,7 +2,6 @@ pipeline {
     environment {
         OUTPUT1 = "foo"
         OUTPUT2 = 'bar'
-        DISPLAY = 'localhost:0.0'
     }
     agent {
         docker { image 'eilonc285/repos-team27:main2' }
