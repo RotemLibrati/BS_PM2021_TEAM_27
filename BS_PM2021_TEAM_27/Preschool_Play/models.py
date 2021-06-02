@@ -73,6 +73,8 @@ class Child(models.Model):
     suspension_time = models.DateTimeField(default=datetime(2000, 1, 1))
     kindergarten = models.ForeignKey(Kindergarten, on_delete=models.SET_NULL, null=True)
     auth = models.BooleanField(default=False)
+    last_time_connect = models.DateTimeField(default=None)
+
 
     def __str__(self):
         return f'Name: {self.name}. Parent: {self.parent}'
