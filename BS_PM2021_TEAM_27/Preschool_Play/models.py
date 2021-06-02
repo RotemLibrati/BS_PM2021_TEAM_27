@@ -21,6 +21,7 @@ class UserProfile(models.Model):
     rank = models.IntegerField(default=0)
     level = models.IntegerField(default=1)
     limit = models.DateTimeField(default=datetime(2000, 1, 1))
+    child_limit = models.IntegerField(default=999)
     auth = models.BooleanField(default=False)
     profanity_warning = models.BooleanField(default=False)
 

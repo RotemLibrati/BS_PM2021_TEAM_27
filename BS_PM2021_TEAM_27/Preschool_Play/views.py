@@ -562,7 +562,11 @@ def add_child(request, **kwargs):
                         if chosen_kindergarten.name != kindergarten:
                             return render(request, 'Preschool_Play/error.html',
                                           {'message': 'The teacher and the kindergarten are not suitable'})
-                        if Child.objects.filter(kindergarten__name=chosen_kindergarten.name).count() >= chosen_kindergarten.max_children:
+                        if Child.objects.filter(parent=user_profile).count() >= user_profile.child_limit:
+                            return render(request, 'Preschool_Play/error.html',
+                                          {'message': 'This Parent Reachead The Max Amount Of Childrens'})
+                        if Child.objects.filter(
+                                kindergarten__name=chosen_kindergarten.name).count() >= chosen_kindergarten.max_children:
                             return render(request, 'Preschool_Play/error.html',
                                           {'message': 'This Kindergarten Reachead The Max Amount Of Childrens'})
                         new_child = Child(name=name, parent=user_profile, teacher=finally_chosen_teacher,
@@ -619,6 +623,33 @@ def limit_kindergarten_childs(request):
             render(request, 'Preschool_Play/error.html', {'error': error})
     context = {'form': form}
     return render(request, 'Preschool_Play/limit-kindergarten.html', context)
+
+
+@login_required(login_url='/preschoolplay/not-logged-in')
+def limit_parent_childs(request):
+    if not request.user.profile.is_admin:
+        return HttpResponse("Not an Admin")
+    if request.method == 'POST':
+        form = LimitParentChildForm(request.POST)
+        if form.is_valid():
+            parent = form.cleaned_data['parent']
+            choosen_parent = UserProfile.objects.get(user__username=parent)
+            choosen_parent.child_limit = form.cleaned_data['amount']
+            choosen_parent.save()
+        return HttpResponseRedirect(reverse('Preschool_Play:index'))
+    else:
+        form = LimitParentChildForm()
+        all_parents = list(UserProfile.objects.filter(type='parent'))
+        try:
+            form.fields['parent'] = forms.CharField(
+                widget=forms.Select(choices=[(n.user, n.user) for n in all_parents]))
+            form.fields['parent'].initial = all_parents[0].user
+        except:
+            error = "Parent is not exist."
+            render(request, 'Preschool_Play/error.html', {'error': error})
+    context = {'form': form}
+    return render(request, 'Preschool_Play/limit-parent.html', context)
+
 
 def delete_user(request):
     if request.user is None or not request.user.is_authenticated:

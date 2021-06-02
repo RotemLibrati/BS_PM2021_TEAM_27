@@ -101,6 +101,10 @@ class LimitKindergartenChildForm(forms.Form):
     kindergarten = forms.CharField()
     amount = forms.IntegerField()
 
+class LimitParentChildForm(forms.Form):
+    parent = forms.CharField()
+    amount = forms.IntegerField()
+
 class DeleteUserForm(forms.Form):
     def __init__(self, set1, *args, **kwargs):
         super(DeleteUserForm, self).__init__(*args, **kwargs)

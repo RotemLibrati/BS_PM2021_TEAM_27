@@ -43,6 +43,7 @@ urlpatterns = [
     path('view-note/<int:note_id>/', views.view_note, name='view-note'),
     path('kindergarten/<str:kindergarten_name>', views.kindergarten_details, name='kindergarten'),
     path('limit-kindergarten', views.limit_kindergarten_childs, name='limit-kindergarten'),
+    path('limit-parent', views.limit_parent_childs, name='limit-parent'),
     path('notes', views.notes, name='notes'),
     path('new-note', views.new_note, name='new-note'),
     path('upload', views.upload_video, name='upload'),
