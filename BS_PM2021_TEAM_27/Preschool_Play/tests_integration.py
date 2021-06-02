@@ -50,7 +50,8 @@ class TestIntegrationWithSelenium(StaticLiveServerTestCase):
 
     def tearDown(self):
         self.browser.close()
-        self.display.stop()
+        if os.name != 'nt':
+            self.display.stop()
 
     @override_settings(DEBUG=True)
     def test_login_then_add_and_delete_new_child(self):
