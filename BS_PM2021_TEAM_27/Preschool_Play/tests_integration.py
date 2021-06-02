@@ -17,7 +17,7 @@ class TestIntegrationWithSelenium(StaticLiveServerTestCase):
             opts.add_argument('--disable-gpu')
             self.display = Display(visible=False, size=(800, 600))
             self.display.start()
-            self.browser = webdriver.Firefox(options=opts)
+            self.browser = webdriver.Firefox(executable_path='./geckodriver-linux64', options=opts)
         else:
             self.browser = webdriver.Firefox(executable_path='./win-geckodriver.exe')
         self.admin_user = User.objects.create_user('admin', 'admin@test.com')
