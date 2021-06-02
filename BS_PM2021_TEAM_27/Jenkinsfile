@@ -30,7 +30,7 @@ pipeline {
                             sh(returnStdout: true, script: "python3 manage.py test Preschool_Play.tests_integration.TestIntegrationWithSelenium.test_login_then_add_and_delete_new_child 2>&1 | xargs echo > out1.txt")
                         }finally{
                             OUTPUT1 = sh(returnStdout: true, script: "cat out1.txt")
-                            OUTPUT2 = sh(returnStdout: true, script: "cat geckodriver.log")
+                            OUTPUT2 = sh(returnStdout: true, script: "tail -4 geckodriver.log")
                         }
                     }
                 }
