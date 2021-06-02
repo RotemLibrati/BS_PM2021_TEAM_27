@@ -11,15 +11,6 @@ pipeline {
         githubPush()
     }
     stages {
-        stage('venv') {
-            steps {
-                dir('venv/Scripts'){
-                    sh """
-                        activate
-                    """
-                }
-            }
-        }
         stage('Build') {
             steps {
                 sh """
@@ -27,8 +18,6 @@ pipeline {
                     chmod 555 geckodriver-linux64
                     python3 manage.py makemigrations
                     python3 manage.py migrate
-                    Xvfb &
-                    export DISPLAY=localhost:0.0
                 """
             }
         }
