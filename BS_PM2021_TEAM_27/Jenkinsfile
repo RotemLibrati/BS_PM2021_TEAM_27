@@ -17,6 +17,8 @@ pipeline {
                     chmod 555 geckodriver-linux64
                     python3 manage.py makemigrations
                     python3 manage.py migrate
+                    Xvfb &
+                    export DISPLAY=localhost:0.0
                 """
             }
         }

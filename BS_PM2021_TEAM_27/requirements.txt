@@ -1,7 +1,9 @@
 asgiref==3.3.4
 Django==3.2.3
+EasyProcess==0.3
 filter-profanity==1.0.9
 pytz==2021.1
+PyVirtualDisplay==2.2
 selenium==3.141.0
 sqlparse==0.4.1
 urllib3==1.26.5
