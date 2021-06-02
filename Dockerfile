@@ -11,7 +11,7 @@ RUN wget https://github.com/mozilla/geckodriver/releases/download/v0.24.0/geckod
 RUN tar -xvzf geckodriver*
 RUN chmod +x geckodriver
 RUN sudo mv geckodriver /usr/local/bin/
-RUN export PATH=$PATH:/user/local/bin/geckodriver
+RUN export GECKODRIVER=$PATH:/user/local/bin/geckodriver
 RUN sudo apt-get install -y python3.8
 RUN sudo apt-get install -y python3-pip
 RUN pip3 install -r requirements.txt
