@@ -13,7 +13,7 @@ class TestIntegrationWithSelenium(StaticLiveServerTestCase):
         driver = './win-geckodriver.exe'
         opts = FirefoxOptions()
         if os.name != 'nt':
-            driver = '/usr/bin/firefox'
+            driver = './geckodriver-linux64'
             opts.add_argument("--headless")
         self.browser = webdriver.Firefox(executable_path=driver, options=opts)
 
