@@ -1,14 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
+{% extends 'Preschool_Play/SubPage.html' %}
 <head>
     <meta charset="UTF-8">
     <title>Delete User</title>
 </head>
 <body>
-    <h1>Are you sure you want to delete the user "{{ user }}" ?</h1>
+{% block title %}
+<h1>Are you sure you want to delete the user "{{ user }}" ?</h1>
+{% endblock %}
+{% block data %}
+
     <form action="{% url 'Preschool_Play:delete-primary-user' %}" method="POST">
   {% csrf_token %}
   {{ form.as_p }}
   <input type="submit" value="Delete" name="_make-unique">
+    </form>
+        {% endblock %}
 </body>
 </html>

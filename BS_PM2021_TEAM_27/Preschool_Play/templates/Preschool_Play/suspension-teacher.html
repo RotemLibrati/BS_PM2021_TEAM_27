@@ -1,14 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
+{% extends 'Preschool_Play/SubPage.html' %}
 <head>
     <meta charset="UTF-8">
     <title>Suspension for teacher</title>
 </head>
 <body>
-    Hey {{ user_profile.user }} <br>
-    Your student that suspended: <br>
+{% block title %}
+<h1>Suspension Student</h1>
+{% endblock %}
+
+{% block data %}
+
+    <h1>Hello {{ user_profile.user }} </h1>
+    <h3>Your student that suspended: </h3>
     {% for c in suspended_child %}
     {{ c.name }} <br>
     {% endfor %}
+{% endblock %}
 </body>
 </html>

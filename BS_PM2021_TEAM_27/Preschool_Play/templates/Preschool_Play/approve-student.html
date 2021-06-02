@@ -1,13 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+{% extends 'Preschool_Play/SubPage.html' %}
 <head>
     <meta charset="UTF-8">
     <title>Approve Student</title>
 </head>
 <body>
+{% block title %}
     <h1>Your student that waiting for your approve</h1>
+{% endblock %}
+{% block data %}
     {% for s in student %}
     <li><a href="{% url 'Preschool_Play:wait-for-approve' s.name %}">{{ s.name }}</a><br>
     {% endfor %}
+{% endblock %}
 </body>
 </html>

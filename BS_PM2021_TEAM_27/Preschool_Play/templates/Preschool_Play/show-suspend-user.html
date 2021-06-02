@@ -1,19 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
+{% extends 'Preschool_Play/SubPage.html' %}
 <head>
     <meta charset="UTF-8">
     <title>Suspend user</title>
 </head>
 <body>
-
-    <h1>Users</h1>
+{% block title %}
+<h1>Users and Suspension</h1>
+{% endblock %}
+{% block data %}
+<h1><u><b>Users:</b></u></h1>
     {% for u in users %}
     <tr>
         <td>{{ u.user }}</td>
         <br>
     </tr>
     {% endfor %}
-    <h1>Suspend users</h1>
+{% for u in c_users %}
+    <tr>
+        <td>{{ u.name }}</td>
+        <br>
+    </tr>
+    {% endfor %}
+
+
+<h1><u><b>Suspend users:</b></u></h1>
+
     {% for u in suspend_user %}
     <tr>
         <td>{{ u.user }}</td>
@@ -21,6 +34,13 @@
         <br>
     </tr>
     {% endfor %}
-
+{% for u in c_suspend %}
+    <tr>
+        <td>{{ u.name }}</td>
+        <td>{{ u.suspension_time }}</td>
+        <br>
+    </tr>
+    {% endfor %}
+{% endblock %}
 </body>
 </html>

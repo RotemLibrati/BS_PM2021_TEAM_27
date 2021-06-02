@@ -22,9 +22,15 @@ class AddMediaForm(forms.Form):
 
 
 class DeleteMediaForm(forms.Form):
-    set = Media.objects.all()
-    MEDIA = list(map(lambda x: (str(x.name), str(x.name)), set))
-    name = forms.CharField(widget=forms.Select(choices=MEDIA))
+    name = forms.CharField()
+
+    def __init__(self, *args, **kwargs):
+        super(DeleteMediaForm, self).__init__(*args, **kwargs)
+
+        set = Media.objects.all()
+        MEDIA = list(map(lambda x: (str(x.name), str(x.name)), set))
+        self.fields['name'] = forms.CharField(
+            widget=forms.Select(choices=MEDIA))
 
 
 class MessageForm(forms.Form):
@@ -34,9 +40,15 @@ class MessageForm(forms.Form):
 
 
 class KindergartenListForm(forms.Form):
-    set = Kindergarten.objects.all()
-    KINDERGARTEN = list(map(lambda x: (str(x.name), str(x.name)), set))
-    name = forms.CharField(widget=forms.Select(choices=KINDERGARTEN))
+    name = forms.CharField()
+
+    def __init__(self, *args, **kwargs):
+        super(KindergartenListForm, self).__init__(*args, **kwargs)
+
+        set = Kindergarten.objects.all()
+        KINDERGARTEN = list(map(lambda x: (str(x.name), str(x.name)), set))
+        self.fields['name'] = forms.CharField(
+            widget=forms.Select(choices=KINDERGARTEN))
 
 
 class CreateUserForm(UserCreationForm):  # create user - django
@@ -68,12 +80,21 @@ class ProfileForm(forms.ModelForm):
 
 
 class ChildForm(forms.Form):
-    name_child= forms.CharField(max_length=30)
+    name_child = forms.CharField(max_length=30)
     teacher = forms.CharField()
     kindergarten = forms.CharField()
 
-class FindStudentForm(forms.Form):
-    username = forms.CharField(max_length=250)
+    def __init__(self, *args, **kwargs):
+        super(ChildForm, self).__init__(*args, **kwargs)
+
+        set = UserProfile.objects.filter(type='teacher')
+        set2 = Kindergarten.objects.all()
+        TEACHER = list(map(lambda x: (str(x.user), str(x.user)), set))
+        KINDERGARTEN = list(map(lambda x: (str(x.name), str(x.name)), set2))
+        self.fields['teacher'] = forms.CharField(
+            widget=forms.Select(choices=TEACHER))
+        self.fields['kindergarten'] = forms.CharField(
+            widget=forms.Select(choices=KINDERGARTEN))
 
 
 class DeleteUserForm(forms.Form):
@@ -85,6 +106,10 @@ class DeleteUserForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput)
 
 
+class FindStudentForm(forms.Form):
+    username = forms.CharField(max_length=250)
+
+
 class ScoreDataForm(forms.Form):
     child_parent_pair = forms.CharField()
 
@@ -92,13 +117,19 @@ class ScoreDataForm(forms.Form):
 class DeletePrimaryUserForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput)
 
+
 class NoteForm(forms.Form):
     child = forms.CharField(max_length=50)
     subject = forms.CharField(max_length=50, initial='message subject')
     body = forms.CharField(max_length=5000, widget=forms.Textarea)
 
+
 class VideoForm(forms.ModelForm):
     class Meta:
-        model= Video
-        fields= ["title", "video"]
+        model = Video
+        fields = ["title", "video"]
+
+
+class CreateKindergartenForm(forms.Form):
+    name = forms.CharField(max_length=50)
 

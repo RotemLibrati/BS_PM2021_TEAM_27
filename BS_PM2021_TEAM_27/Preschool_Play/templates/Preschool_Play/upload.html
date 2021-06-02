@@ -1,11 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+{% extends 'Preschool_Play/SubPage.html' %}
 <head>
     <meta charset="UTF-8">
     <title>Upload Video</title>
 </head>
 <body>
+{% block title %}
 <h1>Video Uploader</h1>
+{% endblock %}
+{% block data %}
 <form enctype="multipart/form-data" method="POST" action="">
 {% csrf_token %}
 {{ form.as_p }}
@@ -14,5 +18,6 @@
 </p>
 
 </form>
+{% endblock %}
 </body>
 </html>

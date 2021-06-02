@@ -1,14 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+{% extends 'Preschool_Play/SubPage.html' %}
 <head>
     <meta charset="UTF-8">
     <title>Parent Page</title>
 </head>
 <body>
-    hello {{user.username}} <br>
+{% block title %}
+<h1>Parent Page {{user.username}} </h1>
+{% endblock %}
 
-{% block content %}
-    <h1>children</h1>
+
+{% block data %}
+    <h1><u>Your Children: </u></h1>
     <div class="row">
         {% for ch in children %}
         <div class="col">

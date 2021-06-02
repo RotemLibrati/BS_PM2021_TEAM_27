@@ -1,20 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
+{% extends 'Preschool_Play/SubPage.html' %}
 <head>
     <meta charset="UTF-8">
     <title>My Area</title>
 </head>
 <body>
+{% block title %}
+<h1>My Area</h1>
+{% endblock %}
+{% block data %}
+
     <h1>WELCOME TO YOUR PERSONAL AREA!</h1>
     <h4>Name: {{child.name}}</h4>
     <h4>Parent: {{child.parent}}</h4>
     <h4>Teacher: {{child.teacher}}</h4>
     <h4>Kindergarten: {{child.kindergarten}}</h4>
+    <a href="{% url 'Preschool_Play:kindergarten' child.kindergarten %}" >My Kindergarten</a><br>
 {% for video in videos %}
 <video width="300" height="300" controls >
 <source src="{{video.video.url}}" type="video/mp4">
 <b>{{video.title}}</b>
 </video>
     {% endfor %}
+<br>
+<a href="{% url 'Preschool_Play:game' child.name 1 %}">Play with difficulty 1</a><br>
+<a href="{% url 'Preschool_Play:game' child.name 2 %}">Play with difficulty 2</a><br>
+<a href="{% url 'Preschool_Play:game' child.name 3 %}">Play with difficulty 3</a>
+{% endblock %}
 </body>
 </html>

@@ -1,21 +1,51 @@
 pipeline {
+    environment {
+        OUTPUT1 = "foo"
+        OUTPUT2 = 'bar'
+    }
     agent {
-        docker { image 'eilonc285/repos-team27:team27' }
+        dockerfile true
+        //docker { image 'eilonc285/repos-team27:main2' }
     }
     triggers {
-      githubPush()
-  }
-
+        githubPush()
+    }
     stages {
-
+        stage('Build') {
+            steps {
+                sh """
+                    cd BS_PM2021_TEAM_27
+                    chmod 555 geckodriver-linux64
+                    python3 manage.py makemigrations
+                    python3 manage.py migrate
+                """
+            }
+        }
         stage('Run Unit Tests') {
-          steps {
-              sh """
-                  cd BS_PM2021_TEAM_27
-                  python manage.py test
-              """
-          }
+            steps {
+                dir("BS_PM2021_TEAM_27"){
+                    script{
+                        try{
+                            sh(returnStdout: true, script: "python3 manage.py test Preschool_Play.tests_integration.TestIntegrationWithSelenium.test_login_then_add_and_delete_new_child 2>&1 | xargs echo > out1.txt")
+                        }finally{
+                            OUTPUT1 = sh(returnStdout: true, script: "cat out1.txt")
+                            OUTPUT2 = sh(returnStdout: true, script: "tail -4 geckodriver.log")
+                        }
+                    }
+                }
+            }
         }
     }
-
+    post{
+        always{
+            echo 'Sending test report email...'
+            dir("BS_PM2021_TEAM_27"){
+                sh """
+                     python3 manage.py email_report -s "Tests Report" -b "${OUTPUT1}"
+                     python3 manage.py email_report -s "Log" -b '${OUTPUT2}'
+                """
+            }
+            echo 'Email sent.'
+        }
+    }
 }

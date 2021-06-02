@@ -1,22 +1,43 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-    <meta charset="UTF-8">
+    {% load static %}
     <title>Preschool Play</title>
+	<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="stylesheet" href="{% static 'preschoolplay/sitestyle/assets/css/main.css' %}" />
 </head>
 <body>
-<h1>Home Page</h1>
-     {% if user.is_authenticated %}
-    {% if message %}
-        {% for m in message %}
-            <script>
-                alert('{{m.message}}')
-            </script>
-        {% endfor %}
+		<!-- Header -->
+			<header id="header" class="alt">
+				<div class="logo"><a href="{% url 'Preschool_Play:index' %}">Preschool_Play <span>by Group_27</span></a></div>
+				<a href="#menu">Main Menu</a>
+			</header>
+        			<nav id="menu">
+				<ul class="links">
+    {% block content %}
+    {% if user.is_authenticated %}
+        {% if message %}
+            {% for m in message %}
+                <script>
+                    alert('{{m.message}}')
+                </script>
+            {% endfor %}
+        {% endif %}
     {% endif %}
+{% endblock %}
+{% block links %}
+    {% if not user.is_authenticated %}
+        <li><a href="{% url 'Preschool_Play:login' %}">Sign-In</a><br>
+        <li><a href="{% url 'Preschool_Play:new-user' %}">Sign-Up</a><br>
+    {% endif %}
+    {% if user.is_authenticated %}
     {% if profile.is_admin %}
             <li><a href="{% url 'Preschool_Play:add-media' %}" >Add Media</a><br>
 			<li><a href="{% url 'Preschool_Play:delete-media' %}">Delete Media</a><br>
+    		<li><a href="{% url 'Preschool_Play:upload-audio' %}">Upload Audio</a><br>
+			<li><a href="{% url 'Preschool_Play:show-users' %}">Approve Users</a><br>
 
     {% endif %}
 
@@ -29,16 +50,122 @@
     {% if profile.type == 'teacher' %}
         <li><a href="{% url 'Preschool_Play:upload' %}">Upload Video</a><br>
         <li><a href="{% url 'Preschool_Play:approve-student' %}">Approve Student</a><br>
+        <li><a href="{% url 'Preschool_Play:create-kindergarten' %}">Create Kindergarten</a><br>
+		<li><a href="{% url 'Preschool_Play:suspension-teacher' %}">Child Suspension</a><br>
     {% endif %}
     <li><a href="{% url 'Preschool_Play:score-graphs' %}">Score Graphs</a><br>
     <li><a href="{% url 'Preschool_Play:message-board' %}">Message Board</a><br>
     <li><a href="{% url 'Preschool_Play:inbox' %}">Inbox{% if unread %}({{unread}}){% endif %}</a><br>
+    <li><a href="{% url 'Preschool_Play:view-FAQ' %}">FAQ</a><br>
     <li><a href="{% url 'Preschool_Play:logout' %}">Logout</a><br>
+    {% endif %}
+{% endblock %}
+				</ul>
+			</nav>
 
-    {% endif %}
-    {% if not user.is_authenticated %}
-        <li><a href="{% url 'Preschool_Play:login' %}">Sign-In</a><br>
-        <li><a href="{% url 'Preschool_Play:new-user' %}">Sign-Up</a><br>
-    {% endif %}
+        	<!-- Banner -->
+			<section class="banner full">
+				<article>
+					<img src="{% static 'preschoolplay/uploads/dev.jpg' %}"  alt="" />
+					<div class="inner">
+						<header>
+							<p>You Can Always Contact Us For Any Problem</p>
+							<h2>Group_27</h2>
+						</header>
+					</div>
+				</article>
+				<article>
+					<img src="{% static 'preschoolplay/uploads/child.jpg' %}" alt="" />
+					<div class="inner">
+						<header>
+							<p>A game for children in preschool</p>
+							<h2>Game</h2>
+						</header>
+					</div>
+				</article>
+				<article>
+					<img src="{% static 'preschoolplay/uploads/parent.jpg' %}"  alt="" />
+					<div class="inner">
+						<header>
+							<p>Check out the option to view the child's progress graph</p>
+							<h2>Parent Son Option</h2>
+						</header>
+					</div>
+				</article>
+				<article>
+					<img src="{% static 'preschoolplay/uploads/message.jpg' %}"  alt="" />
+					<div class="inner">
+						<header>
+							<p>You can send a message to admin or teacher</p>
+							<h2>Messages</h2>
+						</header>
+					</div>
+				</article>
+
+			</section>
+		<!-- One -->
+			<section id="one" class="wrapper style2">
+				<div class="inner">
+					<div class="grid-style">
+
+						<div>
+							<div class="box">
+								<div class="image fit">
+									<img src="{% static 'preschoolplay/uploads/game.jpg' %}" alt="" />
+								</div>
+								<div class="content">
+									<header class="align-center">
+										<p>Game - Part 1</p>
+									</header>
+									<p>The child should connect the dots in order</p>
+									<footer class="align-center">
+
+									</footer>
+								</div>
+							</div>
+						</div>
+
+						<div>
+							<div class="box">
+								<div class="image fit">
+									<img src="{% static 'preschoolplay/uploads/game2.jpg' %}" alt="" />
+								</div>
+								<div class="content">
+									<header class="align-center">
+										<p>Game - Part 2</p>
+									</header>
+									<p> The child has to click on what he sees in the picture from the options</p>
+									<footer class="align-center">
+
+									</footer>
+								</div>
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</section>
+
+<!-- Footer -->
+			<footer id="footer">
+				<div class="container">
+					<ul class="icons">
+						<li><a href="#" class="icon fa-twitter"><span class="label">Twitter</span></a></li>
+						<li><a href="#" class="icon fa-facebook"><span class="label">Facebook</span></a></li>
+						<li><a href="#" class="icon fa-instagram"><span class="label">Instagram</span></a></li>
+						<li><a href="#" class="icon fa-envelope-o"><span class="label">Email</span></a></li>
+					</ul>
+				</div>
+				<div class="copyright">
+					&copy; Untitled. All rights reserved to Group_22.
+				</div>
+			</footer>
+
+		<!-- Scripts -->
+			<script src="{% static 'preschoolplay/sitestyle/assets/js/jquery.min.js' %}"></script>
+			<script src="{% static 'preschoolplay/sitestyle/assets/js/jquery.scrollex.min.js' %}"></script>
+			<script src="{% static 'preschoolplay/sitestyle/assets/js/skel.min.js' %}"></script>
+			<script src="{% static 'preschoolplay/sitestyle/assets/js/util.js' %}"></script>
+			<script src="{% static 'preschoolplay/sitestyle/assets/js/main.js' %}"></script>
 </body>
 </html>
