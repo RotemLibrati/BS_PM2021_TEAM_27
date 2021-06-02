@@ -13,6 +13,7 @@ class TestIntegrationWithSelenium(StaticLiveServerTestCase):
         if os.name != 'nt':
             opts = FirefoxOptions()
             opts.add_argument("--headless")
+            opts.add_argument('--disable-gpu')
             self.browser = webdriver.Firefox(options=opts)
         else:
             self.browser = webdriver.Firefox(executable_path='./win-geckodriver.exe')
