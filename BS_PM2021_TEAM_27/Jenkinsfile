@@ -36,7 +36,7 @@ pipeline {
             }
         }
     }
-    post{
+    /*post{
         always{
             echo 'Sending test report email...'
             dir("BS_PM2021_TEAM_27"){
@@ -47,5 +47,5 @@ pipeline {
             }
             echo 'Email sent.'
         }
-    }
+    }*/
 }
