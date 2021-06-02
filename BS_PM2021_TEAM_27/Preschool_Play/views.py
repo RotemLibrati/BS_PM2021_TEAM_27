@@ -562,6 +562,9 @@ def add_child(request, **kwargs):
                         if chosen_kindergarten.name != kindergarten:
                             return render(request, 'Preschool_Play/error.html',
                                           {'message': 'The teacher and the kindergarten are not suitable'})
+                        if Child.objects.filter(kindergarten__name=chosen_kindergarten.name).count() >= chosen_kindergarten.max_children:
+                            return render(request, 'Preschool_Play/error.html',
+                                          {'message': 'This Kindergarten Reachead The Max Amount Of Childrens'})
                         new_child = Child(name=name, parent=user_profile, teacher=finally_chosen_teacher,
                                           kindergarten=chosen_kindergarten)
                         new_child.save()
@@ -581,8 +584,8 @@ def add_child(request, **kwargs):
                     widget=forms.Select(choices=[(u.user, u.user) for u in all_users]))
                 form.fields['teacher'].initial = all_users[0].user
                 form.fields['kindergarten'] = forms.CharField(
-                    widget=forms.Select(choices=[(n.name, n.name) for n in kindergarten]))
-                form.fields['kindergarten'].initial = kindergarten[0].name
+                    widget=forms.Select(choices=[(n.name, n.name) for n in all_kindergarten]))
+                form.fields['kindergarten'].initial = all_kindergarten[0].name
             except:
                 error = "Teacher is not exist."
                 render(request, 'Preschool_Play/error.html', {'error': error})
@@ -591,6 +594,31 @@ def add_child(request, **kwargs):
             'form': form, 'teachers': teachers_users
         })
 
+
+@login_required(login_url='/preschoolplay/not-logged-in')
+def limit_kindergarten_childs(request):
+    if not request.user.profile.is_admin:
+        return HttpResponse("Not an Admin")
+    if request.method == 'POST':
+        form = LimitKindergartenChildForm(request.POST)
+        if form.is_valid():
+            kindergarten = form.cleaned_data['kindergarten']
+            choosen_kindergarten = Kindergarten.objects.get(name=kindergarten)
+            choosen_kindergarten.max_children = form.cleaned_data['amount']
+            choosen_kindergarten.save()
+        return HttpResponseRedirect(reverse('Preschool_Play:index'))
+    else:
+        form = LimitKindergartenChildForm()
+        all_kindergarten = list(Kindergarten.objects.all())
+        try:
+            form.fields['kindergarten'] = forms.CharField(
+                widget=forms.Select(choices=[(n.name, n.name) for n in all_kindergarten]))
+            form.fields['kindergarten'].initial = all_kindergarten[0].name
+        except:
+            error = "Kindergarten is not exist."
+            render(request, 'Preschool_Play/error.html', {'error': error})
+    context = {'form': form}
+    return render(request, 'Preschool_Play/limit-kindergarten.html', context)
 
 def delete_user(request):
     if request.user is None or not request.user.is_authenticated:

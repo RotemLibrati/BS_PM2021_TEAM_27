@@ -60,7 +60,9 @@ class Media(models.Model):
 
 class Kindergarten(models.Model):
     name = models.CharField(max_length=50, blank=True, null=False)
+    max_children = models.IntegerField(default=999)
     teacher = models.ForeignKey(UserProfile, related_name='teacher', on_delete=models.SET_NULL, null=True)
+
 
     def __str__(self):
         return self.name

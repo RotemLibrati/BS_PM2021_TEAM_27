@@ -84,18 +84,22 @@ class ChildForm(forms.Form):
     teacher = forms.CharField()
     kindergarten = forms.CharField()
 
-    def __init__(self, *args, **kwargs):
-        super(ChildForm, self).__init__(*args, **kwargs)
+    # def __init__(self, *args, **kwargs):
+    #     super(ChildForm, self).__init__(*args, **kwargs)
+    #
+    #     set = UserProfile.objects.filter(type='teacher')
+    #     set2 = Kindergarten.objects.all()
+    #     TEACHER = list(map(lambda x: (str(x.user), str(x.user)), set))
+    #     KINDERGARTEN = list(map(lambda x: (str(x.name), str(x.name)), set2))
+    #     self.fields['teacher'] = forms.CharField(
+    #         widget=forms.Select(choices=TEACHER))
+    #     self.fields['kindergarten'] = forms.CharField(
+    #         widget=forms.Select(choices=KINDERGARTEN))
 
-        set = UserProfile.objects.filter(type='teacher')
-        set2 = Kindergarten.objects.all()
-        TEACHER = list(map(lambda x: (str(x.user), str(x.user)), set))
-        KINDERGARTEN = list(map(lambda x: (str(x.name), str(x.name)), set2))
-        self.fields['teacher'] = forms.CharField(
-            widget=forms.Select(choices=TEACHER))
-        self.fields['kindergarten'] = forms.CharField(
-            widget=forms.Select(choices=KINDERGARTEN))
 
+class LimitKindergartenChildForm(forms.Form):
+    kindergarten = forms.CharField()
+    amount = forms.IntegerField()
 
 class DeleteUserForm(forms.Form):
     def __init__(self, set1, *args, **kwargs):
