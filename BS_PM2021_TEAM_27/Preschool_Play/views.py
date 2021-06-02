@@ -120,11 +120,10 @@ def score_graphs(request):
 @login_required(login_url='/preschoolplay/not-logged-in')
 def game(request, child_name, difficulty=1):
     current_child = Child.objects.get(parent=request.user.profile, name=child_name)
-    current_child.last_time_play = datetime.now
+    current_child.last_time_play = datetime.now()
     current_child.save()
     song = Video.objects.filter(type="audio")
-    context = {'user': request.user, 'child_name': child_name, 'song': song, 'difficulty': difficulty,
-               'last_time_play': current_child.last_time_play}
+    context = {'user': request.user, 'child_name': child_name, 'song': song, 'difficulty': difficulty}
     return render(request, 'Preschool_Play/connect-dots.html', context)
 
 
@@ -433,7 +432,8 @@ def child_area(request, name):
                       {'message': 'You have to wait for your teacher to approve you'})
     teacher = child.teacher
     videos = Video.objects.filter(create=teacher, type='video')
-    context = {'child': child, 'videos': videos}
+
+    context = {'child': child, 'videos': videos, 'last_time_play': child.last_time_play}
     return render(request, 'Preschool_Play/child-area.html', context)
 
 

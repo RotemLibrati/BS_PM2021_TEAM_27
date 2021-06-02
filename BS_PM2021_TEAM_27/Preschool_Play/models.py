@@ -73,7 +73,7 @@ class Child(models.Model):
     suspension_time = models.DateTimeField(default=datetime(2000, 1, 1))
     kindergarten = models.ForeignKey(Kindergarten, on_delete=models.SET_NULL, null=True)
     auth = models.BooleanField(default=False)
-    last_time_play = models.DateTimeField(default=None)
+    last_time_play = models.DateTimeField(default=None, null=True)
 
 
     def __str__(self):
