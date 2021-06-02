@@ -277,7 +277,7 @@ def logout(request):  # logout view
 
     if hasattr(request, 'user'):
         request.user = AnonymousUser()
-    return HttpResponseRedirect(reverse('Preschool_Play:index'))
+    return HttpResponseRedirect(reverse('Preschool_Play:login'))
 
 
 @login_required(login_url='/preschoolplay/not-logged-in')
