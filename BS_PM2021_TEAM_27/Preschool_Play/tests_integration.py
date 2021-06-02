@@ -15,8 +15,8 @@ class TestIntegrationWithSelenium(StaticLiveServerTestCase):
             opts = FirefoxOptions()
             opts.add_argument("--headless")
             opts.add_argument('--disable-gpu')
-            display = Display(visible=False, size=(800, 600))
-            display.start()
+            self.display = Display(visible=False, size=(800, 600))
+            self.display.start()
             self.browser = webdriver.Firefox(options=opts)
         else:
             self.browser = webdriver.Firefox(executable_path='./win-geckodriver.exe')
@@ -50,6 +50,7 @@ class TestIntegrationWithSelenium(StaticLiveServerTestCase):
 
     def tearDown(self):
         self.browser.close()
+        self.display.stop()
 
     @override_settings(DEBUG=True)
     def test_login_then_add_and_delete_new_child(self):
