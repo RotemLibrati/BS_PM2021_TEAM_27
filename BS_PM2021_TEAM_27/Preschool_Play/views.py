@@ -20,7 +20,7 @@ def index(request):
     context = {'user': request.user}
     try:
         context['profile'] = UserProfile.objects.get(user=request.user)
-    except UserProfile.DoesNotExist:
+    except (TypeError, UserProfile.DoesNotExist):
         pass
     if 'profile' in context:
         unread_messages_amount = Message.objects.filter(receiver=request.user, is_unread=True).count()
