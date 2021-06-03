@@ -369,13 +369,18 @@ def new_message(request, **kwargs):
         return render(request, 'Preschool_Play/error.html', {'message': 'UserProfile was not found.'})
     teachers_users = None
     parents_users = None
+    final_parents_users = []
+    final_teacher_users = []
     if user_profile.type == 'teacher':
         teachers_users = User.objects.filter(profile__type='teacher', profile__is_admin=False)
         parents_users = User.objects.filter(profile__type='parent', profile__child__teacher=request.user.profile,
                                             profile__is_admin=False)
+        final_parents_users = set(parents_users)
     if user_profile.type == 'parent':
         teachers_users = User.objects.filter(profile__student__parent=request.user.profile)
-        parents_users = User.objects.filter(profile__type='parent', profile__child__teacher__in=list(teachers_users),
+        final_teacher_users = set(teachers_users)
+        teacher_profiles = [x.profile for x in teachers_users]
+        parents_users = User.objects.filter(profile__type='parent', profile__child__teacher__in=teacher_profiles,
                                             profile__is_admin=False)
     if user_profile.is_admin:
         teachers_users = User.objects.filter(profile__type='teacher', profile__is_admin=False)
@@ -403,7 +408,7 @@ def new_message(request, **kwargs):
         if kwargs:
             if kwargs['reply']:
                 form = MessageForm({'receiver': kwargs['reply']})
-        all_users = list(teachers_users) + list(parents_users) + list(admin_users)
+        all_users = list(final_teacher_users) + list(final_parents_users) + list(admin_users)
         form.fields['receiver'] = forms.CharField(
             widget=forms.Select(choices=[(u.username, u.username) for u in all_users]))
         form.fields['receiver'].initial = all_users[0].username
