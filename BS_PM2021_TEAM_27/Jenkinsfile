@@ -44,7 +44,6 @@ pipeline {
                     python3 manage.py makemigrations
                     python3 manage.py migrate
                     python3 manage.py populate_db
-                    python3 manage.py improvement_report
                 """
             }
         }
@@ -61,7 +60,7 @@ pipeline {
                 }
             }
         }
-        /*stage('Send Reports') {
+        stage('Send Reports') {
             steps {
                 dir("BS_PM2021_TEAM_27"){
                     script{
@@ -75,6 +74,6 @@ pipeline {
                     }
                 }
             }
-        }*/
+        }
     }
 }
