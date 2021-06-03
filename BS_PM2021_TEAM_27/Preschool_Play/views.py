@@ -432,7 +432,6 @@ def child_area(request, name):
                       {'message': 'You have to wait for your teacher to approve you'})
     teacher = child.teacher
     videos = Video.objects.filter(create=teacher, type='video')
-    #last_score = Score.objects.get(child=child, date=Score.date.objects.latest('date'))
     last_score_date = datetime(2000, 1, 1)
     for score in Score.objects.all():
         if score.child==child and score.date>last_score_date:
