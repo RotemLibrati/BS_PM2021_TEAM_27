@@ -16,21 +16,21 @@ from .forms import *
 from django.shortcuts import render, get_object_or_404
 
 
-@login_required(login_url='/preschoolplay/not-logged-in')
 def index(request):
     context = {'user': request.user}
     try:
         context['profile'] = UserProfile.objects.get(user=request.user)
     except UserProfile.DoesNotExist:
-        return render(request, 'Preschool_Play/error.html', {'message': 'User not found'})
-    unread_messages_amount = Message.objects.filter(receiver=request.user, is_unread=True).count()
-    if unread_messages_amount > 0:
-        context['unread'] = unread_messages_amount
-    message = Notification.objects.filter(receiver=request.user, seen=False)
-    context['message'] = message
-    for m in message:
-        m.seen = True
-        m.save()
+        pass
+    if 'profile' in context:
+        unread_messages_amount = Message.objects.filter(receiver=request.user, is_unread=True).count()
+        if unread_messages_amount > 0:
+            context['unread'] = unread_messages_amount
+        message = Notification.objects.filter(receiver=request.user, seen=False)
+        context['message'] = message
+        for m in message:
+            m.seen = True
+            m.save()
     return render(request, 'Preschool_Play/index.html', context)
 
 
