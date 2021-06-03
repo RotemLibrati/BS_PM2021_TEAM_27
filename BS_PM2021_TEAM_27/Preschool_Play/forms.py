@@ -102,7 +102,7 @@ class DeleteUserForm(forms.Form):
         super(DeleteUserForm, self).__init__(*args, **kwargs)
         self.fields['child'].queryset = set1
 
-    child = forms.ModelChoiceField(queryset={})
+    child = forms.ModelChoiceField(queryset=Child.objects.none())
     password = forms.CharField(widget=forms.PasswordInput)
 
 
