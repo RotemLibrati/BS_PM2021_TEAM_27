@@ -20,10 +20,24 @@ pipeline {
                         }catch(e){}
                     }
                 }
+                dir("BS_PM2021_TEAM_27/Preschool_Play"){
+                    script{
+                        try{
+                            sh(returnStdout: true, script: "rm migrations/*")
+                        }catch(e){}
+                    }
+                }
             }
         }
         stage('Build') {
             steps {
+                dir("BS_PM2021_TEAM_27/Preschool_Play"){
+                    script{
+                        try{
+                            sh(returnStdout: true, script: "touch migrations/__init__.py")
+                        }catch(e){}
+                    }
+                }
                 sh """
                     cd BS_PM2021_TEAM_27
                     chmod 555 geckodriver-linux64
