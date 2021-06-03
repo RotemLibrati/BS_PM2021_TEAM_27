@@ -11,12 +11,22 @@ pipeline {
         githubPush()
     }
     stages {
+        stage('Clear old build') {
+            steps {
+                dir("BS_PM2021_TEAM_27"){
+                    script{
+                        try{
+                            sh(returnStdout: true, script: "rm db.sqlite3")
+                        }catch(e){}
+                    }
+                }
+            }
+        }
         stage('Build') {
             steps {
                 sh """
                     cd BS_PM2021_TEAM_27
                     chmod 555 geckodriver-linux64
-                    rm db.sqlite3
                     python3 manage.py makemigrations
                     python3 manage.py migrate
                     python3 manage.py populate_db
