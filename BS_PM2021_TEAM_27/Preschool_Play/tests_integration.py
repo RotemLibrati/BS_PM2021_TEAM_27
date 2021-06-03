@@ -2,18 +2,24 @@ import time
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test.utils import override_settings
 from selenium import webdriver
+from selenium.webdriver import FirefoxOptions
 from .models import *
 import os
+# from pyvirtualdisplay import Display
 
 
 class TestIntegrationWithSelenium(StaticLiveServerTestCase):
 
     def setUp(self):
-        driver = './win-geckodriver.exe'
         if os.name != 'nt':
-            driver = './geckodriver-linux64'
-        self.browser = webdriver.Firefox(executable_path=driver)
-
+            opts = FirefoxOptions()
+            opts.add_argument("--headless")
+            opts.add_argument('--disable-gpu')
+            # self.display = Display(visible=False, size=(800, 600))
+            # self.display.start()
+            self.browser = webdriver.Firefox(executable_path='./geckodriver-linux64', options=opts)
+        else:
+            self.browser = webdriver.Firefox(executable_path='./win-geckodriver.exe')
         self.admin_user = User.objects.create_user('admin', 'admin@test.com')
         self.admin_user.set_password('qwerty246')
         self.admin_user.is_staff = True
@@ -44,6 +50,8 @@ class TestIntegrationWithSelenium(StaticLiveServerTestCase):
 
     def tearDown(self):
         self.browser.close()
+        # if os.name != 'nt':
+        #     self.display.stop()
 
     @override_settings(DEBUG=True)
     def test_login_then_add_and_delete_new_child(self):
