@@ -26,26 +26,28 @@ pipeline {
                 dir("BS_PM2021_TEAM_27"){
                     script{
                         try{
-                            sh(returnStdout: true, script: "python3 manage.py test Preschool_Play.tests_integration.TestIntegrationWithSelenium.test_login_then_add_and_delete_new_child 2>&1 | xargs echo > out1.txt")
+                            sh(returnStdout: true, script: "python3 manage.py test Preschool_Play.tests_unit 2>&1 | xargs echo > out1.txt")
                         }finally{
-                            OUTPUT1 = sh(returnStdout: true, script: "cat out1.txt")
-                            OUTPUT2 = sh(returnStdout: true, script: "cat geckodriver.log")
+                            OUTPUT1 = sh(returnStdout: true, script: "tail -6 out1.txt")
                         }
                     }
                 }
             }
         }
-    }
-    post{
-        always{
-            echo 'Sending test report email...'
-            dir("BS_PM2021_TEAM_27"){
-                sh """
-                     python3 manage.py email_report -s "Tests Report" -b "${OUTPUT1}"
-                     python3 manage.py email_report -s "Log" -b '${OUTPUT2}'
-                """
+        stage('Send Reports') {
+            steps {
+                dir("BS_PM2021_TEAM_27"){
+                    script{
+                        OUTPUT1 += '\n'
+                        OUTPUT1 += sh(returnStdout: true, script: "python3 manage.py improvement_report")
+                        OUTPUT1 += '\n'
+                        OUTPUT1 += sh(returnStdout: true, script: "python3 manage.py message_average_report")
+                        sh """
+                            python3 manage.py email_report -s "Reports" -b "${OUTPUT1}"
+                        """
+                    }
+                }
             }
-            echo 'Email sent.'
         }
     }
 }
