@@ -54,7 +54,8 @@ pipeline {
                         try{
                             sh(returnStdout: true, script: "python3 manage.py test Preschool_Play.tests_unit 2>&1 | xargs -0 echo > out1.txt")
                         }finally{
-                            OUTPUT1 = sh(returnStdout: true, script: "tail -6 out1.txt")
+                            OUTPUT1 = 'Unit tests:\n'
+                            OUTPUT1 += sh(returnStdout: true, script: "tail -6 out1.txt")
                         }
                     }
                 }
@@ -67,7 +68,7 @@ pipeline {
                         try{
                             sh(returnStdout: true, script: "python3 manage.py test Preschool_Play.tests_integration 2>&1 | xargs -0 echo > out1.txt")
                         }finally{
-                            OUTPUT1 += '\n\n'
+                            OUTPUT1 += '\nIntegration tests:\n'
                             OUTPUT1 += sh(returnStdout: true, script: "tail -6 out1.txt")
                         }
                     }
