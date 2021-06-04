@@ -37,6 +37,9 @@ class Command(BaseCommand):
             p.save()
             parents.append(p)
             UserProfile(user=p, type='parent', auth=True).save()
+            for m in range(random.randint(0, 3)):
+                Message(sender=p, receiver=random.choice(parents + teacher_users), subject=f'm{x}.{m}',
+                        body=f'Hello').save()
             for c in range(random.randint(1, 3)):
                 r = random.randint(0, len(teacher_users) - 1)
                 rand_teacher = teacher_users[r]
@@ -45,6 +48,6 @@ class Command(BaseCommand):
                 child.save()
                 children.append(child)
         for ch in children:
-            for _ in range(random.randint(1,5)):
+            for _ in range(random.randint(1, 5)):
                 d = datetime.today() - timedelta(days=random.randint(1, 30))
                 Score(child=ch, amount=random.randint(1, 30), date=d).save()
