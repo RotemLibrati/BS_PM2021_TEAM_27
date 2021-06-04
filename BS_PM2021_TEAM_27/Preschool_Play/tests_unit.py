@@ -812,5 +812,8 @@ class TestChildAreaView(TestCase):
         self.assertContains(response, "Last time play")
 
 
-
+    def test_last_score_is_in_child_area_page(self):
+        response = self.client.get(reverse('Preschool_Play:child-area', args=[self.child.name]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Last score")
 
