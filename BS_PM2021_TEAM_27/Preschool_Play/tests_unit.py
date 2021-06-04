@@ -780,3 +780,40 @@ class TestKindergartenDetailsView(TestCase):
         response = self.client.post(reverse('Preschool_Play:kindergarten', args=[self.kg.name]))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "mypreschool")
+
+
+class TestChildAreaView(TestCase):
+    def setUp(self):
+        self.userP = User.objects.create_user(username='parent1')
+        self.userP.set_password('Qwerty246')
+        self.userP.save()
+        self.profile = UserProfile(user=self.userP, is_admin=False, type='parent')
+        self.profile.save()
+        self.client = Client()
+        self.client.login(username='parent1', password='Qwerty246')
+        self.teacher = User.objects.create_user(username='teacher1')
+        self.teacher.set_password('qwerty246')
+        self.teacher.save()
+        self.teacher_profile = UserProfile(user=self.teacher, type='teacher')
+        self.teacher_profile.save()
+        self.kg = Kindergarten(name='mypreschool', teacher=self.teacher_profile)
+        self.kg.save()
+        self.child = Child(name='ben', parent=self.profile, teacher=self.teacher_profile, kindergarten=self.kg, auth=True)
+        self.child.save()
+
+    def test_child_area_page_is_open(self):
+        response = self.client.post(reverse('Preschool_Play:child-area', args=[self.child.name]))
+        self.assertEqual(response.status_code, 200)
+
+
+    def test_last_time_date_is_in_child_area_page(self):
+        response = self.client.get(reverse('Preschool_Play:child-area', args=[self.child.name]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Last time play")
+
+
+    def test_last_score_is_in_child_area_page(self):
+        response = self.client.get(reverse('Preschool_Play:child-area', args=[self.child.name]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Last score")
+
