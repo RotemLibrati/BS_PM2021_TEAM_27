@@ -563,7 +563,6 @@ def add_child(request, **kwargs):
                 teacher = form.cleaned_data['teacher']
                 child_names = Child.objects.all()
                 child_list = list(child_names)
-                print(child_list)
                 for n in child_list:
                     if name == n.name:
                         return render(request, 'Preschool_Play/error.html',
@@ -609,6 +608,7 @@ def add_child(request, **kwargs):
 
 
 def delete_user(request):
+    # breakpoint()
     if request.user is None or not request.user.is_authenticated:
         return HttpResponse("Not logged in")
     user = request.user
@@ -627,6 +627,8 @@ def delete_user(request):
                                          message='The password is incorrect, you are passed to the home page')
                     alert.save()
                     return HttpResponseRedirect(reverse('Preschool_Play:index'))
+        print(form.errors)
+        breakpoint()
         return HttpResponseRedirect(reverse('Preschool_Play:index'))
     else:
         form = DeleteUserForm(child)

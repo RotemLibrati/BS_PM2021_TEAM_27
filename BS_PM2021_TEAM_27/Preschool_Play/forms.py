@@ -100,9 +100,8 @@ class ChildForm(forms.Form):
 class DeleteUserForm(forms.Form):
     def __init__(self, set1, *args, **kwargs):
         super(DeleteUserForm, self).__init__(*args, **kwargs)
-        self.fields['child'].queryset = set1
-
-    password = forms.CharField(widget=forms.PasswordInput)
+        self.fields['child'] = forms.ModelChoiceField(queryset=set1)
+        self.fields['password'] = forms.CharField(widget=forms.PasswordInput)
 
 
 class FindStudentForm(forms.Form):
