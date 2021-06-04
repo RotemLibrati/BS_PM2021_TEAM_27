@@ -608,7 +608,6 @@ def add_child(request, **kwargs):
 
 
 def delete_user(request):
-    # breakpoint()
     if request.user is None or not request.user.is_authenticated:
         return HttpResponse("Not logged in")
     user = request.user
@@ -617,18 +616,15 @@ def delete_user(request):
     if request.method == 'POST':
         form = DeleteUserForm(child, request.POST)
         if form.is_valid():
-            if "_make-unique" in request.POST:
-                name = form.cleaned_data['child']
-                password = form.cleaned_data['password']
-                if user.check_password(password):
-                    name.delete()
-                else:
-                    alert = Notification(receiver=user,
-                                         message='The password is incorrect, you are passed to the home page')
-                    alert.save()
-                    return HttpResponseRedirect(reverse('Preschool_Play:index'))
-        print(form.errors)
-        breakpoint()
+            name = form.cleaned_data['child']
+            password = form.cleaned_data['password']
+            if user.check_password(password):
+                name.delete()
+            else:
+                alert = Notification(receiver=user,
+                                     message='The password is incorrect, you are passed to the home page')
+                alert.save()
+                return HttpResponseRedirect(reverse('Preschool_Play:index'))
         return HttpResponseRedirect(reverse('Preschool_Play:index'))
     else:
         form = DeleteUserForm(child)

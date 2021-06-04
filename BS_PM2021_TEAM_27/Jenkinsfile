@@ -60,6 +60,20 @@ pipeline {
                 }
             }
         }
+        stage('Run Unit Tests') {
+            steps {
+                dir("BS_PM2021_TEAM_27"){
+                    script{
+                        try{
+                            sh(returnStdout: true, script: "python3 manage.py test Preschool_Play.tests_integration 2>&1 | xargs -0 echo > out1.txt")
+                        }finally{
+                            OUTPUT1 += '\n\n'
+                            OUTPUT1 += sh(returnStdout: true, script: "tail -6 out1.txt")
+                        }
+                    }
+                }
+            }
+        }
         stage('Send Reports') {
             steps {
                 dir("BS_PM2021_TEAM_27"){

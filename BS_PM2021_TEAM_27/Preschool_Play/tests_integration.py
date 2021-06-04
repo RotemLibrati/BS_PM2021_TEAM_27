@@ -2,7 +2,6 @@ from django.test import TestCase, Client, tag
 from django.urls import reverse, resolve
 from . import views
 from .models import *
-from  django.contrib.auth.hashers import make_password
 
 
 @tag('unit-test')
@@ -61,64 +60,67 @@ class TestIntegration(TestCase):
             if x[0] != '':
                 if x[1] == child[0].__str__():
                     choice = x
-            print(x)
-        breakpoint()
         data = form.initial
-        data['child'] = choice
+        data['child'] = choice[0]
         data['password'] = 'qwerty246'
         response = self.client.post(reverse('Preschool_Play:delete-user'), data=data)
         child = Child.objects.filter(name='John', teacher=self.teacher.id, kindergarten=self.kg.id)
-        print(child)
         self.assertTrue(len(child) == 0)
 
-    def test_with_no_messages(self):
-        c = Client()
-        user = User.objects.create_user(username='tester')
-        user.set_password('qwerty246')
-        user.save()
-        user_profile = UserProfile.objects.create(user=user)
-        user_profile.save()
-        c.force_login(user)
-        response = c.get(reverse('Preschool_Play:inbox'))
+    def test_register_as_teacher_and_add_kindergarten_and_parent_register_his_child_to_this_kindergarten(self):
+        self.client.logout()
+        # unregistered user go to main page
+        response = self.client.get(reverse('Preschool_Play:index'))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'Preschool_Play/inbox.html')
-        self.assertEquals(len(response.context['messages_received']), 0)
-        self.assertEquals(len(response.context['messages_sent']), 0)
-
-    def test_with_message_received(self):
-        c = Client()
-        user = User.objects.create_user(username='tester1', password='qwerty246')
-        user.save()
-        user_profile = UserProfile.objects.create(user=user)
-        user_profile.save()
-        user2 = User.objects.create_user(username='tester2', password='qwerty246')
-        user2.save()
-        user_profile2 = UserProfile.objects.create(user=user2)
-        user_profile2.save()
-        message = Message(sender=user2, receiver=user, body='hello')
-        message.save()
-        c.force_login(user)
-        response = c.get(reverse('Preschool_Play:inbox'))
+        self.assertContains(response, "Sign-Up")
+        # go to sign up
+        response = self.client.get(reverse('Preschool_Play:new-user'))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'Preschool_Play/inbox.html')
-        self.assertEquals(len(response.context['messages_received']), 1)
-        self.assertEquals(len(response.context['messages_sent']), 0)
-
-    def test_with_message_sent(self):
-        c = Client()
-        user = User.objects.create_user(username='tester1', password='qwerty246')
-        user.save()
-        user_profile = UserProfile.objects.create(user=user)
-        user_profile.save()
-        user2 = User.objects.create_user(username='tester2', password='qwerty246')
-        user2.save()
-        user_profile2 = UserProfile.objects.create(user=user2)
-        user_profile2.save()
-        message = Message(sender=user2, receiver=user, body='hello')
-        message.save()
-        c.force_login(user2)
-        response = c.get(reverse('Preschool_Play:inbox'))
+        self.assertContains(response, "Username")
+        # post sign up data
+        form = response.context['user_form']
+        data = {'username': 'new-teacher', 'password1': 'qwerty256', 'password2': 'qwerty256'}
+        response = self.client.post(reverse('Preschool_Play:new-user'), data=data, follow=True)
+        # redirected to new profile
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'Preschool_Play/inbox.html')
-        self.assertEquals(len(response.context['messages_received']), 0)
-        self.assertEquals(len(response.context['messages_sent']), 1)
+        self.assertTemplateUsed(response, 'Preschool_Play/new-profile.html')
+        # post new profile data
+        data = {'address': 'asdf', 'age': 23, 'type': 'teacher'}
+        response = self.client.post(reverse('Preschool_Play:new-profile', args=['new-teacher']), data=data, follow=True)
+        # authenticate
+        up = UserProfile.objects.get(user__username='new-teacher')
+        up.auth = True
+        up.save()
+        # redirected to main page
+        self.assertContains(response, 'Sign-In')
+        self.assertTrue(len(UserProfile.objects.filter(user__username='new-teacher')) > 0)
+        # go to login page
+        response = self.client.get(reverse('Preschool_Play:login'))
+        self.assertContains(response, 'User name')
+        # login
+        self.client.force_login(User.objects.get(username='new-teacher'))
+        self.assertTrue(User.objects.get(username='new-teacher').is_authenticated)
+        response = self.client.get(reverse('Preschool_Play:index'))
+        self.assertContains(response, 'Create Kindergarten')
+        self.assertTrue(User.objects.get(username='new-teacher').is_authenticated)
+        # go to create kindergarten
+        response = self.client.get(reverse('Preschool_Play:create-kindergarten'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Name")
+        # post data to create kindergarten
+        data = {'name': 'new-kinder1'}
+        response = self.client.post(reverse('Preschool_Play:create-kindergarten'), data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(len(Kindergarten.objects.filter(name='new-kinder1')) > 0)
+        self.assertContains(response, "Logout")
+        self.client.logout()
+        self.client.login(username='user1', password='qwerty246')
+        response = self.client.get(reverse('Preschool_Play:create-child'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Name child")
+        data = {'name_child': 'ben2', 'teacher': 'new-teacher', 'kindergarten': 'new-kinder1'}
+        response = self.client.post(reverse('Preschool_Play:create-child'), data=data, follow=True)
+        self.assertTrue(len(Child.objects.filter(name='ben2', parent=self.profile)) > 0)
+        response = self.client.get(reverse('Preschool_Play:parent'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "ben2")
