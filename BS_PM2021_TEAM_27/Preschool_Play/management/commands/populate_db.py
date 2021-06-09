@@ -51,3 +51,24 @@ class Command(BaseCommand):
             for _ in range(random.randint(1, 5)):
                 d = datetime.today() - timedelta(days=random.randint(1, 30))
                 Score(child=ch, amount=random.randint(1, 30), date=d).save()
+        FAQs = []
+        faq = FAQ(question='Can I write masseges for the theacher of my child?',
+                  answer='Yes. go to the main menu and press on Inbox, and follow the instructions.')
+        FAQs.append(faq)
+        FAQs.save()
+        faq = FAQ(question='How can I see messages from the teacher?',
+                  answer='Go to the main menu and press on Inbox, and follow the instructions.')
+        FAQs.append(faq)
+        FAQs.save()
+        faq = FAQ(question='How do I get to my childs personal area?', answer='Go to the main menu and press on My Children.')
+        FAQs.append(faq)
+        FAQs.save()
+        faq = FAQ(question='How do I add my child to the system?',
+                  answer='Go to the main menu and press on Create Child, and follow the instructions.')
+        FAQs.append(faq)
+        FAQs.save()
+        faq = FAQ(question='Is it possible to open a personal area for my sons friend?',
+                  answer='No. The system is open only for the Registered kindergartens. If the friend is in the same kindergarten he can open a personal area by his mother.')
+
+
+
