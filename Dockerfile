@@ -1,3 +1,15 @@
+#	docker version     explanation:prints version info
+#	docker build -t [tag name] [Dockerfile path]    explanation:create the image
+#	docker image ls    explanation:list of images on this machine
+#	docker run [image name]    explanation:runs the container
+#		-it explanation:runs in interactive mode
+#       -p [out-port]:[in-port]    explanation: port mapping
+#	docker pull [image name on dockerhub]   explanation:downloads the image to this machine
+#	docker ps   explanation: shows running processes
+#		-a  explanation:show stopped containers also
+#	docker tag [local-image]:[tagname] [new-repo]:[tagname]    explanation:give local image new repository name and tag
+#   docker push [new-repo]:[tagname]    explanation:push local image to its repository (requires existing repository on docker hub)
+
 FROM ubuntu:bionic
 
 COPY BS_PM2021_TEAM_27/requirements.txt requirements.txt

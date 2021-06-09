@@ -1,16 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
+{% extends 'Preschool_Play/SubPage.html' %}
 <head>
     <meta charset="UTF-8">
     <title>My Kindergarten</title>
 </head>
 <body>
+{% block title %}
   <h1>"{{child_kindergarten.name}}" Kindergarten</h1>
+{% endblock %}
+{% block data %}
+
   <h2>Teacher: {{child_kindergarten.teacher.user}}</h2>
   <h3>Children:</h3>
   {% for ch in children %}
   <h4><pre>         -{{ch.name}}</pre></h4>
 
 {% endfor %}
+{% endblock %}
 </body>
 </html>

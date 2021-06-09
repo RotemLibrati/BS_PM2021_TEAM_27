@@ -16,21 +16,21 @@ from .forms import *
 from django.shortcuts import render, get_object_or_404
 
 
-@login_required(login_url='/preschoolplay/not-logged-in')
 def index(request):
     context = {'user': request.user}
     try:
         context['profile'] = UserProfile.objects.get(user=request.user)
-    except UserProfile.DoesNotExist:
-        return render(request, 'Preschool_Play/error.html', {'message': 'User not found'})
-    unread_messages_amount = Message.objects.filter(receiver=request.user, is_unread=True).count()
-    if unread_messages_amount > 0:
-        context['unread'] = unread_messages_amount
-    message = Notification.objects.filter(receiver=request.user, seen=False)
-    context['message'] = message
-    for m in message:
-        m.seen = True
-        m.save()
+    except (TypeError, UserProfile.DoesNotExist):
+        pass
+    if 'profile' in context:
+        unread_messages_amount = Message.objects.filter(receiver=request.user, is_unread=True).count()
+        if unread_messages_amount > 0:
+            context['unread'] = unread_messages_amount
+        message = Notification.objects.filter(receiver=request.user, seen=False)
+        context['message'] = message
+        for m in message:
+            m.seen = True
+            m.save()
     return render(request, 'Preschool_Play/index.html', context)
 
 
@@ -57,7 +57,7 @@ def score_graphs(request):
                 children = list(Child.objects.filter(parent=request.user.profile).order_by('name'))
             if pair[0] == 'All' and user_is_admin:
                 context['scoreData'] = list(
-                    Score.objects.values(d=ExtractDay('date'), m=ExtractMonth('date'), y=ExtractYear('date')).annotate(
+                    Score.objects.all().order_by('date').values(d=ExtractDay('date'), m=ExtractMonth('date'), y=ExtractYear('date')).annotate(
                         Sum('amount')))
                 context['child_name'] = 'All'
             else:
@@ -66,7 +66,7 @@ def score_graphs(request):
                 context['child_name'] = chosen_child.name
                 if user_is_admin or request.user == parent_user_of_chosen_child or request.user.profile == chosen_child.teacher:
                     context['scoreData'] = list(
-                        Score.objects.filter(child=chosen_child).values(d=ExtractDay('date'), m=ExtractMonth('date'),
+                        Score.objects.filter(child=chosen_child).order_by('date').values(d=ExtractDay('date'), m=ExtractMonth('date'),
                                                                         y=ExtractYear('date')).annotate(
                             Sum('amount')))
                 else:
@@ -93,13 +93,13 @@ def score_graphs(request):
             children = list(Child.objects.filter(parent=request.user.profile).order_by('name'))
         if user_is_admin:
             context['scoreData'] = list(
-                Score.objects.values(d=ExtractDay('date'), m=ExtractMonth('date'), y=ExtractYear('date')).annotate(
+                Score.objects.all().order_by('date').values(d=ExtractDay('date'), m=ExtractMonth('date'), y=ExtractYear('date')).annotate(
                     Sum('amount')))
         else:
             if children.__len__() < 1:
                 return render(request, 'Preschool_Play/error.html', {'message': 'Unauthorized user'})
             context['scoreData'] = list(
-                Score.objects.filter(child=children[0]).values(d=ExtractDay('date'), m=ExtractMonth('date'),
+                Score.objects.filter(child=children[0]).order_by('date').values(d=ExtractDay('date'), m=ExtractMonth('date'),
                                                                y=ExtractYear('date')).annotate(
                     Sum('amount')))
         form = ScoreDataForm()
@@ -119,6 +119,9 @@ def score_graphs(request):
 
 @login_required(login_url='/preschoolplay/not-logged-in')
 def game(request, child_name, difficulty=1):
+    current_child = Child.objects.get(parent=request.user.profile, name=child_name)
+    current_child.last_time_play = datetime.now()
+    current_child.save()
     song = Video.objects.filter(type="audio")
     context = {'user': request.user, 'child_name': child_name, 'song': song, 'difficulty': difficulty}
     return render(request, 'Preschool_Play/connect-dots.html', context)
@@ -369,13 +372,18 @@ def new_message(request, **kwargs):
         return render(request, 'Preschool_Play/error.html', {'message': 'UserProfile was not found.'})
     teachers_users = None
     parents_users = None
+    final_parents_users = []
+    final_teacher_users = []
     if user_profile.type == 'teacher':
         teachers_users = User.objects.filter(profile__type='teacher', profile__is_admin=False)
         parents_users = User.objects.filter(profile__type='parent', profile__child__teacher=request.user.profile,
                                             profile__is_admin=False)
+        final_parents_users = set(parents_users)
     if user_profile.type == 'parent':
         teachers_users = User.objects.filter(profile__student__parent=request.user.profile)
-        parents_users = User.objects.filter(profile__type='parent', profile__child__teacher__in=list(teachers_users),
+        final_teacher_users = set(teachers_users)
+        teacher_profiles = [x.profile for x in teachers_users]
+        parents_users = User.objects.filter(profile__type='parent', profile__child__teacher__in=teacher_profiles,
                                             profile__is_admin=False)
     if user_profile.is_admin:
         teachers_users = User.objects.filter(profile__type='teacher', profile__is_admin=False)
@@ -403,7 +411,7 @@ def new_message(request, **kwargs):
         if kwargs:
             if kwargs['reply']:
                 form = MessageForm({'receiver': kwargs['reply']})
-        all_users = list(teachers_users) + list(parents_users) + list(admin_users)
+        all_users = list(final_teacher_users) + list(final_parents_users) + list(admin_users)
         form.fields['receiver'] = forms.CharField(
             widget=forms.Select(choices=[(u.username, u.username) for u in all_users]))
         form.fields['receiver'].initial = all_users[0].username
@@ -429,7 +437,15 @@ def child_area(request, name):
                       {'message': 'You have to wait for your teacher to approve you'})
     teacher = child.teacher
     videos = Video.objects.filter(create=teacher, type='video')
-    context = {'child': child, 'videos': videos}
+    last_score_date = datetime(2000, 1, 1)
+    for score in Score.objects.all():
+        if score.child==child and score.date>last_score_date:
+            last_score_date = score.date
+    if last_score_date==datetime(2000, 1, 1):
+        last_score = None
+    else:
+        last_score = Score.objects.get(date=last_score_date).amount
+    context = {'child': child, 'videos': videos, 'last_time_play': child.last_time_play, 'last_score': last_score}
     return render(request, 'Preschool_Play/child-area.html', context)
 
 
@@ -547,7 +563,6 @@ def add_child(request, **kwargs):
                 teacher = form.cleaned_data['teacher']
                 child_names = Child.objects.all()
                 child_list = list(child_names)
-                print(child_list)
                 for n in child_list:
                     if name == n.name:
                         return render(request, 'Preschool_Play/error.html',
@@ -660,16 +675,15 @@ def delete_user(request):
     if request.method == 'POST':
         form = DeleteUserForm(child, request.POST)
         if form.is_valid():
-            if "_make-unique" in request.POST:
-                name = form.cleaned_data['child']
-                password = form.cleaned_data['password']
-                if user.check_password(password):
-                    name.delete()
-                else:
-                    alert = Notification(receiver=user,
-                                         message='The password is incorrect, you are passed to the home page')
-                    alert.save()
-                    return HttpResponseRedirect(reverse('Preschool_Play:index'))
+            name = form.cleaned_data['child']
+            password = form.cleaned_data['password']
+            if user.check_password(password):
+                name.delete()
+            else:
+                alert = Notification(receiver=user,
+                                     message='The password is incorrect, you are passed to the home page')
+                alert.save()
+                return HttpResponseRedirect(reverse('Preschool_Play:index'))
         return HttpResponseRedirect(reverse('Preschool_Play:index'))
     else:
         form = DeleteUserForm(child)

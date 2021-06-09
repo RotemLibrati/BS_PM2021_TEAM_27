@@ -76,25 +76,12 @@ class Child(models.Model):
     suspension_time = models.DateTimeField(default=datetime(2000, 1, 1))
     kindergarten = models.ForeignKey(Kindergarten, on_delete=models.SET_NULL, null=True)
     auth = models.BooleanField(default=False)
+    last_time_play = models.DateTimeField(default=None, null=True)
+
 
     def __str__(self):
         return f'Name: {self.name}. Parent: {self.parent}'
 
-
-class Note(models.Model):
-    teacher = models.ForeignKey(User, related_name='note', on_delete=models.SET_NULL, null=True)
-    child = models.ForeignKey(Child, related_name='note', on_delete=models.SET_NULL, null=True)
-    date = models.DateTimeField(default=datetime.now, blank=True)
-    subject = models.CharField(max_length=250, blank=True, null=True)
-    body = models.CharField(max_length=500, blank=True, null=True)
-
-    def __str__(self):
-        return f'Child: {self.child}. Subject: {self.subject}. Date: {self.date}.'
-
-
-class FAQ(models.Model):
-    question = models.CharField(max_length=500)
-    answer = models.CharField(max_length=1000)
 
 class Score(models.Model):
     child = models.ForeignKey(Child, related_name='score', on_delete=models.SET_NULL, null=True)

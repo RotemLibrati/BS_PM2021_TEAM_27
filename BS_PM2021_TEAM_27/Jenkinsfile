@@ -4,20 +4,46 @@ pipeline {
         OUTPUT2 = 'bar'
     }
     agent {
-        dockerfile true
-        //docker { image 'eilonc285/repos-team27:main2' }
+        //dockerfile true
+        docker { image 'eilonc285/repos-team27:main2' }
     }
     triggers {
         githubPush()
     }
     stages {
+        stage('Clear old build') {
+            steps {
+                dir("BS_PM2021_TEAM_27"){
+                    script{
+                        try{
+                            sh(returnStdout: true, script: "rm db.sqlite3")
+                        }catch(e){}
+                    }
+                }
+                dir("BS_PM2021_TEAM_27/Preschool_Play"){
+                    script{
+                        try{
+                            sh(returnStdout: true, script: "rm migrations/*")
+                        }catch(e){}
+                    }
+                }
+            }
+        }
         stage('Build') {
             steps {
+                dir("BS_PM2021_TEAM_27/Preschool_Play"){
+                    script{
+                        try{
+                            sh(returnStdout: true, script: "touch migrations/__init__.py")
+                        }catch(e){}
+                    }
+                }
                 sh """
                     cd BS_PM2021_TEAM_27
                     chmod 555 geckodriver-linux64
                     python3 manage.py makemigrations
                     python3 manage.py migrate
+                    python3 manage.py populate_db
                 """
             }
         }
@@ -26,26 +52,43 @@ pipeline {
                 dir("BS_PM2021_TEAM_27"){
                     script{
                         try{
-                            sh(returnStdout: true, script: "python3 manage.py test Preschool_Play.tests_integration.TestIntegrationWithSelenium.test_login_then_add_and_delete_new_child 2>&1 | xargs echo > out1.txt")
+                            sh(returnStdout: true, script: "python3 manage.py test Preschool_Play.tests_unit 2>&1 | xargs -0 echo > out1.txt")
                         }finally{
-                            OUTPUT1 = sh(returnStdout: true, script: "cat out1.txt")
-                            OUTPUT2 = sh(returnStdout: true, script: "tail -4 geckodriver.log")
+                            OUTPUT1 = 'Unit tests:\n'
+                            OUTPUT1 += sh(returnStdout: true, script: "tail -6 out1.txt")
                         }
                     }
                 }
             }
         }
-    }
-    post{
-        always{
-            echo 'Sending test report email...'
-            dir("BS_PM2021_TEAM_27"){
-                sh """
-                     python3 manage.py email_report -s "Tests Report" -b "${OUTPUT1}"
-                     python3 manage.py email_report -s "Log" -b '${OUTPUT2}'
-                """
+        stage('Run Integration Tests') {
+            steps {
+                dir("BS_PM2021_TEAM_27"){
+                    script{
+                        try{
+                            sh(returnStdout: true, script: "python3 manage.py test Preschool_Play.tests_integration 2>&1 | xargs -0 echo > out1.txt")
+                        }finally{
+                            OUTPUT1 += '\nIntegration tests:\n'
+                            OUTPUT1 += sh(returnStdout: true, script: "tail -6 out1.txt")
+                        }
+                    }
+                }
             }
-            echo 'Email sent.'
+        }
+        stage('Send Reports') {
+            steps {
+                dir("BS_PM2021_TEAM_27"){
+                    script{
+                        OUTPUT1 += '\n'
+                        OUTPUT1 += sh(returnStdout: true, script: "python3 manage.py improvement_report")
+                        OUTPUT1 += '\n'
+                        OUTPUT1 += sh(returnStdout: true, script: "python3 manage.py message_average_report")
+                        sh """
+                            python3 manage.py email_report -s "Reports" -b "${OUTPUT1}"
+                        """
+                    }
+                }
+            }
         }
     }
 }

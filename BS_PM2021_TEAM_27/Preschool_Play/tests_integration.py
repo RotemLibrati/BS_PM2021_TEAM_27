@@ -1,25 +1,13 @@
-import time
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-from django.test.utils import override_settings
-from selenium import webdriver
-from selenium.webdriver import FirefoxOptions
+from django.test import TestCase, Client, tag
+from django.urls import reverse, resolve
+from . import views
 from .models import *
-import os
-from pyvirtualdisplay import Display
 
 
-class TestIntegrationWithSelenium(StaticLiveServerTestCase):
+@tag('unit-test')
+class TestIntegration(TestCase):
 
     def setUp(self):
-        if os.name != 'nt':
-            opts = FirefoxOptions()
-            opts.add_argument("--headless")
-            opts.add_argument('--disable-gpu')
-            self.display = Display(visible=False, size=(800, 600))
-            self.display.start()
-            self.browser = webdriver.Firefox(executable_path='./geckodriver-linux64', options=opts)
-        else:
-            self.browser = webdriver.Firefox(executable_path='./win-geckodriver.exe')
         self.admin_user = User.objects.create_user('admin', 'admin@test.com')
         self.admin_user.set_password('qwerty246')
         self.admin_user.is_staff = True
@@ -34,192 +22,105 @@ class TestIntegrationWithSelenium(StaticLiveServerTestCase):
         self.teacher_profile.save()
         self.kg = Kindergarten(name='mypreschool', teacher=self.teacher_profile)
         self.kg.save()
-        self.user = User.objects.create_user(username='user1')
+        self.user = User(username='user1')
         self.user.set_password('qwerty246')
         self.user.save()
-        self.profile = UserProfile(user=self.user, is_admin=True)
-        self.profile.save()
-        self.user = User.objects.create_user(username='parent')
-        self.user.set_password('qwerty246')
-        self.user.save()
-        self.profile = UserProfile(user=self.user, type='parent')
+        self.profile = UserProfile(user=self.user, type='parent', auth=True)
         self.profile.save()
         self.kid = Child(name='kid2', parent=self.profile, teacher=self.teacher_profile, kindergarten=self.kg,
-                         auth=True, suspension_time=datetime.now() + timedelta(hours=1))
+                         auth=True)
         self.kid.save()
+        self.client = Client()
+        self.client.login(username='user1', password='qwerty246')
 
-    def tearDown(self):
-        self.browser.close()
-        self.display.stop()
-
-    @override_settings(DEBUG=True)
     def test_login_then_add_and_delete_new_child(self):
-        self.browser.get(f'{self.live_server_url}/preschoolplay/login')
-        username_input = self.browser.find_element_by_name("user_name")
-        username_input.send_keys('user1')
-        password_input = self.browser.find_element_by_name("password")
-        password_input.send_keys('qwerty246')
-        self.browser.find_element_by_xpath('//button[@type="submit"]').click()
-        self.browser.find_element_by_xpath('//a[text()="Main Menu"]').click()
-        self.browser.find_element_by_xpath('//a[text()="Add Child"]').click()
-        time.sleep(1)
-        child_name = self.browser.find_element_by_name("name_child")
-        child_name.send_keys('kid1')
-        self.browser.find_element_by_xpath('//button[@type="submit"]').click()
-        self.browser.find_element_by_xpath('//a[text()="Main Menu"]').click()
-        self.browser.find_element_by_xpath('//a[text()="Delete Child"]').click()
-        time.sleep(1)
-        self.browser.find_element_by_xpath('//select/option[text()="Name: kid1. Parent: user1"]').click()
-        pass_kid = self.browser.find_element_by_name("password")
-        pass_kid.send_keys('qwerty246')
-        self.browser.find_element_by_xpath('//input[@type="submit"]').click()
-
-    def test_add_child_and_approve_this_child_from_user_of_his_teacher(self):
-        self.browser.get(f'{self.live_server_url}/preschoolplay/login')
-        username_input = self.browser.find_element_by_name("user_name")
-        username_input.send_keys('parent')
-        password_input = self.browser.find_element_by_name("password")
-        password_input.send_keys('qwerty246')
-        self.browser.find_element_by_xpath('//button[@type="submit"]').click()
-        time.sleep(1)
-        self.browser.find_element_by_xpath('//a[text()="Main Menu"]').click()
-        self.browser.find_element_by_xpath('//a[text()="Add Child"]').click()
-        time.sleep(1)
-        child_name = self.browser.find_element_by_name("name_child")
-        child_name.send_keys('kid1')
-        self.browser.find_element_by_xpath('//button[@type="submit"]').click()
-        time.sleep(1)
-        self.browser.find_element_by_xpath('//a[text()="Main Menu"]').click()
-        self.browser.find_element_by_xpath('//a[text()="Logout"]').click()
-        self.browser.get(f'{self.live_server_url}/preschoolplay/login')
-        username_input = self.browser.find_element_by_name("user_name")
-        username_input.send_keys('teacher1')
-        password_input = self.browser.find_element_by_name("password")
-        password_input.send_keys('qwerty246')
-        self.browser.find_element_by_xpath('//button[@type="submit"]').click()
-        self.browser.switch_to.alert.accept()
-        time.sleep(1)
-        self.browser.find_element_by_xpath('//a[text()="Main Menu"]').click()
-        self.browser.find_element_by_xpath('//a[text()="Approve Student"]').click()
-        time.sleep(1)
-        self.browser.find_element_by_xpath('//a[text()="kid1"]').click()
-        self.browser.find_element_by_xpath("//a[@href='/preschoolplay/final-approve/kid1']").click()
-
-    def test_suspend_child_and_make_sure_he_is_on_his_teachers_suspended_list(self):
-        self.browser.get(f'{self.live_server_url}/preschoolplay/login')
-        username_input = self.browser.find_element_by_name("user_name")
-        username_input.send_keys('parent')
-        password_input = self.browser.find_element_by_name("password")
-        password_input.send_keys('qwerty246')
-        self.browser.find_element_by_xpath('//button[@type="submit"]').click()
-        time.sleep(1)
-        self.browser.find_element_by_xpath('//a[text()="Main Menu"]').click()
-        self.browser.find_element_by_xpath('//a[text()="My Children"]').click()
-        time.sleep(1)
-        self.browser.find_element_by_xpath("//h5[@class='card-title' and text()='kid2']")
-        time.sleep(1)
-        self.browser.find_element_by_xpath('//a[text()="Main Menu"]').click()
-        self.browser.find_element_by_xpath('//a[text()="Logout"]').click()
-        self.browser.get(f'{self.live_server_url}/preschoolplay/login')
-        username_input = self.browser.find_element_by_name("user_name")
-        username_input.send_keys('teacher1')
-        password_input = self.browser.find_element_by_name("password")
-        password_input.send_keys('qwerty246')
-        self.browser.find_element_by_xpath('//button[@type="submit"]').click()
-        time.sleep(1)
-        self.browser.find_element_by_xpath('//a[text()="Main Menu"]').click()
-        self.browser.find_element_by_xpath('//a[text()="Child Suspension"]').click()
-        time.sleep(1)
-        self.browser.find_element_by_xpath("//div[contains(., 'kid2')]")
-        time.sleep(1)
-
-    def test_sending_and_receiving_messages_between_two_users(self):
-        def wait_page_load():
-            time.sleep(0.5)
-
-        self.browser.get(f'{self.live_server_url}/preschoolplay/login')
-        username_input = self.browser.find_element_by_name("user_name")
-        username_input.send_keys('user1')
-        password_input = self.browser.find_element_by_name("password")
-        password_input.send_keys('qwerty246')
-        self.browser.find_element_by_xpath('//button[@type="submit"]').click()
-        wait_page_load()
-        self.browser.get(f'{self.live_server_url}/preschoolplay')
-        self.browser.find_element_by_xpath('//a[text()="Main Menu"]').click()
-        wait_page_load()
-        self.browser.find_element_by_xpath('//a[text()="Inbox"]').click()
-        wait_page_load()
-        self.browser.find_element_by_xpath('//a[text()="Send new message"]').click()
-        wait_page_load()
-        self.browser.find_element_by_xpath('//select[@name="receiver"]/option[text()="admin"]').click()
-        wait_page_load()
-        subject_input = self.browser.find_element_by_name("subject")
-        subject_input.send_keys('this new app')
-        subject_input = self.browser.find_element_by_name("body")
-        subject_input.send_keys('random text')
-        self.browser.find_element_by_xpath('//button[@type="submit"]').click()
-        self.browser.get(f'{self.live_server_url}/preschoolplay')
-        self.browser.find_element_by_xpath('//a[text()="Main Menu"]').click()
-        wait_page_load()
-        self.browser.find_element_by_xpath('//a[text()="Logout"]').click()
-        wait_page_load()
-        self.browser.get(f'{self.live_server_url}/preschoolplay/login')
-        username_input = self.browser.find_element_by_name("user_name")
-        username_input.send_keys('admin')
-        password_input = self.browser.find_element_by_name("password")
-        password_input.send_keys('qwerty246')
-        self.browser.find_element_by_xpath('//button[@type="submit"]').click()
-        wait_page_load()
-        self.browser.find_element_by_xpath('//a[text()="Main Menu"]').click()
-        wait_page_load()
-        self.browser.find_element_by_xpath('//a[text()="Inbox(1)"]').click()
-        wait_page_load()
-        self.browser.find_element_by_xpath('//a[text()=" Open"]').click()
-        message_subject = self.browser.find_element_by_xpath('//h3')
-        self.assertEquals('this new app' in message_subject.text, True)
+        response = self.client.get(reverse('Preschool_Play:index'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Add Child")
+        response = self.client.get(reverse('Preschool_Play:create-child'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Name child")
+        form = response.context['form']
+        data = form.initial
+        data['name_child'] = 'John'
+        data['teacher'] = 'teacher1'
+        data['kindergarten'] = 'mypreschool'
+        response = self.client.post(reverse('Preschool_Play:create-child'), data=data)
+        child = Child.objects.filter(name='John', teacher=self.teacher.id, kindergarten=self.kg.id)
+        self.assertTrue(len(child) > 0)
+        response = self.client.get(reverse('Preschool_Play:index'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Delete Child")
+        response = self.client.get(reverse('Preschool_Play:delete-user'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Child")
+        form = response.context['form']
+        choice = None
+        for x in form.fields['child']._get_choices():
+            if x[0] != '':
+                if x[1] == child[0].__str__():
+                    choice = x
+        data = form.initial
+        data['child'] = choice[0]
+        data['password'] = 'qwerty246'
+        response = self.client.post(reverse('Preschool_Play:delete-user'), data=data)
+        child = Child.objects.filter(name='John', teacher=self.teacher.id, kindergarten=self.kg.id)
+        self.assertTrue(len(child) == 0)
 
     def test_register_as_teacher_and_add_kindergarten_and_parent_register_his_child_to_this_kindergarten(self):
-        self.browser.get(f'{self.live_server_url}/preschoolplay/new-user')
-        register_input = self.browser.find_element_by_name("username")
-        register_input.send_keys('teacher2')
-        password_input = self.browser.find_element_by_name("password1")
-        password_input.send_keys('qwerty246')
-        password_input = self.browser.find_element_by_name("password2")
-        password_input.send_keys('qwerty246')
-        self.browser.find_element_by_xpath('//button[@type="submit"]').click()
-        address_input = self.browser.find_element_by_name("address")
-        address_input.send_keys('address')
-        self.browser.find_element_by_xpath('//select/option[text()="teacher"]').click()
-        self.browser.find_element_by_xpath('//button[@type="submit"]').click()
-        self.browser.get(f'{self.live_server_url}/preschoolplay/login')
-        username_input = self.browser.find_element_by_name("user_name")
-        username_input.send_keys('teacher2')
-        password_input = self.browser.find_element_by_name("password")
-        password_input.send_keys('qwerty246')
-        self.browser.find_element_by_xpath('//button[@type="submit"]').click()
-        time.sleep(1)
-        self.browser.find_element_by_xpath('//a[text()="Main Menu"]').click()
-        self.browser.find_element_by_xpath('//a[text()="Create Kindergarten"]').click()
-        time.sleep(1)
-        kn_input = self.browser.find_element_by_name("name")
-        kn_input.send_keys('kindergartenNew')
-        self.browser.find_element_by_xpath('//button[@type="submit"]').click()
-        time.sleep(1)
-        self.browser.find_element_by_xpath('//a[text()="Main Menu"]').click()
-        self.browser.find_element_by_xpath('//a[text()="Logout"]').click()
-        self.browser.get(f'{self.live_server_url}/preschoolplay/login')
-        username_input = self.browser.find_element_by_name("user_name")
-        username_input.send_keys('parent')
-        password_input = self.browser.find_element_by_name("password")
-        password_input.send_keys('qwerty246')
-        self.browser.find_element_by_xpath('//button[@type="submit"]').click()
-        time.sleep(1)
-        self.browser.find_element_by_xpath('//a[text()="Main Menu"]').click()
-        self.browser.find_element_by_xpath('//a[text()="Add Child"]').click()
-        time.sleep(1)
-        child_name = self.browser.find_element_by_name("name_child")
-        child_name.send_keys('kid1')
-        self.browser.find_element_by_xpath('//select/option[text()="teacher2"]').click()
-        self.browser.find_element_by_xpath('//select/option[text()="kindergartenNew"]').click()
-        self.browser.find_element_by_xpath('//button[@type="submit"]').click()
-        time.sleep(1)
+        self.client.logout()
+        # unregistered user go to main page
+        response = self.client.get(reverse('Preschool_Play:index'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Sign-Up")
+        # go to sign up
+        response = self.client.get(reverse('Preschool_Play:new-user'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Username")
+        # post sign up data
+        form = response.context['user_form']
+        data = {'username': 'new-teacher', 'password1': 'qwerty256', 'password2': 'qwerty256'}
+        response = self.client.post(reverse('Preschool_Play:new-user'), data=data, follow=True)
+        # redirected to new profile
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'Preschool_Play/new-profile.html')
+        # post new profile data
+        data = {'address': 'asdf', 'age': 23, 'type': 'teacher'}
+        response = self.client.post(reverse('Preschool_Play:new-profile', args=['new-teacher']), data=data, follow=True)
+        # authenticate
+        up = UserProfile.objects.get(user__username='new-teacher')
+        up.auth = True
+        up.save()
+        # redirected to main page
+        self.assertContains(response, 'Sign-In')
+        self.assertTrue(len(UserProfile.objects.filter(user__username='new-teacher')) > 0)
+        # go to login page
+        response = self.client.get(reverse('Preschool_Play:login'))
+        self.assertContains(response, 'User name')
+        # login
+        self.client.force_login(User.objects.get(username='new-teacher'))
+        self.assertTrue(User.objects.get(username='new-teacher').is_authenticated)
+        response = self.client.get(reverse('Preschool_Play:index'))
+        self.assertContains(response, 'Create Kindergarten')
+        self.assertTrue(User.objects.get(username='new-teacher').is_authenticated)
+        # go to create kindergarten
+        response = self.client.get(reverse('Preschool_Play:create-kindergarten'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Name")
+        # post data to create kindergarten
+        data = {'name': 'new-kinder1'}
+        response = self.client.post(reverse('Preschool_Play:create-kindergarten'), data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(len(Kindergarten.objects.filter(name='new-kinder1')) > 0)
+        self.assertContains(response, "Logout")
+        self.client.logout()
+        self.client.login(username='user1', password='qwerty246')
+        response = self.client.get(reverse('Preschool_Play:create-child'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Name child")
+        data = {'name_child': 'ben2', 'teacher': 'new-teacher', 'kindergarten': 'new-kinder1'}
+        response = self.client.post(reverse('Preschool_Play:create-child'), data=data, follow=True)
+        self.assertTrue(len(Child.objects.filter(name='ben2', parent=self.profile)) > 0)
+        response = self.client.get(reverse('Preschool_Play:parent'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "ben2")
