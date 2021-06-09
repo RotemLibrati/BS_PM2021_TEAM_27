@@ -57,7 +57,7 @@ def score_graphs(request):
                 children = list(Child.objects.filter(parent=request.user.profile).order_by('name'))
             if pair[0] == 'All' and user_is_admin:
                 context['scoreData'] = list(
-                    Score.objects.values(d=ExtractDay('date'), m=ExtractMonth('date'), y=ExtractYear('date')).annotate(
+                    Score.objects.all().order_by('date').values(d=ExtractDay('date'), m=ExtractMonth('date'), y=ExtractYear('date')).annotate(
                         Sum('amount')))
                 context['child_name'] = 'All'
             else:
@@ -66,7 +66,7 @@ def score_graphs(request):
                 context['child_name'] = chosen_child.name
                 if user_is_admin or request.user == parent_user_of_chosen_child or request.user.profile == chosen_child.teacher:
                     context['scoreData'] = list(
-                        Score.objects.filter(child=chosen_child).values(d=ExtractDay('date'), m=ExtractMonth('date'),
+                        Score.objects.filter(child=chosen_child).order_by('date').values(d=ExtractDay('date'), m=ExtractMonth('date'),
                                                                         y=ExtractYear('date')).annotate(
                             Sum('amount')))
                 else:
@@ -93,13 +93,13 @@ def score_graphs(request):
             children = list(Child.objects.filter(parent=request.user.profile).order_by('name'))
         if user_is_admin:
             context['scoreData'] = list(
-                Score.objects.values(d=ExtractDay('date'), m=ExtractMonth('date'), y=ExtractYear('date')).annotate(
+                Score.objects.all().order_by('date').values(d=ExtractDay('date'), m=ExtractMonth('date'), y=ExtractYear('date')).annotate(
                     Sum('amount')))
         else:
             if children.__len__() < 1:
                 return render(request, 'Preschool_Play/error.html', {'message': 'Unauthorized user'})
             context['scoreData'] = list(
-                Score.objects.filter(child=children[0]).values(d=ExtractDay('date'), m=ExtractMonth('date'),
+                Score.objects.filter(child=children[0]).order_by('date').values(d=ExtractDay('date'), m=ExtractMonth('date'),
                                                                y=ExtractYear('date')).annotate(
                     Sum('amount')))
         form = ScoreDataForm()
