@@ -54,21 +54,25 @@ class Command(BaseCommand):
         FAQs = []
         faq = FAQ(question='Can I write masseges for the theacher of my child?',
                   answer='Yes. go to the main menu and press on Inbox, and follow the instructions.')
+        faq.save()
         FAQs.append(faq)
-        FAQs.save()
+
         faq = FAQ(question='How can I see messages from the teacher?',
                   answer='Go to the main menu and press on Inbox, and follow the instructions.')
+        faq.save()
         FAQs.append(faq)
-        FAQs.save()
+
         faq = FAQ(question='How do I get to my childs personal area?', answer='Go to the main menu and press on My Children.')
+        faq.save()
         FAQs.append(faq)
-        FAQs.save()
+
         faq = FAQ(question='How do I add my child to the system?',
                   answer='Go to the main menu and press on Create Child, and follow the instructions.')
+        faq.save()
         FAQs.append(faq)
-        FAQs.save()
+
         faq = FAQ(question='Is it possible to open a personal area for my sons friend?',
                   answer='No. The system is open only for the Registered kindergartens. If the friend is in the same kindergarten he can open a personal area by his mother.')
-
-
+        faq.save()
+        FAQs.append(faq)
 
